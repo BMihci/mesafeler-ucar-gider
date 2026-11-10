@@ -708,5 +708,100 @@ body::before{opacity:.28}
 .ftxt,.float{text-shadow:0 2px 0 var(--ink),0 0 8px #fff;font-weight:900}
 .toast{border:3px solid #fff;outline:2.5px solid var(--ink);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3);background:radial-gradient(ellipse 80% 45% at 50% 6%,rgba(255,255,255,.55),transparent),linear-gradient(180deg,#A878FF,#6A35E0);box-shadow:0 5px 0 #3A1585,0 10px 16px rgba(50,15,100,.4);transition:transform .45s var(--jelly)}
 .toast.show{transform:translate(-50%,0) scale(1)}
+
+/* v11: harita */
+.tmap{margin:0 0 8px;border:3px solid var(--gold2);border-radius:24px;overflow:hidden;box-shadow:0 4px 0 var(--gold3),0 0 0 2px var(--ink)}
+.tmap svg{display:block;width:100%;height:auto}
+.mp-sea{font-size:13px;font-weight:900;fill:#fff;letter-spacing:2px;opacity:.85;stroke:#2E8FC0;stroke-width:.6px}
+.mp-city text{font-size:17px;font-weight:900;fill:#4B2377;stroke:#fff;stroke-width:4px;paint-order:stroke;stroke-linejoin:round}
+.mp-city.on text{fill:#B00F66}
+/* v11: grup yuvaları */
+.nests{display:flex;gap:6px;overflow-x:auto;overflow-y:visible;padding:14px 4px 2px;flex:1 1 auto;min-width:0;max-width:58%;scrollbar-width:none}
+.nests::-webkit-scrollbar{display:none}
+.nests .nest{width:78px;flex:none}
+.nest svg.ns{width:78px;height:62px}
+.nest .nico{position:absolute;left:50%;top:6px;width:38px;height:38px;margin-left:-19px;pointer-events:none;transition:transform .2s var(--jelly)}
+.nest:active .nico{transform:translateY(3px) scale(1.1,.85)}
+.nest.want .nico{animation:jpulse .9s ease-in-out infinite}
+.nest.want::before{content:"";position:absolute;inset:4px 4px 10px;border-radius:50%;box-shadow:0 0 14px 4px rgba(255,230,90,.9);pointer-events:none}
+.nests .nlabel{font-size:9.5px;display:block;max-width:78px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nests .nd{font-size:17px}.nests .nd-t{top:-14px}.nests .nd-l{left:-4px;bottom:18px}.nests .nd-r{right:-4px;bottom:18px}
+
+/* v11: mobil ekran oranı — her şey tek ekrana sığsın */
+@media (max-width:899px){
+  :root{--bw:max(230px,min(calc(100vw - 20px),420px,calc(100dvh - 388px)));--bw:max(230px,min(calc(100vw - 20px),420px,calc(100dvh - 388px)))}
+  .awning{height:9px}.awning::after{height:7px}
+  #app{padding:6px 10px 8px;gap:5px}
+  .top .l2{display:none}.logo{padding-top:6px}.logoCat{width:26px;height:20px;top:-4px}
+  .l1{font-size:clamp(11px,3.5vw,15px);-webkit-text-stroke:4px var(--ink);letter-spacing:0}.hpill{padding:2px 7px!important}.top{gap:5px}
+  .ibtn{width:29px;height:29px;font-size:14px}.hpill{padding:2px 9px;font-size:13px}
+  .distance{padding:3px 10px 0}.d-top{font-size:10px}.d-top .km{font-size:15px}
+  .track{height:28px;margin-top:0}.runner,.goal{width:28px;height:28px}.runner2{display:none}.bar{top:9px;height:11px}
+  .lvcard{padding:4px 8px 5px}.lv-t{font-size:12px}.lv-t small{display:none}.goals{margin-top:3px;gap:4px}
+  .gl .gi{width:24px;height:24px}.gl{font-size:11px}.stat{height:28px}
+  .feed{width:88px;min-height:0;border-radius:20px}
+  .order{padding:5px 7px 6px}.o-head{font-size:12px}.orow{min-height:38px;margin-top:2px;padding:2px 4px}.orow .mini{width:30px;height:30px}
+  .orew{font-size:9px;line-height:1.05}
+  .boardWrap{padding-top:18px}.bcat{width:60px;height:34px;top:-24px}.bcat2{width:44px;height:28px;top:-18px}
+  .board{padding:6px;gap:5px;border-radius:24px}
+  .jbar{padding:2px 6px;gap:6px}.jb{min-height:0}
+  .nestRow{gap:4px;align-items:flex-end}
+  .nests{padding-top:10px;max-width:56%}
+  .nests .nest{width:66px}.nest svg.ns{width:66px;height:52px}.nest .nico{width:32px;height:32px;margin-left:-16px;top:4px}
+  .nests .nlabel{font-size:9px;max-width:66px}
+  .energy{padding:4px 8px}.e-note{display:none}.e-top b{font-size:15px}.ebar{height:9px;margin:2px 0 0}
+  .kit{width:60px}.kitArt{width:60px;height:52px}.kitArt .kb{width:60px}.kitArt .kc{width:38px;margin-left:-19px}
+  #buyEnergy{padding:3px 6px}
+  .coll,.bottom{display:none}
+}
+@media (max-width:899px){
+  .distance{display:flex;align-items:center;gap:8px;padding:2px 10px}
+  .d-top{flex:none;display:block}.d-top>span:first-child,.d-top>span:last-child{display:none}
+  .d-top .km{font-size:14px;white-space:nowrap}.d-top .km small{font-size:10px}
+  .track{flex:1;height:26px;margin:0}.bar{top:8px}.runner,.goal{width:26px;height:26px}
+  .lvcard{display:flex;align-items:center;gap:5px;padding:3px 8px}
+  .lv-top{display:contents}.lv-t{flex:1;min-width:0;order:0;font-size:12px;white-space:nowrap}
+  .goals{order:1;margin:0;flex:none;flex-wrap:nowrap}.gl small{display:none}.gl b{font-size:12px}
+  .lv-top>.stat,.lv-top>.ibtn,.lv-top>button{order:2;flex:none}
+  .orow{min-height:34px;padding:2px 4px;gap:4px}.orow .mini{width:26px;height:26px}.orow .req{padding:1px 6px 1px 2px;gap:3px}.orow .req .rt span{font-size:12px}
+  .odif{width:18px;font-size:8px}.o-head{font-size:11px;margin-bottom:0}.order{padding:4px 6px 5px}
+  :root{--bw:max(230px,min(calc(100vw - 20px),420px,calc(100dvh - 440px)))}
+}
+@media (max-width:899px){
+  .nestRow{flex-wrap:wrap;row-gap:3px;align-items:center}
+  .energy{order:-2;flex:1 1 calc(100% - 92px);display:flex;align-items:center;gap:7px;padding:2px 9px;min-width:0;border-radius:16px}
+  .e-top{flex:none}.ebar{flex:1;margin:0!important}
+  #buyEnergy{order:-1;flex:none}
+  .nests{order:0;flex:1 1 calc(100% - 68px);max-width:none;padding-top:8px}
+  .kit{order:1;width:60px}
+  :root{--bw:max(230px,min(calc(100vw - 20px),420px,calc(100dvh - 488px)))}
+}
+
+/* v11: performans — pahalı efektleri azalt */
+body::before{display:none!important}
+.modal,.jbar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.jbar{background:rgba(255,248,252,.94)!important}
+.item .ico,#feedBird svg,.pip svg,.nest svg.ns{filter:none!important}
+.kx,.item.t6{animation:none!important}
+.item.t6,.kx{box-shadow:inset 0 5px 4px rgba(255,255,255,.9),inset 0 -8px 8px rgba(0,0,0,.14),0 4px 0 var(--t3),0 0 14px 3px rgba(255,220,60,.9)}
+.cell.spot{animation:none!important;box-shadow:0 0 0 4px #FFD66B,0 0 14px 5px rgba(255,200,60,.7)}
+.board{will-change:auto}
+body.eco #bg,body.eco #roam{display:none!important}
+body.eco .idle .fb-in,body.eco .runner2,body.eco .tail,body.eco .eyes,body.eco .ceyes,body.eco .steam,body.eco .track.close .goal,body.eco .item.balloon,body.eco .nest.want .nico,body.eco .req.want,body.eco .item.t6::after,body.eco .dot,body.eco .cell.sel .item{animation:none!important}
+body.eco .cell.sel .item{transform:scale(1.06)}
+body.eco .panel,body.eco .mcard,body.eco .board{box-shadow:0 4px 0 var(--gold3)!important}
+body.eco .item{box-shadow:inset 0 4px 3px rgba(255,255,255,.8),0 3px 0 var(--t3)!important}
+body.eco .btn{box-shadow:0 4px 0 #9C0F5C!important}
+body.eco .btn.soft{box-shadow:0 4px 0 #4FA7D0!important}
+body.eco .spk{filter:none}
+.modal:not(#mBook):not(#mShop):not(#mSettings):not(#mGift){z-index:95}
+.toast,.spk,.floaty{pointer-events:none}
+svg.ui{display:inline-block;width:1.18em;height:1.18em;vertical-align:-.24em;overflow:visible;flex:none}
+.eic{display:inline}
+.spk svg.ui{width:1em;height:1em;vertical-align:top}
+.x svg.ui,.ibtn svg.ui{width:1em;height:1em;vertical-align:middle}
+.ibtn svg.ui{width:19px;height:19px}
+.mp-me{animation:mpbob 1.8s ease-in-out infinite}@keyframes mpbob{50%{transform:translateY(-3px)}}
+body.eco .mp-me{animation:none}
 </style>
 </head>

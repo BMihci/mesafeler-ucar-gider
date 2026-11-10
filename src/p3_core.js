@@ -6,11 +6,15 @@
    ===================================================================== */
 const CELLS=25,KM_TOTAL=940,KEY0='pofuduk-kuslar-v2',SLOTKEY='pk-active-slot',KEY1='pofuduk-kuslar-mesafe-ask-v1';
 const MAXL={a:6,c:6};
+/* üretim grupları: her grubun kendi yuvası var, ikonlar sabit; yeni grup ilerledikçe açılır */
+const GROUPS=['post','flower','sweet','coffee','fruit','sea','camp','kitchen'];
+const GROUP_AT=[1,3,9,17,27,39,52,66];
+const groupsAt=n=>GROUPS.filter((g,i)=>n>=GROUP_AT[i]);
 const BAL={
   energyBase:50,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
   regenMs:50000,regenPerPost:.10,regenPerCat:.02,
   kitMs:45000,kitMax:3,kitPerCat:.05,
-  unlockCost:5,orderEnergy:2,orderHearts:2,
+  unlockCost:5,orderEnergy:1,orderHearts:2,
   rushMs:100000,rushEvery:4,rushMult:2,
   boxChance:.10,boxMinLevel:3,
   buyEnergyCost:30,buyEnergyAmt:8,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
@@ -52,6 +56,8 @@ const REGION_TRACK=['bosph','forest','steppe','cappa','snow','coffee','sea','ada
 
 /* ---------- yardımcılar ---------- */
 const $=s=>document.querySelector(s);
+/* pil tasarrufu: dokunmatik cihazlarda varsayılan açık */
+const ecoOn=()=>!!(state&&state.settings&&(state.settings.eco===null||state.settings.eco===undefined?(matchMedia&&matchMedia('(pointer:coarse)').matches):state.settings.eco));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -76,7 +82,7 @@ const regenMs=()=>Math.round(BAL.regenMs*(1-BAL.regenPerPost*state.up.post)*(1-B
 const kitMs=()=>Math.round(BAL.kitMs*(1-BAL.kitPerCat*state.maxC));
 
 /* ---------- durum ---------- */
-function defaultSettings(){return{sfx:true,music:true,sfxVol:.8,musVol:.7,track:'auto',unlimited:false,lang:'tr',names:{me:'Bird',you:'Birdie'}}}
+function defaultSettings(){return{sfx:true,music:true,sfxVol:.8,musVol:.7,track:'auto',unlimited:false,eco:null,art:'gh',lang:'tr',names:{me:'Bird',you:'Birdie'}}}
 function defState(settings){
   const board=Array(CELLS).fill(null);
   [6,7,11,13,17].forEach(i=>board[i]={t:'a',l:1,k:false});
@@ -246,7 +252,7 @@ const iPad=(ns,t,d,v)=>ns.forEach(n=>{const f=mf(n);osc('triangle',f,t,d,musicIn
 const iBass=(n,t,d,v)=>{const f=mf(n);osc('sine',f,t,d,musicIn,v,.01);osc('triangle',f*2,t,d*.5,musicIn,v*.25,.01)};
 const iPluck=(n,t,d,v)=>{const f=mf(n);osc('triangle',f,t,d,musicIn,v,.003);osc('square',f,t,d*.3,musicIn,v*.06,.002)};
 function kick(t,v){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+.14);env(g,t,.003,.18,v);o.connect(g);g.connect(musicIn);o.start(t);o.stop(t+.26)}
-function noiseHit(t,d,v,type,freq){const s=AC.createBufferSource();s.buffer=noise();const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();env(g,t,.002,d,v);s.connect(f);f.connect(g);g.connect(musicIn);s.start(t,Math.random()*.5,d+.05)}
+function noiseHit(t,d,v,type,freq){if(ecoOn())return;const s=AC.createBufferSource();s.buffer=noise();const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();env(g,t,.002,d,v);s.connect(f);f.connect(g);g.connect(musicIn);s.start(t,Math.random()*.5,d+.05)}
 const hat=(t,v)=>noiseHit(t,.04,v,'highpass',7500);
 const snare=(t,v)=>noiseHit(t,.12,v,'bandpass',1900);
 const nearestIdx=(arr,v)=>{let bi=0,bd=1e9;arr.forEach((x,i)=>{const d=Math.abs(x-v);if(d<bd){bd=d;bi=i}});return bi};
@@ -360,7 +366,7 @@ function desiredTrack(){
 function startMusic(){
   if(!AC||musicTimer||!state.settings.music)return;
   trackKey=desiredTrack();mNextT=AC.currentTime+.15;mStep=0;
-  musicTimer=setInterval(schedMusic,200);applyVolumes();schedMusic();
+  musicTimer=setInterval(schedMusic,ecoOn()?300:200);applyVolumes();schedMusic();
 }
 function stopMusic(){
   clearInterval(musicTimer);musicTimer=0;

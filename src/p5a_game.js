@@ -13,7 +13,7 @@ function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 
 /* ---------- parçacıklar ---------- */
 const cv=$('#fx'),ctx=cv.getContext('2d');let parts=[],raf=0,lastT=0;
-function resizeCv(){const d=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0)}
+function resizeCv(){const d=ecoOn()?1:Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0)}
 addEventListener('resize',resizeCv);resizeCv();
 function heartPath(c,s){c.beginPath();c.moveTo(0,s*.6);c.bezierCurveTo(-s*1.1,-s*.1,-s*.6,-s*.9,0,-s*.25);c.bezierCurveTo(s*.6,-s*.9,s*1.1,-s*.1,0,s*.6);c.closePath()}
 function addPart(p){parts.push(p);if(!raf){lastT=performance.now();raf=requestAnimationFrame(loop)}}
@@ -36,9 +36,9 @@ function loop(t){
 const PAL=['#FF7FA3','#FFB3C7','#FFD66B','#FFFFFF','#B9E8CD','#D1C2F6','#B6DCF8'];
 function sparkle(x,y,n){
   if(matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  n=Math.min(n||8,14);const em=['⭐','✨','💖','🌟','💛','🎀','💗'];
+  n=Math.min(n||8,14);const em=['star','sparkle','heart2','star','sparkle','ribbon','heart'];
   for(let i=0;i<n;i++){
-    const e=document.createElement('div');e.className='spk';e.textContent=rnd(em);
+    const e=document.createElement('div');e.className='spk';e.innerHTML=emoSvg(rnd(em));
     const a=Math.random()*Math.PI*2,d=36+Math.random()*80,r=(Math.random()-.5)*260;
     e.style.left=x+'px';e.style.top=y+'px';e.style.fontSize=(12+Math.random()*14)+'px';
     document.body.appendChild(e);
@@ -68,17 +68,21 @@ function cellCenter(i){const r=cellEls[i].getBoundingClientRect();return{x:r.lef
 function elCenter(e){const r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
 
 /* ---------- modal yöneticisi (kuyruklu) ---------- */
-const mq=[];let mCur=null;
+const mq=[];let mCur=null,ovCur=null;
+const PANEL=['mBook','mShop','mSettings','mGift'];
 function showModal(id,prep){
-  if(mCur){if(mCur===id){if(prep)prep();return}mq.push({id,prep});return}
+  /* defter/dükkan açıkken not ve çizgi roman ÜSTTE açılır (kuyruğa girmez) */
+  if(mCur&&PANEL.includes(mCur)&&!PANEL.includes(id)){ovCur=id;if(prep)prep();$('#'+id).classList.add('open');return}
+  if(mCur){if(mCur===id){if(prep)prep();return}if(!mq.some(m=>m.id===id))mq.push({id,prep});else{const m=mq.find(m=>m.id===id);m.prep=prep}return}
   mCur=id;if(prep)prep();$('#'+id).classList.add('open');
 }
 function closeModal(id){
   const el=$('#'+id);if(!el)return;el.classList.remove('open');
+  if(ovCur===id){ovCur=null;return}
   if(mCur===id){mCur=null;const nx=mq.shift();if(nx)setTimeout(()=>{if(!mCur)showModal(nx.id,nx.prep)},260)}
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-close]');if(b)closeModal(b.dataset.close)});
-['mSettings','mBook','mShop'].forEach(id=>$('#'+id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
+['mSettings','mBook','mShop','mGift'].forEach(id=>$('#'+id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)}));
 function showNote(o){
   showModal('mNote',()=>{
     $('#noteArt').innerHTML=o.art||'';$('#noteTitle').textContent=o.title||'';
@@ -171,6 +175,7 @@ function renderKit(){
 }
 let lastHearts=-1;
 function renderHUD(){
+  renderNests();
   $('#hearts').textContent=state.hearts;$('#shopHearts').textContent=state.hearts;
   if(lastHearts>=0&&state.hearts!==lastHearts){const p=$('#heartPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}
   lastHearts=state.hearts;
@@ -181,17 +186,34 @@ function renderHUD(){
 }
 
 /* ---------- üretim ---------- */
-function spawn(){
-  ensureAudio();
-  const unl=state.settings.unlimited,nest=$('#nest');
+function spawn(k){
+  ensureAudio();k=k||'post';
+  const unl=state.settings.unlimited,nest=document.querySelector('.nest[data-k="'+k+'"]')||$('#nest');
   if(!lvActive()){sfx('err');toast(T('Önce haritadan bir seviye seç 🗺️','Pick a level on the map first 🗺️'));bounceEl(nest);return}
   if(!unl&&state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da altınla enerji al','Out of energy! Deliver orders, wait, or buy energy with coins'));bounceEl(nest);afterAction();return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}
   if(!unl)state.energy--;
   const l=Math.random()<BAL.nestL2*state.up.nest?2:1;
-  place(newItem(l),'spawn');
+  place(newItem(l,k),'spawn');
   state.stats.spawns++;ev('spawn');state.lv.spawned++;state.lv.usedMoves++;
   sfx('pop');buzz(8);mechTick();renderBoard();renderHUD();tutAdv('spawn');afterAction();saveSoon();
+}
+const NEST_LBL={post:['Mektup','Letters']};
+const nestSvg='<svg class="ns" viewBox="0 0 140 110" aria-hidden="true"><ellipse cx="70" cy="101" rx="52" ry="7" fill="rgba(107,74,69,.18)"/><ellipse class="nb1" cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/><path class="nb2" d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/><path class="nb3" d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/></svg>';
+let nestSig='';
+function unlockedGroups(){return groupsAt(state.saga?state.saga.n:1)}
+function renderNests(){
+  const gs=unlockedGroups(),sig=gs.join()+'|'+lang();
+  const box=$('#nests');
+  if(sig===nestSig&&box.children.length)return;
+  nestSig=sig;
+  box.innerHTML=gs.map((k,i)=>{
+    const nm=NEST_LBL[k]?T(NEST_LBL[k][0],NEST_LBL[k][1]):T(SETS[k].n[0],SETS[k].n[1]);
+    return '<button class="nest" data-k="'+k+'"'+(i===0?' id="nest"':'')+' aria-label="'+nm+'">'+GS(nestSvg)+'<span class="nico mini t1">'+itemIcon('a',1,k)+'</span>'+
+      (i===0?'<span class="nd nd-t" id="ndT"></span><span class="nd nd-l" id="ndL"></span><span class="nd nd-r" id="ndR"></span>':'')+'<span class="nlabel">'+nm+'</span></button>';
+  }).join('');
+  if(typeof applyNest==='function')applyNest();
+  updateWant();
 }
 function takeKitten(){
   ensureAudio();tickKit();const kb=$('#kitBtn');
@@ -336,23 +358,31 @@ function pickSet(){
   if(w.length&&r<.8)return rnd(w);
   return rnd(sets);
 }
-function newItem(l){
-  const k=pickSet();
+function newItem(l,fk){
+  const k=fk||pickSet();
   if(k==='cat')return{t:'c',l:1,k:false};
   return (k==='post'||!SETS[k]||!SETS[k].it)?{t:'a',l,k:false}:{t:'a',s:k,l,k:false};
 }
 function makeOrder(d){
   d=d==null?1:d;
-  const m=state.lv?state.lv.mech:null,lo=m?m.oLo:2,hi=m?m.oHi:3;
-  const sets=lvSets(),reqs=[],used=new Set(),cnt=(d===2&&(!state.lv||state.lv.n>=4))?2:1;
-  for(let n=0,tr=0;n<cnt&&tr<60;tr++){
-    const k=rnd(sets);
-    let l=d===0?Math.max(1,lo-1+(Math.random()<.5?0:1)):d===1?rint(lo,hi):rint(Math.max(lo,hi-1),Math.min(6,hi+(hi<5?1:0)));
-    if(k==='cat'){l=clamp(l,2,4);const key='c'+l;if(used.has(key))continue;used.add(key);reqs.push({t:'c',l,need:1,got:0});n++;continue}
+  const n=state.lv?state.lv.n:1;
+  // zorluk eğrisi: ilk seviyelerde basit, ilerledikçe yavaş yavaş zorlaşır
+  const hi=clamp(2+Math.floor(n/14),2,6);
+  const sets=lvSets(),reqs=[],used=new Set();
+  const cnt=(d===2&&n>=10)?2:1;
+  // yeni açılan grup daha sık istenir
+  const pool=[];sets.forEach((k,i)=>{pool.push(k);if(k!=='cat'&&i===sets.filter(x=>x!=='cat').length-1&&sets.length>1)pool.push(k)});
+  for(let t=0,got=0;got<cnt&&t<60;t++){
+    const k=rnd(pool);
+    let l;
+    if(d===0)l=rint(Math.max(1,hi-2),Math.max(1,hi-1));
+    else if(d===1)l=rint(Math.max(1,hi-1),hi);
+    else l=rint(hi,Math.min(6,hi+(n>=20?1:0)));
+    if(k==='cat'){l=clamp(l,2,4);const key='c'+l;if(used.has(key))continue;used.add(key);reqs.push({t:'c',l,need:1,got:0});got++;continue}
     const key=k+l;if(used.has(key))continue;used.add(key);
-    const need=(l===1)?rint(2,3):((l===2&&d<2&&Math.random()<.5)?2:1);
+    const need=(l===1)?rint(2,3):((l===2&&(d<2||n<10))?rint(1,2):1);
     const q={t:'a',l,need,got:0};if(k!=='post'&&SETS[k]&&SETS[k].it)q.s=k;
-    reqs.push(q);n++;
+    reqs.push(q);got++;
   }
   if(!reqs.length)reqs.push({t:'a',l:2,need:1,got:0});
   return{reqs,done:false,say:0,d};
@@ -383,6 +413,7 @@ function renderOrder(swapIdx){
 function tickRush(){}
 function updateWant(){
   const c=sel!=null?state.board[sel]:null;
+  if(state.orders){const w=wantedSets();document.querySelectorAll('.nest').forEach(n=>n.classList.toggle('want',w.includes(n.dataset.k)))}
   [...$('#ords').querySelectorAll('.req')].forEach(el=>{
     const o=state.orders[+el.dataset.o],r=o&&o.reqs[+el.dataset.r];
     el.classList.toggle('want',!!(c&&r&&!o.done&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need));

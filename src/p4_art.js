@@ -1,7 +1,27 @@
 /* =====================================================================
    SANAT: kuşlar, kediler, eşya ikonları, çizgi roman sahneleri (hepsi inline SVG)
    ===================================================================== */
-const INK='#6B4A45';
+const INK='#5A4636';
+/* v14: suluboya renk süzgeci — doygunluğu kıs, sıcak kâğıt tonuna çek */
+const __gsc={};
+function GS(s){
+  if(!document.body||!document.body.classList.contains('gh'))return s;
+  s=s.replace(/#4B2377|#6B4A45/gi,'#5A4636');
+  return s.replace(/#([0-9A-Fa-f]{6})\b/g,(m,h)=>{
+    const k=h.toUpperCase();if(__gsc[k])return __gsc[k];
+    if(k==='5A4636'||k==='FFFFFF'||k==='FFF6E0'){return __gsc[k]=m}
+    let r=parseInt(k.slice(0,2),16)/255,g=parseInt(k.slice(2,4),16)/255,b=parseInt(k.slice(4,6),16)/255;
+    const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let H=0,S=0,L=(mx+mn)/2;
+    if(mx!==mn){const d=mx-mn;S=L>.5?d/(2-mx-mn):d/(mx+mn);
+      H=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;H/=6}
+    if(H>.72&&H<.8)H=H*.6+.1;/* mor -> sıcak gül */
+    S=S*.72;L=L*.93+.06;
+    const f=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p};
+    let R,G,B;if(S===0){R=G=B=L}else{const q=L<.5?L*(1+S):L+S-L*S,p=2*L-q;R=f(p,q,H+1/3);G=f(p,q,H);B=f(p,q,H-1/3)}
+    const x=v=>('0'+Math.round(v*255).toString(16)).slice(-2);
+    return __gsc[k]='#'+(x(R)+x(G)+x(B)).toUpperCase();
+  });
+}
 const HP='M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z';
 const st=w=>'stroke="'+INK+'" stroke-width="'+(w||2.6)+'" stroke-linejoin="round" stroke-linecap="round"';
 
@@ -150,7 +170,7 @@ function peekSVG(o){
 }
 
 /* ---- eşya ikonları (viewBox 64) ---- */
-const wrapIco=inner=>'<svg class="ico" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+inner+'</svg>';
+const wrapIco=inner=>GS('<svg class="ico" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+inner+'</svg>');
 const TB='#E8B98A',TM='#FFE3C8';
 const ICON_A=[null,
   /*1 mektup*/'<g '+st(2.4)+'><rect x="8" y="17" width="48" height="32" rx="5" fill="#FFF9EE"/><path d="M8 20L32 38L56 20" fill="#FFD3DF"/><path d="M8 47L25 33M56 47L39 33" fill="none"/></g><circle cx="32" cy="38" r="7.5" fill="#FF6F91" '+st(2.2)+'/><path transform="translate(32 38) scale(.5)" d="'+HP+'" fill="#fff"/>',
@@ -185,8 +205,8 @@ const SETS={
 };
 const setOf=c=>(c&&c.s&&SETS[c.s])?c.s:'post';
 function emoIcon(s,l){
-  const it=SETS[s].it[l-1],ring=l>=5?'#FFC94D':INK;
-  return wrapIco('<circle cx="32" cy="33" r="27" fill="'+SETS[s].c+'" stroke="'+ring+'" stroke-width="'+(l>=5?3.4:2.4)+'"/><path d="M13 26Q18 11 35 8" stroke="#fff" stroke-opacity=".85" stroke-width="3.4" fill="none" stroke-linecap="round"/><text x="32" y="46.5" text-anchor="middle" font-size="37" font-family=\''+EMO_FONT.replace(/"/g,'')+'\'>'+it[0]+'</text>'+(l>=5?'<path d="M51 8l1.8 4 4 1.8-4 1.8L51 20l-1.8-4.4-4-1.8 4-1.8z" fill="#FFC94D" stroke="'+INK+'" stroke-width="1.4"/>':''));
+  const it=SETS[s].it[l-1],ring=l>=5?'#FFC94D':INK,art=ITEM_ART[s]&&ITEM_ART[s][l-1];
+  return wrapIco('<circle cx="32" cy="33" r="27" fill="'+SETS[s].c+'" stroke="'+ring+'" stroke-width="'+(l>=5?3.4:2.4)+'"/><path d="M13 26Q18 11 35 8" stroke="#fff" stroke-opacity=".85" stroke-width="3.4" fill="none" stroke-linecap="round"/>'+(art?'<g transform="translate(11 12) scale(.66)">'+art+'</g>':'<text x="32" y="46.5" text-anchor="middle" font-size="37" font-family=\''+EMO_FONT.replace(/"/g,'')+'\'>'+it[0]+'</text>')+(l>=5?'<path d="M51 8l1.8 4 4 1.8-4 1.8L51 20l-1.8-4.4-4-1.8 4-1.8z" fill="#FFC94D" stroke="'+INK+'" stroke-width="1.4"/>':''));
 }
 function itemIcon(t,l,s){
   if(t==='m')return wrapIco(ICON_MOSS);

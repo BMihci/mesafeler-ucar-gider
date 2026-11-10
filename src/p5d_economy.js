@@ -250,7 +250,7 @@ const SHOP_TABS=[['joker','🔨'],['wear','🎀'],['board','🎨'],['nest','🏡
 const SLOT_N={t:['Üst','Top'],l:['Sol','Left'],r:['Sağ','Right']};
 function applyNest(){
   if(!state||!state.nest)return;
-  const el=$('#nest');if(!el)return;
+  const el=$('#nests');if(!el)return;
   const c=NEST_SKINS[state.nest.skin].c;
   el.style.setProperty('--nst1',c[0]);el.style.setProperty('--nst2',c[1]);el.style.setProperty('--nst3',c[2]);
   ['l','r','t'].forEach(s=>{const d=state.nest.decor[s],n=$('#nd'+s.toUpperCase());if(n)n.textContent=d?NEST_DECOR[d].e:''});

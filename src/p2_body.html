@@ -7,6 +7,7 @@
     <div class="logo"><div class="logoCat" id="logoCat"></div><span class="l1" data-en="Distances Fly Away">Mesafeler Uçar Gider</span><span class="l2" data-en="Bird &amp; Birdie · Long-distance love 💞">Bird &amp; Birdie · Uzak mesafe aşkı 💞</span></div>
     <div class="hpill" id="heartPill">❤ <b id="hearts">0</b></div>
     <button class="ibtn" id="btnBook" aria-label="Defter">📖<i class="dot" id="bookDot"></i></button>
+    <button class="ibtn" id="btnGift" aria-label="Hediye">🎁</button>
     <button class="ibtn" id="btnShop" aria-label="Dükkan">🛍️</button>
     <button class="ibtn" id="btnSettings" aria-label="Ayarlar">⚙️</button>
   </header>
@@ -66,25 +67,7 @@
   <section class="jbar" id="jbar"></section>
 
   <section class="nestRow">
-    <button class="nest" id="nest" aria-label="Yuva">
-      <svg class="ns" viewBox="0 0 140 110" aria-hidden="true">
-        <ellipse cx="70" cy="101" rx="52" ry="7" fill="rgba(107,74,69,.18)"/>
-        <ellipse class="nb1" cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
-        <g class="nchick" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round">
-          <ellipse cx="70" cy="52" rx="27" ry="25" fill="#FFE08A"/>
-          <path d="M64 29q-4-13 2-11 1-8 5 2 6-4 1 9z" fill="#FFE08A"/>
-          <circle cx="60" cy="52" r="3.6" fill="#5B3A3A" stroke="none"/><circle cx="80" cy="52" r="3.6" fill="#5B3A3A" stroke="none"/>
-          <circle cx="59" cy="50.8" r="1.2" fill="#fff" stroke="none"/><circle cx="79" cy="50.8" r="1.2" fill="#fff" stroke="none"/>
-          <path d="M66 57h8l-4 5z" fill="#FF9F5A" stroke-width="2"/>
-          <ellipse cx="53" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/><ellipse cx="87" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/>
-        </g>
-        <path class="nb2" d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
-        <path class="nb3" d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
-        <path transform="translate(116 36) scale(1.1)" d="M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z" fill="#FF8FB0" stroke="#6B4A45" stroke-width="2"/>
-      </svg>
-      <span class="nd nd-t" id="ndT"></span><span class="nd nd-l" id="ndL"></span><span class="nd nd-r" id="ndR"></span>
-      <span class="nlabel" id="nestLabel">Yuva · ✉️ üret</span>
-    </button>
+    <div class="nests" id="nests"></div>
     <div class="panel energy">
       <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
       <div class="ebar"><i id="eFill"></i></div>
@@ -248,6 +231,8 @@
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
+      <div class="mrow"><div><span data-en="🎨 Art style: storybook watercolor">🎨 Çizim stili: masal / suluboya</span><small data-en="Hand-painted storybook look. Turn off for the glossy candy look">El boyaması masal görünümü. Kapatırsan parlak şeker görünümüne döner</small></div><label class="sw"><input type="checkbox" id="swArt"><span></span></label></div>
+      <div class="mrow"><div><span data-en="🔋 Battery saver">🔋 Pil tasarrufu</span><small data-en="Fewer animations, lighter music — keeps the phone cool">Daha az animasyon, hafif müzik — telefon ısınmasın</small></div><label class="sw"><input type="checkbox" id="swEco"><span></span></label></div>
       <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
     </div>
     <div class="mbtns">
@@ -275,6 +260,14 @@
     <div class="mhead"><h2 data-en="📖 Journal">📖 Defter</h2><button class="x" data-close="mBook">✕</button></div>
     <div class="tabs" id="bookTabs"></div>
     <div class="mbody" id="bookBody"></div>
+  </div>
+</div>
+
+<!-- Hediye -->
+<div class="modal" id="mGift">
+  <div class="mcard wide">
+    <div class="mhead"><h2 data-en="🎁 Gift">🎁 Hediye</h2><button class="x" data-close="mGift">✕</button></div>
+    <div class="mbody" id="giftBody"></div>
   </div>
 </div>
 

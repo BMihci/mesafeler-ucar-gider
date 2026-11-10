@@ -1,0 +1,214 @@
+
+/* =====================================================================
+   v14 — EL BOYAMASI / SULUBOYA MASAL DÜNYASI (Ghibli'den esinli, özgün)
+   body.gh = varsayılan · Ayarlar > Çizim stili ile "Şeker" a dönülebilir
+   ===================================================================== */
+body.gh{
+  --ink:#4E3B2C;--ink2:#8A7258;--paper:#FBF4E2;
+  --pink:#E39A8E;--pinkd:#B35A4F;--pink2:#F6D5C8;
+  --bg1:#CDE6E2;--bg2:#F5F0D8;--bg3:#D6E6B4;
+  --tray1:#C9A06A;--tray2:#A97C4C;--trayE:#6E4A2A;--cell:#FCF3DC;--cellS:#E6D2A6;
+  --sh:rgba(78,59,44,.28);
+  --gold1:#F4DE96;--gold2:#C99B4E;--gold3:#8E6A32;
+  --jelly:cubic-bezier(.34,1.25,.5,1);
+  font-family:"Palatino Linotype","Book Antiqua",Palatino,"Iowan Old Style",Georgia,"Nunito",serif;
+  color:var(--ink);
+}
+body.gh[data-theme=autumn]{--bg1:#F3DDB8;--bg2:#F7E8C6;--bg3:#E4C28A;--pink:#E3965A;--pinkd:#B25F27;--pink2:#F6D3A9}
+body.gh[data-theme=snow]{--bg1:#DCEAF2;--bg2:#EEF4F5;--bg3:#C9DCE8;--pink:#8FB4CF;--pinkd:#4F7FA3;--pink2:#CFE2EF}
+body.gh[data-theme=bosphorus]{--bg1:#BFDCE6;--bg2:#F4E8DA;--bg3:#F0D3BE}
+body.gh[data-theme=forest]{--bg1:#BFDEC6;--bg2:#E5F0D2;--bg3:#A9CE9E}
+body.gh[data-theme=steppe]{--bg1:#E4EBC8;--bg2:#F6EDC4;--bg3:#E3CE8E}
+body.gh[data-theme=cappa]{--bg1:#F2D7C4;--bg2:#F8E6D0;--bg3:#E2B896}
+body.gh[data-theme=taurus]{--bg1:#CFDDE4;--bg2:#EAF0EA;--bg3:#BBCFC3}
+body.gh[data-theme=plain]{--bg1:#E8EBC2;--bg2:#F7EFC6;--bg3:#DCCB86}
+body.gh[data-theme=sea]{--bg1:#B8E0E0;--bg2:#EAF4E4;--bg3:#C6E3D0}
+body.gh[data-theme=adana]{--bg1:#F2D9B8;--bg2:#F8E6C4;--bg3:#E8C48C}
+
+/* gökyüzü: yumuşak sulu boya yıkaması + kağıt dokusu */
+body.gh{background:
+  radial-gradient(ellipse 60% 30% at 18% 10%,rgba(255,255,255,.75) 0,transparent 70%),
+  radial-gradient(ellipse 50% 24% at 86% 24%,rgba(255,255,255,.55) 0,transparent 70%),
+  radial-gradient(ellipse 70% 30% at 60% 88%,rgba(255,244,190,.5) 0,transparent 70%),
+  linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed}
+body.gh::before{display:block!important;opacity:.5;mix-blend-mode:multiply}
+body.gh.eco::before{display:none!important}
+
+/* ---- üst şerit: dokuma bez tente ---- */
+body.gh .awning{height:12px;border-bottom:2px solid var(--ink);box-shadow:0 2px 6px rgba(78,59,44,.2);
+  background:repeating-linear-gradient(90deg,#E8A79B 0 24px,#FBF0DA 24px 48px)}
+body.gh .awning::after{filter:drop-shadow(0 2px 0 rgba(78,59,44,.55))}
+
+/* ---- kağıt paneller ---- */
+body.gh .panel{border:2px solid rgba(78,59,44,.75);border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,252,240,.96),rgba(250,240,214,.96));
+  box-shadow:0 3px 0 rgba(78,59,44,.18),inset 0 0 0 3px rgba(255,255,255,.55),inset 0 -6px 14px rgba(200,160,100,.14),0 8px 16px rgba(78,59,44,.16)}
+body.gh .hpill,body.gh .stat{border:2px solid rgba(78,59,44,.75);background:linear-gradient(180deg,#FFFBEA,#F4E6B8);
+  box-shadow:0 2px 0 rgba(78,59,44,.25),inset 0 2px 0 rgba(255,255,255,.8),0 4px 8px rgba(78,59,44,.14);color:var(--ink);text-shadow:none}
+body.gh .ibtn{border:2px solid rgba(78,59,44,.8);outline:none;
+  background:radial-gradient(ellipse at 50% 0,rgba(255,255,255,.7) 0 35%,transparent 36%),linear-gradient(180deg,#BFE3D8,#8CC3B4 70%,#74AE9F);
+  box-shadow:0 3px 0 #4E7F72,inset 0 -3px 0 rgba(0,0,0,.08),0 6px 8px rgba(78,59,44,.2)}
+body.gh .ibtn:active{box-shadow:0 1px 0 #4E7F72}
+body.gh .dot{background:radial-gradient(circle at 35% 30%,#fff 0 2px,#E8786C 3px,#C0483E);border-color:#FFF6E0}
+
+/* ---- başlık: el yazısı gibi serif ---- */
+body.gh .l1{font-family:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;font-style:italic;font-weight:700;
+  color:#FFF6DC;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill;text-shadow:0 2px 0 rgba(78,59,44,.55),0 4px 8px rgba(78,59,44,.25);letter-spacing:.3px}
+body.gh .l2{color:#FFF6DC;text-shadow:0 1px 0 var(--ink),0 0 6px rgba(78,59,44,.5);font-style:italic;font-weight:700}
+body.gh h2,body.gh .mcard h2,body.gh .o-head,body.gh .tl0{font-family:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;font-weight:700}
+
+/* ---- mesafe çubuğu: iplik ---- */
+body.gh .bar{border:2px solid var(--ink);height:12px;top:14px;background:repeating-linear-gradient(90deg,#FFF9EA 0 8px,#F3E5C4 8px 14px);box-shadow:inset 0 2px 3px rgba(78,59,44,.2)}
+body.gh .fill{background:linear-gradient(180deg,#F5BDB0 0,#E39A8E 55%,#C97466 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
+
+/* ---- butonlar: boyalı tahta düğme ---- */
+body.gh .btn{border:2px solid var(--ink);color:#FFF8E6;text-shadow:0 1px 0 rgba(78,59,44,.55);font-weight:700;
+  background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.4) 0,transparent 100%),linear-gradient(180deg,#EDA89C 0,#E08F82 55%,#CB7466 100%);
+  box-shadow:0 4px 0 #8E4A40,inset 0 0 0 2px rgba(255,255,255,.28),0 8px 12px rgba(78,59,44,.2);transition:transform .22s var(--jelly),box-shadow .2s}
+body.gh .btn:hover{transform:translateY(-1px)}
+body.gh .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #8E4A40,inset 0 0 0 2px rgba(255,255,255,.28)}
+body.gh .btn.soft{color:var(--ink);text-shadow:0 1px 0 rgba(255,255,255,.7);
+  background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.8) 0,transparent 100%),linear-gradient(180deg,#FFFBEA,#F2E6C2 60%,#E6D4A2);
+  box-shadow:0 4px 0 #A58A55,inset 0 0 0 2px rgba(255,255,255,.7),0 8px 12px rgba(78,59,44,.14)}
+body.gh .btn.danger{background:linear-gradient(180deg,#F2C58A,#E4A15A 55%,#CE8541);box-shadow:0 4px 0 #8A5A25,inset 0 0 0 2px rgba(255,255,255,.28)}
+body.gh .btn.dis{filter:grayscale(.6);opacity:.7}
+
+/* ---- siparişler: kraft kâğıt etiketler ---- */
+body.gh .orow{border:2px solid #9CC49A;background:linear-gradient(180deg,#FFFDF2,#E9F2D6);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 2px 0 #7BA37A}
+body.gh .orow.d1{border-color:#E4A99E;background:linear-gradient(180deg,#FFFDF2,#FBE4DA);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 2px 0 #C47C6F}
+body.gh .orow.d2{border-color:#E2C060;background:linear-gradient(180deg,#FFFDF2,#FBF0C6);box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 2px 0 #B8932E}
+body.gh .odif{color:#D9A21E;text-shadow:0 1px 0 #fff}
+body.gh .orew{color:#A8493F;text-shadow:0 1px 0 #fff}
+body.gh .req{border:2px dashed #D98B7E;background:linear-gradient(180deg,#FFFDF2,#FBEBDD);box-shadow:inset 0 2px 0 #fff}
+body.gh .req.want{border-color:#7FB488;background:linear-gradient(180deg,#FFFDF2,#E1F1D6);animation:ghPulse 1.6s ease-in-out infinite}
+body.gh .req.over{transform:scale(1.06)}
+body.gh .mini{border:2px solid var(--ink);box-shadow:inset 0 2px 0 rgba(255,255,255,.7),0 2px 0 var(--t3)}
+body.gh #orderReward{background:linear-gradient(180deg,#FBEFB4,#EFD27A);border:2px solid var(--gold3);color:#6B4A1E;box-shadow:inset 0 2px 0 #fff}
+body.gh .o-head{text-shadow:0 1px 0 #fff}
+
+/* ---- görüntülü konuşma penceresi: ahşap tablo çerçevesi ---- */
+body.gh .feed{border:5px solid #9B6E40;border-radius:20px;background:#CFE8EA;
+  box-shadow:0 0 0 2px var(--ink),0 5px 0 2px #6E4A2A,inset 0 0 0 2px rgba(255,245,220,.7),inset 0 -10px 16px rgba(120,160,120,.18),0 12px 18px rgba(78,59,44,.3)}
+body.gh .feed::after{background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0))}
+body.gh .live{background:linear-gradient(180deg,#EA8C7F,#C9574B);border:2px solid #FFF6E0;box-shadow:0 2px 0 var(--ink)}
+body.gh .fname{background:linear-gradient(180deg,#7DAA9C,#4F8576);border:1.5px solid #FFF6E0;box-shadow:0 2px 0 rgba(0,0,0,.2);font-style:italic}
+body.gh .fsay{border:2px solid var(--ink);box-shadow:0 3px 0 #EBCFA7,inset 0 2px 0 #fff;background:#FFFBEE;font-style:italic}
+body.gh .pip{border:2px solid #9B6E40;box-shadow:0 2px 0 #6E4A2A}
+body.gh .fh{filter:none}
+body.gh .idle .fb-in{animation:ghBreathe 4.2s ease-in-out infinite}
+body.gh .hop .fb-in{animation:ghHop .9s ease-in-out 2}
+@keyframes ghBreathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1.5px) scale(1.025,.985)}}
+@keyframes ghHop{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px) rotate(-2deg)}65%{transform:translateY(-4px) rotate(1.5deg)}}
+@keyframes ghPulse{50%{transform:scale(1.04)}}
+
+/* ---- TAHTA: işlenmiş ahşap tepsi ---- */
+body.gh .board{border:3px solid #6E4A2A;border-radius:26px;
+  background:radial-gradient(ellipse 90% 26% at 50% 0,rgba(255,240,200,.35) 0,transparent 100%),
+   repeating-linear-gradient(92deg,rgba(90,56,26,.07) 0 3px,transparent 3px 9px,rgba(255,235,190,.06) 9px 12px,transparent 12px 20px),
+   linear-gradient(160deg,var(--tray1),var(--tray2));
+  box-shadow:0 6px 0 var(--trayE),0 0 0 2px rgba(78,59,44,.9),inset 0 3px 0 rgba(255,240,200,.4),inset 0 -8px 14px rgba(70,40,15,.25),0 18px 26px rgba(78,59,44,.3)}
+body.gh .cell{border:2px solid rgba(255,244,214,.55);border-radius:16px;
+  background:radial-gradient(ellipse 70% 40% at 50% 10%,rgba(255,255,255,.6) 0,transparent 100%),radial-gradient(circle at 50% 60%,var(--cell) 0,var(--cell) 60%,var(--cellS) 100%);
+  box-shadow:inset 0 -4px 0 var(--cellS),inset 0 2px 4px rgba(255,255,255,.7),0 1px 0 rgba(60,35,12,.28);transition:transform .25s var(--jelly),background .2s}
+body.gh .cell:not(.empty):active{transform:scale(.96)}
+body.gh .cell.sel{outline:2.5px solid #F2D27A;outline-offset:0;transform:translateY(-2px);background:radial-gradient(circle at 50% 40%,#FFFBE6,#F9EBB6);box-shadow:0 0 12px 3px rgba(242,210,122,.7),inset 0 -4px 0 #E8D08A}
+body.gh .cell.sel .item{animation:ghSway 1.6s ease-in-out infinite}
+@keyframes ghSway{0%,100%{transform:rotate(-2.5deg) scale(1.04)}50%{transform:rotate(2.5deg) scale(1.06)}}
+body.gh .cell.over{transform:scale(1.05);background:#FBEBDC}
+body.gh .cell.hint{box-shadow:inset 0 0 0 3px #8CC79A,inset 0 -4px 0 #CDE8CF,0 0 10px rgba(140,199,154,.75)}
+
+/* ---- EŞYA KARTLARI: boyanmış ahşap/kağıt tılsım ---- */
+body.gh .item{border:2px solid rgba(78,59,44,.85);border-radius:34%;
+  background:radial-gradient(ellipse 54% 30% at 34% 18%,rgba(255,255,255,.85) 0,rgba(255,255,255,0) 100%),radial-gradient(circle at 50% 56%,var(--t1) 0,var(--t1) 48%,var(--t2) 100%);
+  box-shadow:inset 0 3px 3px rgba(255,255,255,.7),inset 0 -6px 8px rgba(78,59,44,.12),0 3px 0 var(--t3),0 6px 6px rgba(78,59,44,.2)}
+body.gh .item .ico{filter:none}
+body.gh .item .lv{background:var(--t3);border:2px solid #FFF6E0;outline:1.5px solid var(--ink);text-shadow:0 1px 0 rgba(0,0,0,.3);box-shadow:none}
+body.gh .t1{--t1:#F9DDD4;--t2:#E8A99C;--t3:#B8685B}
+body.gh .t2{--t1:#E2EFC8;--t2:#A9CC8A;--t3:#6A9552}
+body.gh .t3{--t1:#FAEBC4;--t2:#EBC47A;--t3:#B88A3A}
+body.gh .t4{--t1:#E6DEF0;--t2:#B9AAD6;--t3:#85739F}
+body.gh .t5{--t1:#D8EEF0;--t2:#96C9D4;--t3:#5A97A8}
+body.gh .t6,body.gh .kx{--t1:#FBF1B6;--t2:#EBCF68;--t3:#B8932E}
+body.gh .item.t6::after{content:"";width:calc(var(--cs)*.14);height:calc(var(--cs)*.14);right:12%;top:8%;border-radius:50%;background:radial-gradient(circle,#fff 0,rgba(255,250,200,.9) 40%,transparent 72%);text-shadow:none;animation:ghTwk 2.4s ease-in-out infinite}
+@keyframes ghTwk{50%{transform:scale(1.7);opacity:.55}}
+body.gh .item.t6,body.gh .kx{box-shadow:inset 0 3px 3px rgba(255,255,255,.7),0 3px 0 var(--t3),0 0 12px 3px rgba(245,225,130,.8)!important}
+
+/* ---- yumuşak animasyonlar (yaylı değil, rüzgârlı) ---- */
+body.gh .a-spawn{animation:ghPop .5s cubic-bezier(.3,1.3,.5,1)}
+body.gh .a-merge{animation:ghMerge .55s cubic-bezier(.3,1.25,.5,1)}
+body.gh .a-move{animation:ghLand .32s ease-out}
+body.gh .a-unlock{animation:ghShake .5s ease-in-out}
+@keyframes ghPop{0%{transform:scale(.3) rotate(-8deg);opacity:0}60%{transform:scale(1.1) rotate(2deg);opacity:1}100%{transform:scale(1)}}
+@keyframes ghMerge{0%{transform:scale(.7)}40%{transform:scale(1.2)}70%{transform:scale(.96)}100%{transform:scale(1)}}
+@keyframes ghLand{0%{transform:scale(1.07,.94)}100%{transform:scale(1)}}
+@keyframes ghShake{25%{transform:rotate(-6deg)}60%{transform:rotate(5deg)}100%{transform:rotate(0)}}
+body.gh .spk{filter:none}
+
+/* ---- yuvalar, sepet ---- */
+body.gh .nest svg.ns{transition:transform .25s var(--jelly)}
+body.gh .nest:active svg.ns{transform:scale(1.05,.95)}
+body.gh .nest.want .nico{animation:ghPulse 1.8s ease-in-out infinite}
+body.gh .nest.want::before{box-shadow:0 0 12px 4px rgba(245,225,130,.85)}
+body.gh .nlabel{text-shadow:0 1px 0 rgba(255,250,235,.9)}
+body.gh #eFill{background:linear-gradient(180deg,#CFE8A6 0,#9CC77A 55%,#75A558);box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
+body.gh .e-track,body.gh .ebar{border:2px solid var(--ink);background:#FFFBEE;box-shadow:inset 0 2px 3px rgba(78,59,44,.18)}
+body.gh .jb{border:2px solid var(--ink);border-radius:16px;background:linear-gradient(180deg,#FFFBEA,#F2E6C2 60%,#E4D09C);box-shadow:0 3px 0 #A58A55,inset 0 0 0 2px rgba(255,255,255,.6)}
+body.gh .jb.on{background:linear-gradient(180deg,#FBF1B6,#EBCF68);box-shadow:0 3px 0 var(--gold3),0 0 10px rgba(245,225,130,.8)}
+body.gh .jb.jsell{background:linear-gradient(180deg,#F8EAB0,#E7C766 60%,#D2A83A)}
+body.gh .jn{background:linear-gradient(180deg,#EA8C7F,#C9574B);border:2px solid #FFF6E0;outline:1.5px solid var(--ink)}
+body.gh .jbar{background:rgba(251,244,226,.95)!important}
+
+/* ---- modallar: parşömen ---- */
+body.gh .modal{background:radial-gradient(circle at 50% 30%,rgba(90,70,40,.38),rgba(40,30,18,.62))}
+body.gh .mcard{border:3px solid #7A5530;border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,253,244,.98),rgba(248,236,206,.98));
+  box-shadow:0 0 0 2px rgba(78,59,44,.55),0 5px 0 2px #5A3C1E,inset 0 0 0 3px rgba(255,255,255,.55),inset 0 -8px 16px rgba(190,150,90,.18),0 24px 40px rgba(40,30,18,.45);animation:ghPop .5s cubic-bezier(.3,1.2,.5,1)}
+body.gh .mcard h2{color:var(--ink);text-shadow:0 1px 0 #fff}
+body.gh .mhead .x,body.gh .x{border:2px solid #FFF6E0;outline:1.5px solid var(--ink);background:linear-gradient(180deg,#EDA89C,#CB7466);color:#FFF8E6;box-shadow:0 2px 0 #8E4A40;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+body.gh .tabs button{border:2px solid var(--ink);border-radius:14px;background:linear-gradient(180deg,#FFFBEA,#F2E6C2);box-shadow:0 2px 0 #A58A55;font-weight:700}
+body.gh .tabs button.on{background:linear-gradient(180deg,#EDA89C,#DC8A7C);color:#FFF8E6;box-shadow:0 3px 0 #8E4A40;transform:translateY(-1px)}
+body.gh .chip{border:2px solid var(--ink);background:linear-gradient(180deg,#FFFBEA,#F2E6C2);box-shadow:0 2px 0 #A58A55}
+body.gh .chip.on{background:linear-gradient(180deg,#EDA89C,#DC8A7C);box-shadow:0 2px 0 #8E4A40;color:#FFF8E6}
+body.gh .lrow,body.gh .sitem{border:2px solid rgba(78,59,44,.8);background:linear-gradient(180deg,#FFFDF2,#F9F0D8);box-shadow:0 2px 0 #E6D2A6,inset 0 2px 0 #fff}
+body.gh .lrow .li{background:linear-gradient(180deg,#F9DDD4,#EBA99C);border:2px solid var(--ink);box-shadow:inset 0 2px 0 rgba(255,255,255,.7)}
+body.gh .sitem.on{border-color:var(--gold3);background:linear-gradient(180deg,#FFF9DC,#F6E49A);box-shadow:0 2px 0 var(--gold3),0 0 10px rgba(245,225,130,.7)}
+body.gh .ftxt,body.gh .float{text-shadow:0 2px 0 var(--ink),0 0 6px #FFF6E0;font-weight:700}
+body.gh .toast{border:2px solid #FFF6E0;outline:1.5px solid var(--ink);color:#FFF8E6;text-shadow:0 1px 0 rgba(0,0,0,.35);background:linear-gradient(180deg,#8FB8A8,#5F917F)}
+body.gh .tmap{border:3px solid #7A5530;border-radius:20px;box-shadow:0 4px 0 #5A3C1E,0 0 0 2px rgba(78,59,44,.6)}
+body.gh .mp-sea{fill:#FFF8E6;stroke:#4F8E9C}
+body.gh .mp-city text{fill:#4E3B2C;stroke:#FFF8E6}
+body.gh .mp-city.on text{fill:#A8493F}
+body.gh.eco .panel,body.gh.eco .mcard,body.gh.eco .board{box-shadow:0 3px 0 rgba(78,59,44,.35)!important}
+body.gh.eco .item{box-shadow:inset 0 3px 3px rgba(255,255,255,.7),0 3px 0 var(--t3)!important}
+body.gh.eco .btn{box-shadow:0 4px 0 #8E4A40!important}
+body.gh.eco .btn.soft{box-shadow:0 4px 0 #A58A55!important}
+
+/* ---- arka plan: rüzgârda uçuşan yapraklar, çiçek yaprakları ---- */
+body.gh #bg span{bottom:-60px;opacity:.7;display:block;line-height:0;animation:ghDrift linear infinite}
+body.gh #bg span svg{width:100%;height:100%;display:block;animation:ghSpin 7s ease-in-out infinite alternate}
+@keyframes ghDrift{0%{transform:translate(0,0)}25%{transform:translate(28px,-28vh)}50%{transform:translate(-22px,-58vh)}75%{transform:translate(24px,-84vh)}100%{transform:translate(0,-118vh)}}
+@keyframes ghSpin{0%{transform:rotate(-40deg)}100%{transform:rotate(50deg)}}
+body.gh #scene{opacity:1}
+body.gh #scene svg{filter:saturate(.8) sepia(.12)}
+@media (prefers-reduced-motion:reduce){body.gh #bg{display:none}}
+
+/* ---- giriş ekranı: çayır tepeleri, kabarık bulutlar ---- */
+body.gh #title{background:linear-gradient(180deg,#9FD3DE 0%,#D6ECE4 38%,#F7EBC9 70%,#F2D7B4 100%)}
+body.gh .tsun{background:radial-gradient(circle,#FFF4C2 0 55%,#F9DE86 100%);border:2px solid rgba(90,70,54,.55);box-shadow:0 0 0 12px rgba(255,240,170,.35),0 0 40px 16px rgba(255,236,150,.4)}
+body.gh .tcloud{font-size:0;width:150px;height:60px;opacity:.95;filter:drop-shadow(0 5px 3px rgba(90,110,120,.18));background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 60'%3E%3Cg fill='%23fff'%3E%3Ccircle cx='38' cy='38' r='18'/%3E%3Ccircle cx='66' cy='28' r='24'/%3E%3Ccircle cx='98' cy='34' r='20'/%3E%3Ccircle cx='122' cy='42' r='13'/%3E%3Crect x='24' y='40' width='108' height='15' rx='7'/%3E%3C/g%3E%3Cpath d='M30 52Q75 58 128 52' stroke='%23DCE8EA' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+body.gh .tcloud svg{display:none}
+body.gh .tcloud.c2{width:110px;height:44px}body.gh .tcloud.c3{width:84px;height:34px}
+body.gh .tl0{color:#7C5A3E;font-style:italic;letter-spacing:2px}
+body.gh .tl1{font-family:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;font-style:italic;font-weight:700;color:#FFF9E6;-webkit-text-stroke:7px var(--ink);text-shadow:0 4px 0 rgba(78,59,44,.55),0 10px 16px rgba(78,59,44,.25);transform:rotate(-2deg)}
+body.gh .tl1.b{color:#F7C9BC;transform:rotate(1.5deg)}
+body.gh .tl2{background:rgba(255,250,235,.9);border:2px solid rgba(78,59,44,.8);font-style:italic;box-shadow:0 2px 0 rgba(78,59,44,.2)}
+body.gh .thills path:nth-child(1){fill:#B7D49A;stroke:#5A4636;stroke-width:2.2}
+body.gh .thills path:nth-child(2){fill:#8FBF7E;stroke:#5A4636;stroke-width:2.2}
+body.gh .tscene::before{content:"";position:absolute;left:0;right:0;bottom:16%;height:36%;z-index:0;opacity:.85;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'%3E%3Cpath d='M0 90Q50 30 110 70T230 60T340 74T400 52V120H0Z' fill='%23A9C9C2' opacity='.7'/%3E%3Cg fill='%237FAE86' stroke='%235A4636' stroke-width='1.6'%3E%3Cpath d='M300 92q-3-26 8-34q11 8 8 34z'/%3E%3Cpath d='M322 94q-2-20 7-26q9 6 7 26z'/%3E%3Cpath d='M40 96q-3-22 7-30q10 8 7 30z'/%3E%3C/g%3E%3C/svg%3E") center bottom/100% 100% no-repeat}
+body.gh .tbtn.big{animation:ghPulse 3s ease-in-out infinite}
+body.gh .tb{animation:ghFloat 4.5s ease-in-out infinite}
+body.gh .tcatR{animation:ghFloat 5.5s ease-in-out infinite}
+@keyframes ghFloat{50%{transform:translateY(-6px) rotate(.8deg)}}
+body.gh .tfoot{color:#7C5A3E;font-style:italic}
+body.gh .slot{border:2px solid var(--ink);background:linear-gradient(180deg,#FFFDF2,#F9F0D8)}
+body.gh .slot.on{background:#FBEBDD;border-color:var(--pinkd)}
