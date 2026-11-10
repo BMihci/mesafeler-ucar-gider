@@ -1,0 +1,225 @@
+<body data-theme="pink">
+<div id="bg"></div>
+<div class="awning"></div>
+<div id="app">
+  <header class="top">
+    <div class="logo"><div class="logoCat" id="logoCat"></div><span class="l1" data-en="Distances Fly Away">Mesafeler Uçar Gider</span><span class="l2" data-en="Bird &amp; Birdie · Fluffy Birds 💞">Bird &amp; Birdie · Pofuduk Kuşlar 💞</span></div>
+    <div class="hpill" id="heartPill">❤ <b id="hearts">0</b></div>
+    <button class="ibtn" id="btnBook" aria-label="Defter">📖<i class="dot" id="bookDot"></i></button>
+    <button class="ibtn" id="btnShop" aria-label="Dükkan">🛍️</button>
+    <button class="ibtn" id="btnSettings" aria-label="Ayarlar">⚙️</button>
+  </header>
+
+  <section class="panel distance">
+    <div class="d-top"><span id="cityA">📍 İstanbul</span><span class="km"><span id="kmText">1000 km</span> <small data-en="to go">kaldı</small></span><span id="cityB">Erzurum 📍</span></div>
+    <div class="track" id="track">
+      <div class="bar"><div class="fill"></div></div>
+      <div class="runner2" id="runner2"></div>
+      <div class="runner" id="runner"></div>
+      <div class="goal" id="goal"></div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="panel order" id="orderCard">
+      <div class="o-head"><span id="orderTitle">📦 Birdie'nin Siparişi</span><em id="orderReward"></em></div>
+      <p class="o-say" id="orderSay"></p>
+      <div class="rush" id="rush"><i></i><span></span></div>
+      <div class="reqs" id="reqs"></div>
+    </div>
+    <div class="feed idle" id="feed" aria-label="Canlı görüntülü arama">
+      <svg class="scene" viewBox="0 0 104 132" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="104" height="132" fill="#FFE9F0"/>
+        <path d="M0 40h104M0 80h104" stroke="#FFD5E1" stroke-width="2"/>
+        <rect y="102" width="104" height="30" fill="#F6D6C0"/>
+        <path d="M0 102h104" stroke="#6B4A45" stroke-width="2"/>
+        <rect x="44" y="20" width="48" height="44" rx="8" fill="#CFE9FF" stroke="#6B4A45" stroke-width="3"/>
+        <path d="M68 20v44M44 42h48" stroke="#6B4A45" stroke-width="2.5"/>
+        <circle cx="54" cy="31" r="1.6" fill="#fff"/><circle cx="80" cy="52" r="1.6" fill="#fff"/><circle cx="60" cy="57" r="1.3" fill="#fff"/><circle cx="86" cy="30" r="1.3" fill="#fff"/><circle cx="74" cy="34" r="1.2" fill="#fff"/>
+        <path d="M70 104h24l-3 16H73z" fill="#F2A98A" stroke="#6B4A45" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M82 104c-9-9-11-18-5-25 4 7 7 14 5 25zM82 104c9-11 13-18 9-27-7 7-9 15-9 27z" fill="#8FD3A8" stroke="#6B4A45" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M6 18Q14 8 22 18" stroke="#FF8FB0" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="live"><i></i>CANLI</span>
+      <div class="fsay" id="fsay"></div>
+      <div class="pip" id="pip"></div>
+      <div id="feedCat"></div>
+      <div id="feedBird"><div class="fb-in" id="fbIn"></div></div>
+      <div class="fhl" id="fhl"></div>
+      <span class="fname" id="fname">Birdie · Erzurum</span>
+    </div>
+  </section>
+
+  <section class="boardWrap"><div class="boardBox" id="boardBox">
+    <div class="bcat" id="bcat" aria-label="Kedi"></div>
+    <div class="bcat2" id="bcat2" aria-label="Kedi"></div>
+    <div class="board" id="board"></div>
+  </div></section>
+
+  <section class="nestRow">
+    <button class="nest" id="nest" aria-label="Yuva">
+      <svg class="ns" viewBox="0 0 140 110" aria-hidden="true">
+        <ellipse cx="70" cy="101" rx="52" ry="7" fill="rgba(107,74,69,.18)"/>
+        <ellipse cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
+        <g class="nchick" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round">
+          <ellipse cx="70" cy="52" rx="27" ry="25" fill="#FFE08A"/>
+          <path d="M64 29q-4-13 2-11 1-8 5 2 6-4 1 9z" fill="#FFE08A"/>
+          <circle cx="60" cy="52" r="3.6" fill="#5B3A3A" stroke="none"/><circle cx="80" cy="52" r="3.6" fill="#5B3A3A" stroke="none"/>
+          <circle cx="59" cy="50.8" r="1.2" fill="#fff" stroke="none"/><circle cx="79" cy="50.8" r="1.2" fill="#fff" stroke="none"/>
+          <path d="M66 57h8l-4 5z" fill="#FF9F5A" stroke-width="2"/>
+          <ellipse cx="53" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/><ellipse cx="87" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/>
+        </g>
+        <path d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
+        <path transform="translate(116 36) scale(1.1)" d="M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z" fill="#FF8FB0" stroke="#6B4A45" stroke-width="2"/>
+      </svg>
+      <span class="nlabel" id="nestLabel">Yuva · ✉️ üret</span>
+    </button>
+    <div class="panel energy">
+      <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
+      <div class="ebar"><i id="eFill"></i></div>
+      <div class="e-note" id="eNote"></div>
+    </div>
+    <button class="kit" id="kitBtn" aria-label="Kedi Sepeti">
+      <div class="kitArt">
+        <div class="kc" id="kitCat"></div>
+        <svg class="kb" viewBox="0 0 70 40" aria-hidden="true">
+          <path d="M3 8Q35 2 67 8L62 36Q35 42 8 36Z" fill="#E2B27A" stroke="#6B4A45" stroke-width="2.6" stroke-linejoin="round"/>
+          <path d="M7 18Q35 24 63 18M9 27Q35 33 61 27" stroke="#B97A4E" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <path d="M3 8Q35 15 67 8" stroke="#6B4A45" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <path d="M31 14l4-5 4 5-4 3z" fill="#FF8FB0" stroke="#6B4A45" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+        <span class="kbadge" id="kitN">3</span>
+      </div>
+      <span class="nlabel" id="kitLabel">Kedi Sepeti</span>
+    </button>
+    <button class="pill" id="buyEnergy">+5 🌻<small>10 ❤</small></button>
+  </section>
+
+  <section class="panel coll" id="coll"></section>
+
+  <div class="bottom">
+    <button class="btn" id="btnSave" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
+    <div class="hint-txt" data-en="Drag or tap two matching items to merge · Drop the requested item on the order card · Pet the cats 🐾">Aynı iki eşyayı sürükle ya da dokun &amp; birleştir · İstenen eşyayı sipariş kartına bırak · Kedileri sev 🐾</div>
+  </div>
+</div>
+
+<div class="roam" id="roam"></div>
+<div class="toast" id="toast"></div>
+<canvas id="fx"></canvas>
+
+<div class="coach" id="coach">
+  <div class="cav" id="coachCat"></div>
+  <div class="ctxt"><b id="coachTitle"></b><span id="coachText"></span></div>
+  <div class="cbtn"><button class="btn sm" id="coachOk">Tamam</button><button class="lnk" id="coachSkip">Atla</button></div>
+</div>
+
+<!-- Giriş ekranı -->
+<div id="title" class="show">
+  <div class="tsky"><i class="tcloud c1">☁️</i><i class="tcloud c2">☁️</i><i class="tcloud c3">☁️</i><i class="tsun"></i></div>
+  <div class="ttop"><button class="ibtn" id="tLang" aria-label="Language">🌍</button><button class="ibtn" id="tMusic" aria-label="Music">🎵</button></div>
+  <div class="tlogo">
+    <div class="tl0" data-en="~ Bird &amp; Birdie ~">~ Bird &amp; Birdie ~</div>
+    <div class="tl1"><span data-en="Distances">Mesafeler</span></div>
+    <div class="tl1 b"><span data-en="Fly Away">Uçar Gider</span></div>
+    <div class="tl2" data-en="a cozy long-distance merge story 💞">uzak mesafe aşkının cozy birleştirme hikâyesi 💞</div>
+  </div>
+  <div class="tscene">
+    <svg class="tpath" viewBox="0 0 400 140" preserveAspectRatio="none"><path id="tarc" d="M70 118 C130 -10 270 -10 330 118" fill="none" stroke="#6B4A45" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" opacity=".55"/><g><text font-size="26" text-anchor="middle" dy="8">💌</text><animateMotion dur="6.5s" repeatCount="indefinite" rotate="0"><mpath href="#tarc"/></animateMotion></g></svg>
+    <div class="tb l" id="tBird"></div><div class="tb r" id="tBirdie"></div>
+    <div class="tcatL" id="tCatL"></div><div class="tcatR" id="tCatR"></div>
+    <svg class="thills" viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 70 Q70 20 140 62 T260 58 T400 64 V120 H0Z" fill="#FFC4D3" stroke="#6B4A45" stroke-width="3"/><path d="M0 92 Q90 52 190 86 T400 80 V120 H0Z" fill="#FFE4B8" stroke="#6B4A45" stroke-width="3"/></svg>
+  </div>
+  <div class="tmenu">
+    <button class="btn tbtn big" id="tStart">▶ Başla</button>
+    <button class="btn tbtn soft" id="tSlots" data-en="📂 Choose Save">📂 Kayıt Seç</button>
+    <button class="btn tbtn soft" id="tSet" data-en="⚙️ Settings">⚙️ Ayarlar</button>
+    <button class="btn tbtn soft" id="tHow" data-en="📖 How to Play">📖 Nasıl Oynanır</button>
+  </div>
+  <div class="tfoot" id="tFoot"></div>
+</div>
+
+<!-- Ayarlar -->
+<div class="modal" id="mSettings">
+  <div class="mcard wide">
+    <div class="mhead"><h2 data-en="⚙️ Settings">⚙️ Ayarlar</h2><button class="x" data-close="mSettings">✕</button></div>
+    <div class="mbody">
+      <div class="mrow"><div><span data-en="🔊 Sound Effects">🔊 Ses Efektleri</span><small data-en="Pops, chimes and meows">Puf, pop, çınlama ve miyavlamalar</small></div><label class="sw"><input type="checkbox" id="swSfx"><span></span></label></div>
+      <div class="mrow"><div style="width:100%"><span data-en="SFX volume">Efekt sesi</span><input type="range" id="rgSfx" min="0" max="100"></div></div>
+      <div class="mrow"><div><span data-en="🎵 Music">🎵 Müzik</span><small data-en="Cozy generative tunes">Yumuşak, kendi kendine akan melodiler</small></div><label class="sw"><input type="checkbox" id="swMusic"><span></span></label></div>
+      <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
+      <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
+      <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
+      <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn sm" id="btnSave2" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
+      <button class="btn sm soft" id="btnTut" data-en="🎓 Replay Tutorial">🎓 Eğitimi Tekrarla</button>
+      <button class="btn sm soft" id="btnIntro" data-en="📖 Replay Story">📖 Hikâyeyi İzle</button>
+      <button class="btn sm danger" id="btnReset" data-en="🗑️ Reset Game">🗑️ Oyunu Sıfırla</button>
+      <button class="btn sm soft" id="btnMenu" data-en="🏠 Main Menu">🏠 Ana Menü</button>
+      <button class="btn sm soft" id="btnCloseS" data-en="Close">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Kayıt seç -->
+<div class="modal" id="mSlots">
+  <div class="mcard wide">
+    <div class="mhead"><h2 data-en="📂 Choose Save">📂 Kayıt Seç</h2><button class="x" data-close="mSlots">✕</button></div>
+    <div class="mbody" id="slotBody"></div>
+  </div>
+</div>
+
+<!-- Defter -->
+<div class="modal" id="mBook">
+  <div class="mcard wide">
+    <div class="mhead"><h2 data-en="📖 Journal">📖 Defter</h2><button class="x" data-close="mBook">✕</button></div>
+    <div class="tabs" id="bookTabs"></div>
+    <div class="mbody" id="bookBody"></div>
+  </div>
+</div>
+
+<!-- Dükkan -->
+<div class="modal" id="mShop">
+  <div class="mcard wide">
+    <div class="mhead"><h2 data-en="🛍️ Shop">🛍️ Dükkan</h2><button class="x" data-close="mShop">✕</button></div>
+    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">❤ <b id="shopHearts">0</b></div>
+    <div class="tabs" id="shopTabs"></div>
+    <div class="mbody" id="shopBody"></div>
+  </div>
+</div>
+
+<!-- Çizgi roman -->
+<div class="modal" id="mComic">
+  <div class="mcard comicCard">
+    <div class="cgrid" id="cgrid"></div>
+    <div class="mbtns"><button class="btn" id="cNext">Devam ▶</button></div>
+  </div>
+</div>
+
+<!-- Not / kart -->
+<div class="modal" id="mNote">
+  <div class="mcard note">
+    <div class="art" id="noteArt"></div>
+    <h2 id="noteTitle"></h2>
+    <p id="noteText"></p>
+    <div class="mbtns"><button class="btn" id="noteOk">Tamam</button></div>
+  </div>
+</div>
+
+<!-- Zafer -->
+<div class="modal" id="mWin">
+  <div class="mcard">
+    <div class="vscene" id="vscene"></div>
+    <h2 data-en="We're Together! 💕">Kavuştuk! 💕</h2>
+    <p id="winText" style="margin:4px 0;font-weight:800;color:var(--ink2);font-size:13.5px;line-height:1.4"></p>
+    <div class="vstats"><div>❤ <span id="vsH">0</span></div><div>📦 <span id="vsO">0</span></div><div>🎁 <span id="vsI">0</span></div><div>🐱 <span id="vsC">0</span></div></div>
+    <div class="mbtns">
+      <button class="btn" id="btnNewTrip" data-en="💌 New Journey">💌 Yeni Yolculuk</button>
+      <button class="btn soft" id="btnKeep" data-en="Keep Celebrating">Kutlamaya Devam</button>
+    </div>
+  </div>
+</div>
+
+<script>
