@@ -29,8 +29,11 @@ const ACH=[
   {id:'s7',h:30,n:()=>T('Bir Hafta Sevgi','A Week of Love'),d:()=>T('7 gün üst üste gir','Log in 7 days in a row'),ok:s=>s.daily.streak>=7},
   {id:'g1',h:15,n:()=>T('Posta Güvercini','Carrier Pigeon'),d:()=>T('Bir partner hediyesi gönder ya da aç','Send or open a partner gift'),ok:s=>s.stats.gifts>=1},
   {id:'p20',h:15,n:()=>T('Pati Sever','Paw Lover'),d:()=>T('Kedileri 20 kez sev','Pet the cats 20 times'),ok:s=>s.stats.pets>=20},
-  {id:'half',h:20,n:()=>T('Yarı Yol','Halfway There'),d:()=>T('500 km’nin altına in','Get under 500 km'),ok:s=>s.km<=500},
-  {id:'home',h:50,n:()=>T('Kavuştuk!','Together!'),d:()=>T('Mesafeyi sıfırla','Reach 0 km'),ok:s=>s.km<=0||s.trip>1}
+  {id:'lv10',h:10,n:()=>T('İlk Bölüm','First Chapter'),d:()=>T('10. seviyeyi geç','Clear level 10'),ok:s=>!!s.saga&&s.saga.stars[10]>0},
+  {id:'lv40',h:30,n:()=>T('Yolun Yarısı','Halfway Road'),d:()=>T('40. seviyeyi geç','Clear level 40'),ok:s=>!!s.saga&&s.saga.stars[40]>0},
+  {id:'stars',h:30,n:()=>T('Yıldız Toplayıcı','Star Collector'),d:()=>T('100 yıldız topla','Collect 100 stars'),ok:s=>!!s.saga&&Object.values(s.saga.stars).reduce((a,b)=>a+b,0)>=100},
+  {id:'half',h:20,n:()=>T('Yarı Yol','Halfway There'),d:()=>T('500 km’nin altına in','Get under 500 km'),ok:s=>!!s.saga&&s.km<=500},
+  {id:'home',h:50,n:()=>T('Kavuştuk!','Together!'),d:()=>T('Mesafeyi sıfırla','Reach 0 km'),ok:s=>(!!s.saga&&s.saga.done)||s.trip>1}
 ];
 function ensureQuests(){
   if(state.quests.date===today()&&state.quests.list.length)return;
@@ -234,8 +237,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-close="mBo
 /* ---------- dükkan ---------- */
 let shopTab='up';
 const UP_META={
-  blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('+'+BAL.energyPerBlanket+' maks. enerji','+'+BAL.energyPerBlanket+' max energy')},
-  post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('%'+(BAL.regenPerPost*100)+' daha hızlı enerji','+'+(BAL.regenPerPost*100)+'% faster energy')},
+  blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('Her seviyede +'+BAL.energyPerBlanket+' hamle','+'+BAL.energyPerBlanket+' moves every level')},
+  post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('Her siparişte +1 ekstra hamle','+1 extra move per order')},
   nest:{ico:'🪺',n:()=>T('Büyük Yuva','Bigger Nest'),d:()=>T('Yuvadan %'+(BAL.nestL2*100)+' ihtimalle Fotoğraf','+'+(BAL.nestL2*100)+'% chance of a Photo')}
 };
 function renderShop(){
@@ -247,17 +250,12 @@ function renderShop(){
       const u=UPS[k],lv=state.up[k],m=UP_META[k];
       h+='<div class="lrow"><div class="li">'+m.ico+'</div><div class="lt">'+m.n()+'<small>'+m.d()+' · '+T('Seviye ','Lv ')+lv+'/'+u.max+'</small></div>'+(lv>=u.max?'<span class="chip on">MAX</span>':'<button class="btn sm" data-act="up:'+k+'">'+u.cost[lv]+' ❤</button>')+'</div>';
     }
-    h+='<div class="sec">'+T('Enerji','Energy')+'</div><div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('enerji','energy')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' ❤</button></div>';
+    h+='<div class="sec">'+T('Hamle','Moves')+'</div><div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('hamle','moves')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' ❤</button></div>';
   }else{
     h+='<div class="sec">'+T('Bird’e Şapkalar','Hats for Bird')+'</div>';
     for(const k in HATS){
       const own=state.cos.hats.includes(k),on=state.cos.hat===k;
       h+='<div class="lrow"><div class="li" style="background:#fff">'+birdSVG({body:'#FFE08A',wing:'#FFCD5E',belly:'#FFF4CB',acc:HAT[k]},'idle')+'</div><div class="lt">'+T(HAT_NAMES[k][0],HAT_NAMES[k][1])+'</div>'+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="hat:'+k+'">'+(own?T('Tak','Wear'):HATS[k]+' ❤')+'</button>')+'</div>';
-    }
-    h+='<div class="sec">'+T('Temalar','Themes')+'</div>';
-    for(const k in THEMES){
-      const own=state.cos.themes.includes(k),on=state.cos.theme===k;
-      h+='<div class="lrow"><div class="li">'+({pink:'🌸',autumn:'🍂',snow:'❄️'})[k]+'</div><div class="lt">'+T(THEME_NAMES[k][0],THEME_NAMES[k][1])+'</div>'+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="theme:'+k+'">'+(own?T('Seç','Use'):THEMES[k]+' ❤')+'</button>')+'</div>';
     }
   }
   $('#shopBody').innerHTML=h;$('#shopHearts').textContent=state.hearts;
@@ -270,8 +268,8 @@ function buyUp(k){
 }
 function buyEnergy(){
   if(state.settings.unlimited)return;
-  if(state.energy>=energyMax()+BAL.energyOverfill){toast(T('Enerjin zaten çok dolu 🌻','Your energy is already overflowing 🌻'));return}
-  if(state.hearts<BAL.buyEnergyCost){sfx('err');toast(T('Enerji için '+BAL.buyEnergyCost+' ❤ gerek','Energy costs '+BAL.buyEnergyCost+' ❤'));return}
+  if(state.energy>=energyMax()+BAL.energyOverfill){toast(T('Hamlen zaten çok dolu 🌻','You already have plenty of moves 🌻'));return}
+  if(state.hearts<BAL.buyEnergyCost){sfx('err');toast(T('Hamle için '+BAL.buyEnergyCost+' ❤ gerek','Moves cost '+BAL.buyEnergyCost+' ❤'));return}
   state.hearts-=BAL.buyEnergyCost;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+BAL.buyEnergyAmt);
   sfx('energy');renderHUD();if($('#mShop').classList.contains('open'))renderShop();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
 }
@@ -282,7 +280,7 @@ function useHat(k){
   }
   state.cos.hat=k;sfx('levelup');renderArt();renderHUD();renderShop();saveSoon();
 }
-function useTheme(k){
+function useThemeOld(k){
   if(!state.cos.themes.includes(k)){
     if(state.hearts<THEMES[k]){sfx('err');toast(T('Yeterli ❤ yok','Not enough ❤'));return}
     state.hearts-=THEMES[k];state.cos.themes.push(k);
@@ -293,7 +291,7 @@ $('#shopTabs').addEventListener('click',e=>{const b=e.target.closest('button');i
 $('#shopBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const [a,x]=b.dataset.act.split(':');
-  if(a==='up')buyUp(x);else if(a==='energy')buyEnergy();else if(a==='hat')useHat(x);else if(a==='theme')useTheme(x);
+  if(a==='up')buyUp(x);else if(a==='energy')buyEnergy();else if(a==='hat')useHat(x);
 });
 $('#btnShop').addEventListener('click',()=>{sfx('tap');showModal('mShop',renderShop)});
 $('#buyEnergy').addEventListener('click',buyEnergy);
@@ -304,24 +302,13 @@ $('#kitBtn').addEventListener('click',takeKitten);
 function renderArt(){
   $('#runner').innerHTML=birdSVG(meBird());
   $('#runner2').innerHTML=catSVG(CATS[5],'idle','mail');
-  $('#goal').innerHTML=birdSVG(BIRDIE,'love');
+  $('#goal').innerHTML=birdSVG(partnerBird(),'love');
   $('#pip').innerHTML=birdSVG(meBird());
   $('#logoCat').innerHTML=peekSVG(CATS[2]);
   $('#bcat').innerHTML=peekSVG(CATS[1]);
   $('#bcat2').innerHTML=peekSVG(CATS[5]);
   $('#kitCat').innerHTML=catSVG(CATS[1],'happy');
   $('#coachCat').innerHTML=catSVG(CATS[5],'happy','mail');
-}
-const BG_EMO={pink:['💗','☁️','✨','🐾','🤍'],autumn:['🍂','🍁','☕','🐾','🧡'],snow:['❄️','✨','☁️','🐾','🤍']};
-function applyTheme(){
-  document.body.dataset.theme=state.cos.theme;
-  const bg=$('#bg');bg.innerHTML='';
-  for(let i=0;i<13;i++){
-    const s=document.createElement('span');s.textContent=rnd(BG_EMO[state.cos.theme]);
-    s.style.left=Math.random()*100+'%';s.style.fontSize=(14+Math.random()*22)+'px';
-    s.style.animationDuration=(22+Math.random()*26)+'s';s.style.animationDelay=(-Math.random()*40)+'s';
-    bg.appendChild(s);
-  }
 }
 function applyLang(){
   const en=lang()==='en';document.documentElement.lang=en?'en':'tr';
@@ -392,16 +379,16 @@ $('#btnReset').addEventListener('click',e=>{
   state.story.intro=true;state.letters.push('intro');
   tickEnergy();ensureQuests();applyTheme();renderArt();renderAll();updateKm(false);applyTrack();
   closeModal('mSettings');save(false);toast(T('Yeni bir başlangıç 🌱','A fresh start 🌱'));
-  state.tut={step:0,done:false};setTimeout(showTut,500);
+  setTimeout(openChar,500);
 });
 
 /* ---------- eğitim (kedi rehber Tombik) ---------- */
 const TUT=[
   {adv:'merge',spot:{cells:[6,7]},t:()=>T('Birleştir!','Merge!'),x:()=>T('Yan yana iki ✉️’ı sürükle (ya da sırayla dokun): Fotoğraf olsun!','Drag one ✉️ onto the other (or tap both) to make a Photo!')},
   {adv:'deliver',spot:{sel:'#orderCard'},t:()=>T('Kargola!','Deliver!'),x:()=>T(YOU()+' bir 🖼️ istiyor. Fotoğrafı sipariş kartına bırak!',YOU()+' wants a 🖼️. Drop the Photo on the order card!')},
-  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir. Enerjin zamanla yenilenir 🌻','Tap the nest for a new ✉️. Your energy refills over time 🌻')},
+  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir ama 1 hamle harcar! Hamlen bitmeden hedefleri tamamla 🌻','Tap the nest for a new ✉️, but it costs 1 move! Finish the goals before moves run out 🌻')},
   {adv:'ok',spot:{sel:'#kitBtn'},t:()=>T('Kediler! 🐱','Cats! 🐱'),x:()=>T('Sepetten yavru kedi al, aynı kedileri birleştir. Her yeni kedi sana bonus enerji verir. Gezen kedileri sevmeyi unutma 🐾','Take kittens from the basket and merge matching cats. Every new cat gives bonus energy. Pet the wandering cats too 🐾')},
-  {adv:'ok',spot:{sel:'#btnBook'},t:()=>T('Defter 📖','Journal 📖'),x:()=>T('Günlük hediye, görevler, mektuplar, kediler ve partner hediyesi burada. Sürpriz 🎁 kutularına dokun!','Daily gifts, quests, letters, cats and partner gifts live here. Tap the 🎁 boxes for surprises!')}
+  {adv:'ok',spot:{sel:'#btnBook'},t:()=>T('Defter 📖','Journal 📖'),x:()=>T('Üstteki kartta seviye hedefin, 🗺️ ile haritan var. Defterde günlük hediye, görevler ve kediler seni bekliyor!','Your level goals are on the card above, and 🗺️ opens the map. The journal holds daily gifts, quests and cats!')}
 ];
 function hideCoach(){$('#coach').classList.remove('show');setSpots(null)}
 function showTut(){
@@ -446,18 +433,18 @@ function bootState(st){
 function slotInfo(n){
   const s=readSlot(n);
   if(!s)return null;
-  return{km:s.km,hearts:s.hearts,trip:s.trip,cats:s.maxC,won:s.won};
+  return{km:s.km,hearts:s.hearts,trip:s.trip,cats:s.maxC,won:s.won,lv:s.saga?s.saga.n:0,dir:s.saga?s.saga.dir:''};
 }
 function refreshTitle(){
   const t=$('#title');if(!t||!state)return;
   const n=curSlot(),info=slotInfo(n);
   $('#tStart').textContent=info?T('▶ Devam Et','▶ Continue'):T('▶ Başla','▶ Start');
-  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info?Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v2.0';
+  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info&&info.lv?T('Seviye ','Level ')+info.lv+' · '+Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v3.0';
   $('#tMusic').textContent=state.settings.music?'🎵':'🔇';
 }
 function renderTitleArt(){
-  $('#tBird').innerHTML=birdSVG(meBird(),'idle');
-  $('#tBirdie').innerHTML=birdSVG(BIRDIE,'love');
+  $('#tBird').innerHTML=birdSVG({body:BIRDIE.body,wing:BIRDIE.wing,belly:BIRDIE.belly,acc:HAIR},'idle');
+  $('#tBirdie').innerHTML=birdSVG(BIRDB,'love');
   $('#tCatL').innerHTML=catSVG(CATS[2],'idle');
   $('#tCatR').innerHTML=catSVG(CATS[5],'idle','mail');
 }
@@ -473,7 +460,15 @@ function hideTitle(){
 function startGame(){
   started=true;ensureAudio();startMusic();hideTitle();
   save(false);
-  setTimeout(()=>{say(T('Merhaba aşkım! 💕','Hello, love! 💕'));startFlow()},500);
+  setTimeout(()=>{
+    if(!state.saga){openChar();return}
+    if(state.lv&&!state.lv.done){
+      applyTheme();renderAll();say(T('Merhaba aşkım! 💕','Hello, love! 💕'));
+      if(!state.tut.done)showTut();else maybeDaily();return;
+    }
+    if(state.saga.done){openMap();return}
+    startLevel(Math.min(80,state.saga.n));
+  },500);
 }
 function goMenu(){
   closeModal('mSettings');
@@ -486,7 +481,7 @@ function renderSlots(){
   for(let n=1;n<=3;n++){
     const i=slotInfo(n),on=n===curSlot();
     h+='<div class="slot'+(on?' on':'')+'"><div class="si">'+(i?(i.won||i.trip>1?'💞':'🐦'):'🪺')+'</div><div class="st">'+T('Kayıt ','Save ')+n+
-      '<small>'+(i?Math.round(i.km)+' km '+T('kaldı','left')+' · '+i.hearts+' ❤ · '+i.cats+'/6 🐱'+(i.trip>1?' · '+T('Yolculuk ','Trip ')+i.trip:''):T('Boş · yeni yolculuk','Empty · new journey'))+'</small></div><div class="sb">'+
+      '<small>'+(i?(i.lv?T('Seviye ','Level ')+i.lv+'/80 · ':'')+Math.round(i.km)+' km '+T('kaldı','left')+' · '+i.hearts+' ❤ · '+i.cats+'/6 🐱'+(i.trip>1?' · '+T('Yolculuk ','Trip ')+i.trip:''):T('Boş · yeni yolculuk','Empty · new journey'))+'</small></div><div class="sb">'+
       '<button class="btn sm" data-act="pick:'+n+'">'+(i?T('Yükle','Load'):T('Yeni','New'))+'</button>'+
       (i?'<button class="btn sm danger" data-act="del:'+n+'">🗑</button>':'')+'</div></div>';
   }
@@ -518,8 +513,8 @@ $('#tSet').addEventListener('click',()=>{ensureAudio();sfx('tap');showModal('mSe
 $('#tHow').addEventListener('click',()=>{
   ensureAudio();sfx('tap');
   showNote({art:'<div style="font-size:56px">📖</div>',title:T('Nasıl Oynanır?','How to Play'),
-   text:T('✉️ Yuvaya dokun, eşyalar çıksın.\n🔀 Aynı iki eşyayı sürükleyip birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Siparişi doğru eşyayla kargola, aradaki km azalsın.\n🐱 Kedileri de birleştir; her yeni kedi bonus enerji verir.\n🎁 Sürpriz kutuları, günlük hediyeler ve görevler seni bekliyor.\n\n0 km’de Bird ve Birdie kavuşur! 💞',
-   'Tap the nest to hatch items.\nDrag two matching items together: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\nDeliver orders to cut the kilometers.\nMerge cats too; every new cat gives bonus energy.\nSurprise boxes, daily gifts and quests await.\n\nAt 0 km, Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
+   text:T('🎯 Her seviyenin bir hedefi ve hamle sınırı var. Yuvaya her dokunuş 1 hamle harcar.\n🔀 Aynı iki eşyayı birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Siparişleri teslim et: hedef olur, hamle kazandırır.\n🐱 Kediler de birleşir; her yeni kedi bonus hamle verir.\n🗺️ 80 seviyeyi geç, İstanbul ile Adana arasını kapat. Her 10 seviyede yeni tema ve yeni engel gelir!\n\nSonunda Bird ve Birdie kavuşur! 💞',
+   'Every level has goals and a move limit. Each nest tap costs 1 move.\nMerge two matching items: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\nDeliver orders: they can be goals and earn moves.\nMerge cats too; each new cat gives bonus moves.\nClear 80 levels to close the gap between Istanbul and Adana. Every 10 levels brings a new theme and a new hazard!\n\nIn the end Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
 });
 $('#tLang').addEventListener('click',()=>{sfx('tap');state.settings.lang=state.settings.lang==='en'?'tr':'en';renderAll();syncSettings();if(started)saveSoon();else try{localStorage.setItem(KEY,JSON.stringify(Object.assign({},readSlot(curSlot())||state,{settings:state.settings})))}catch(e){}});
 $('#tMusic').addEventListener('click',()=>{
@@ -542,7 +537,7 @@ function init(){
   setInterval(()=>{if(document.hidden||mCur||!started)return;say(rnd(IDLE)())},13000);
   roamStart();
   showTitle();
-  window.__PK={get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,useTheme,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
+  window.__PK={startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
 }
 init();
 })();

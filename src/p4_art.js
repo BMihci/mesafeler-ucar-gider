@@ -14,8 +14,16 @@ const HAT={
   catears:'<g '+st(2.4)+'><path d="M34 36L32 12L50 26Z" fill="#FF8FB0"/><path d="M86 36L88 12L70 26Z" fill="#FF8FB0"/><path d="M33 38Q60 20 87 38" fill="none" stroke-width="3.4"/></g><path d="M36 30l-1-10 8 7zM84 30l1-10-8 7z" fill="#FFD3DF"/>',
   crown:'<g '+st(2.4)+'><path d="M42 36L44 17L52 27L60 13L68 27L76 17L78 36Z" fill="#FFD76A"/></g><circle cx="60" cy="24" r="2.4" fill="#FF5D8F"/><circle cx="46" cy="30" r="1.8" fill="#6EB5F2"/><circle cx="74" cy="30" r="1.8" fill="#6EB5F2"/>'
 };
-const BIRDIE={body:'#FFC4D6',wing:'#FFA9C4',belly:'#FFE9F0',acc:'<g transform="translate(86 32) rotate(14)" '+st(2.2)+'><path d="M0 0L-15 -9V9Z" fill="#FF7FA3"/><path d="M0 0L15 -9V9Z" fill="#FF7FA3"/><circle r="4.5" fill="#FF5D8F"/></g>'};
-const meBird=()=>({body:'#FFE08A',wing:'#FFCD5E',belly:'#FFF4CB',acc:HAT[state.cos.hat]||''});
+/* Birdie: mavi saçlı beyaz kuş · Bird: kahverengi kuş */
+const HAIR='<g '+st(2.4)+'><path d="M22 54Q18 22 60 20Q102 22 98 54Q92 38 76 36Q66 46 56 36Q38 40 22 54Z" fill="#5BA8F0"/><path d="M22 54Q12 72 22 92Q31 80 31 62Z" fill="#5BA8F0"/><path d="M98 54Q108 72 98 92Q89 80 89 62Z" fill="#5BA8F0"/></g><path d="M36 31Q46 25 58 27" stroke="#B8DBFA" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M92 28l2.4 4.8 5.3.8-3.8 3.7.9 5.3-4.8-2.5-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z" fill="#FFE08A" '+st(1.6)+'/>';
+const SCARF='<path d="M34 90Q60 106 86 90L84 99Q60 114 36 99Z" fill="#E2638A" '+st(2.2)+'/><path d="M78 96l6 14 7-4-4-12z" fill="#E2638A" '+st(2)+'/>';
+const BIRDIE={body:'#FFFFFF',wing:'#DDEAF8',belly:'#F3F8FF',acc:HAIR};
+const BIRDB={body:'#A8744F',wing:'#8B5A3A',belly:'#E8C9A0',acc:SCARF};
+const playerIsBirdie=()=>!(state&&state.saga&&state.saga.dir==='B');
+const meBird=()=>playerIsBirdie()
+  ?{body:BIRDIE.body,wing:BIRDIE.wing,belly:BIRDIE.belly,acc:HAIR+(HAT[state.cos.hat]||'')}
+  :{body:BIRDB.body,wing:BIRDB.wing,belly:BIRDB.belly,acc:SCARF+(HAT[state.cos.hat]||'')};
+const partnerBird=()=>playerIsBirdie()?BIRDB:BIRDIE;
 
 function birdSVG(o,mood){
   mood=mood||'idle';let eyes;
@@ -116,8 +124,12 @@ const ICON_A=[null,
   /*6 bilet*/'<g transform="rotate(-12 32 32)"><path d="M5 19H59V27A5 5 0 0 0 59 37V45H5V37A5 5 0 0 0 5 27Z" fill="#FFF3C4" '+st(2.6)+'/><path d="M42 20V44" stroke="'+INK+'" stroke-width="2" stroke-dasharray="3 3" fill="none"/><path d="M12 34L28 26L31 27L22 33L31 35L34 32L37 33L34 38L26 39L24 43L21 42L22 38Z" fill="#6EA8E8" '+st(1.8)+'/><path transform="translate(51 32)" d="M0 -6L1.8 -1.8L6.5 -1.5L2.9 1.5L4 6L0 3.4L-4 6L-2.9 1.5L-6.5 -1.5L-1.8 -1.8Z" fill="#FFD76A" '+st(1.6)+'/></g>'
 ];
 const ICON_BOX='<g '+st(2.4)+'><rect x="10" y="28" width="44" height="28" rx="5" fill="#FFB3C7"/><rect x="7" y="19" width="50" height="13" rx="5" fill="#FF8FB0"/><rect x="28" y="19" width="8" height="37" fill="#FFE08A"/><path d="M32 19Q20 4 15 12T32 19Q44 4 49 12T32 19Z" fill="#FFE08A"/></g><path d="M12 7l1.5 3 3 1.5-3 1.5L12 16l-1.5-3L7.5 11.5l3-1.5z" fill="#fff" stroke="#F2B01E" stroke-width="1.2"/>';
+const ICON_ROCK=h=>'<g '+st(2.6)+'><path d="M8 50Q4 30 18 20Q28 8 44 14Q60 20 57 40Q58 56 44 56H16Q10 56 8 50Z" fill="'+(h>1?'#9A918A':'#BDB3AA')+'"/></g><path d="M22 24Q30 20 38 22" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/>'+(h>1?'<path d="M18 40l8-6 6 8 8-6" stroke="'+INK+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>':'<path d="M30 30l5 8-4 6" stroke="'+INK+'" stroke-opacity=".5" stroke-width="2.2" fill="none" stroke-linecap="round"/>');
+const ICON_BALLOON='<g '+st(2.4)+'><path d="M32 4C16 4 10 16 12 26C14 36 24 42 26 44H38C40 42 50 36 52 26C54 16 48 4 32 4Z" fill="#FF8FB0"/><path d="M32 4C24 12 24 36 28 44M32 4C40 12 40 36 36 44" fill="none"/><rect x="26" y="52" width="12" height="8" rx="2" fill="#E8B98A"/></g><path d="M27 44L28 52M37 44L36 52" '+st(2)+'/><path d="M20 10Q24 8 28 9" stroke="#fff" stroke-opacity=".7" stroke-width="3" fill="none" stroke-linecap="round"/>';
 function itemIcon(t,l){
   if(t==='x')return wrapIco(ICON_BOX);
+  if(t==='r')return wrapIco(ICON_ROCK(l));
+  if(t==='w')return wrapIco(ICON_BALLOON);
   if(t==='c')return catSVG(CATS[l]).replace('<svg ','<svg class="ico cat" ');
   return wrapIco(ICON_A[l]);
 }
@@ -132,7 +144,7 @@ const C_DESC=[null,
   ['Kulakları ve patileri çikolata gibi.','Ears and paws like chocolate.'],
   ['Postacı! Takım elbisesiyle kargo dağıtır.','The courier! Delivers parcels in a tux.'],
   ['Şans getirir; pati kaldırınca kalpler uçar.','Brings luck; hearts fly when its paw goes up.']];
-const itemName=(t,l)=>t==='x'?T('Sürpriz Kutusu','Surprise Box'):(t==='c'?T(C_NAMES[l][0],C_NAMES[l][1]):T(A_NAMES[l][0],A_NAMES[l][1]));
+const itemName=(t,l)=>t==='x'?T('Sürpriz Kutusu','Surprise Box'):t==='w'?T('Balon Jokeri','Balloon Joker'):t==='r'?T('Taş','Rock'):(t==='c'?T(C_NAMES[l][0],C_NAMES[l][1]):T(A_NAMES[l][0],A_NAMES[l][1]));
 const catName=l=>T(C_NAMES[l][0],C_NAMES[l][1]);
 const HAT_NAMES={none:['Şapkasız','No hat'],beanie:['Bere','Beanie'],flower:['Çiçek Tacı','Flower Crown'],bow:['Fiyonk','Bow'],catears:['Kedi Kulağı','Cat Ears'],crown:['Taç','Crown']};
 const THEME_NAMES={pink:['Şeker Pembe','Candy Pink'],autumn:['Sonbahar Kafesi','Autumn Café'],snow:['Karlı Pencere','Snowy Window']};
@@ -151,7 +163,7 @@ const BGS={
 };
 function charSVG(c){
   if(c.k==='me')return birdSVG(meBird(),c.mood);
-  if(c.k==='you')return birdSVG(BIRDIE,c.mood);
+  if(c.k==='you')return birdSVG(partnerBird(),c.mood);
   if(c.k&&c.k[0]==='c'){const l=+c.k.slice(1);return catSVG(CATS[l],c.mood,c.acc)}
   return '';
 }
@@ -164,41 +176,46 @@ function panelHTML(p){
 }
 
 /* ---- hikâye (iki dilli) ---- */
+
+/* ---- yol üzerindeki duraklar: bölge notları ---- */
+const BLURB=[
+  ['Boğaz’da vapur düdüğü, martılar ve simit kokusu 🚢','Ferry horns, seagulls and simit over the Bosphorus 🚢'],
+  ['Bolu’nun çam ormanında yağmur kokusu 🌲','Rain on the pine forests of Bolu 🌲'],
+  ['Ankara bozkırında rüzgâr uğulduyor 🌾','Wind howls over the Ankara steppe 🌾'],
+  ['Peribacalarının arasında sıcak hava balonları 🎈','Hot-air balloons between the fairy chimneys 🎈'],
+  ['Toroslar’da kar tipisi! ❄️','A blizzard in the Taurus Mountains! ❄️'],
+  ['Çukurova’da pamuk tarlaları uçsuz bucaksız ☁️','Endless cotton fields in Cukurova ☁️'],
+  ['Tarsus’ta Akdeniz’in tuzlu esintisi 🌊','The salty Mediterranean breeze in Tarsus 🌊'],
+  ['Adana’da şalgam ve kebap kokusu 🍢','Smell of kebab and turnip juice in Adana 🍢']
+];
+const routeIdx=j=>dirB()?7-j:j;
+const blurbAt=j=>T(BLURB[routeIdx(j)][0],BLURB[routeIdx(j)][1]);
 const STORY={
   intro:()=>[
-    {bg:'morning',chars:[{k:'me',x:8,y:8,w:46,mood:'idle'}],bub:[{txt:T(`Günaydın ${YOU()}… bugün de 1000 km ötedesin 🥺`,`Good morning ${YOU()}… you're still 1000 km away 🥺`),x:30,y:6}],cap:T('İstanbul · Sabah','Istanbul · Morning')},
-    {bg:'snowroom',chars:[{k:'you',x:8,y:8,w:40},{k:'c1',x:58,y:4,w:30,mood:'sleep'}],bub:[{txt:T(`${ME()}'i özledim… Yumak da özledi 💕`,`I miss ${ME()}… so does Fluff 💕`),x:6,y:6}],cap:T('Erzurum · Kar yağıyor','Erzurum · Snowing')},
-    {bg:'road',wide:true,chars:[{k:'c5',x:62,y:6,w:20,mood:'happy',acc:'mail'}],bub:[{txt:T('Miyav! Paket servisi! İstanbul’dan Erzurum’a kaç kilo aşk var? 📦','Meow! Parcel service! How many kilos of love from Istanbul to Erzurum? 📦'),x:4,y:10}],cap:T('Postacı Tombik','Postcat Tux')},
-    {bg:'sunset',wide:true,chars:[{k:'me',x:10,y:8,w:24,mood:'happy'},{k:'c5',x:62,y:6,w:20,mood:'happy',acc:'mail'}],bub:[{txt:T('Her hediye aramızdaki yolu biraz kısaltsın! 💌','Let every gift shorten the road between us! 💌'),x:8,y:8},{txt:T('Kargo yola çıkıyor! 🐾','Parcel on its way! 🐾'),x:58,y:14,r:1}],cap:T('Yolculuk başlıyor','The journey begins')}
+    {bg:'morning',chars:[{k:'me',x:8,y:8,w:46,mood:'idle'}],bub:[{txt:T(`Günaydın ${YOU()}… bugün de ${KM_TOTAL} km ötedesin 🥺`,`Good morning ${YOU()}… you're still ${KM_TOTAL} km away 🥺`),x:30,y:6}],cap:rc(0)+' · '+T('Sabah','Morning')},
+    {bg:'snowroom',chars:[{k:'you',x:8,y:8,w:40},{k:'c1',x:58,y:4,w:30,mood:'sleep'}],bub:[{txt:T(`${ME()}'i özledim… Yumak da özledi 💕`,`I miss ${ME()}… so does Fluff 💕`),x:6,y:6}],cap:rc(7)},
+    {bg:'road',wide:true,chars:[{k:'c5',x:62,y:6,w:20,mood:'happy',acc:'mail'}],bub:[{txt:T(`Miyav! Paket servisi! ${rc(0)}’dan ${rc(7)}’ya kaç kilo aşk var? 📦`,`Meow! Parcel service! How many kilos of love from ${rc(0)} to ${rc(7)}? 📦`),x:4,y:10}],cap:T('Postacı Tombik','Postcat Tux')},
+    {bg:'sunset',wide:true,chars:[{k:'me',x:10,y:8,w:24,mood:'happy'},{k:'c5',x:62,y:6,w:20,mood:'happy',acc:'mail'}],bub:[{txt:T('80 seviye, 8 şehir… Her seviye seni biraz daha yaklaştırsın! 💌','80 levels, 8 cities… every level brings me closer! 💌'),x:8,y:8},{txt:T('Kargo yola çıkıyor! 🐾','Parcel on its way! 🐾'),x:58,y:14,r:1}],cap:T('Yolculuk başlıyor','The journey begins')}
   ],
-  1:()=>[
-    {bg:'train',chars:[{k:'c5',x:30,y:4,w:42,mood:'happy',acc:'mail'}],bub:[{txt:T('Eskişehir’e geldik! Patilerim yoruldu miyav…','We reached Eskisehir! My paws are tired, meow…'),x:6,y:6}],cap:T('Eskişehir','Eskisehir')},
-    {bg:'snowroom',chars:[{k:'you',x:8,y:8,w:40,mood:'happy'},{k:'c1',x:58,y:4,w:30}],bub:[{txt:T(`Paket geldi! ${ME()} sıcak kahve göndermiş ☕`,`A parcel! ${ME()} sent hot coffee ☕`),x:6,y:6}],cap:T('Erzurum','Erzurum')}
-  ],
-  2:()=>[
-    {bg:'road',chars:[{k:'me',x:6,y:6,w:38,mood:'happy'},{k:'c5',x:54,y:6,w:34,mood:'happy',acc:'mail'}],bub:[{txt:T('Yarı yola yaklaşıyoruz! Devam!','Nearly halfway! Keep going!'),x:8,y:6}],cap:'Ankara'},
-    {bg:'snowroom',chars:[{k:'you',x:8,y:8,w:40,mood:'happy'},{k:'c1',x:58,y:4,w:30,mood:'happy'}],bub:[{txt:T('Sana atkı örüyorum ama Yumak yumağı karıştırdı 🧶','I’m knitting you a scarf but Fluff tangled the yarn 🧶'),x:4,y:6}],cap:T('Erzurum','Erzurum')}
-  ],
-  3:()=>[
-    {bg:'snowroad',chars:[{k:'c5',x:30,y:4,w:42,mood:'happy',acc:'mail'}],bub:[{txt:T('Brrr! Sivas’ta kar tipisi var! ❄️','Brrr! Blizzard in Sivas! ❄️'),x:6,y:6}],cap:'Sivas'},
-    {bg:'night',chars:[{k:'me',x:26,y:8,w:46,mood:'idle'}],bub:[{txt:T(`Aynı ay, aynı gökyüzü… ${YOU()} da bakıyordur 🌙`,`Same moon, same sky… ${YOU()} must be looking too 🌙`),x:4,y:4}],cap:T('Gece','Night')}
-  ],
-  4:()=>[
-    {bg:'sunset',chars:[{k:'me',x:6,y:8,w:38,mood:'happy'},{k:'c5',x:54,y:6,w:34,mood:'happy',acc:'mail'}],bub:[{txt:T('Az kaldı! Sadece 200 km!','Almost there! Only 200 km!'),x:8,y:6}],cap:'Erzincan'},
-    {bg:'doorstep',chars:[{k:'you',x:4,y:2,w:38,mood:'love'},{k:'c1',x:62,y:2,w:30,mood:'happy'}],bub:[{txt:T(`Kapıda bekliyorum… hadi ${ME()} 💞`,`Waiting by the door… hurry, ${ME()} 💞`),x:30,y:4,r:1}],cap:T('Erzurum','Erzurum')}
-  ],
+  beat:k=>{
+    const c=2*k-1,city=rc(c+1),pct=Math.round((c+1)*10/80*100),left=Math.round(KM_TOTAL*(1-(c+1)*10/80));
+    return[
+      {bg:k===3?'snowroad':'train',chars:[{k:'c5',x:30,y:4,w:42,mood:'happy',acc:'mail'}],bub:[{txt:T(`${city}’a geldik! ${blurbAt(c+1)}`,`We reached ${city}! ${blurbAt(c+1)}`),x:4,y:4}],cap:city},
+      {bg:k===4?'doorstep':'snowroom',chars:[{k:'you',x:8,y:8,w:40,mood:'happy'},{k:'c1',x:58,y:4,w:30,mood:'happy'}],bub:[{txt:T(`Yolun %${pct}’i tamam! Aramızda ${left} km kaldı 💕`,`${pct}% of the road done! ${left} km left between us 💕`),x:4,y:6}],cap:rc(7)}
+    ];
+  },
   fin:()=>[
-    {bg:'doorstep',chars:[{k:'you',x:30,y:2,w:42,mood:'happy'}],bub:[{txt:T('Kapı çalıyor?!','Someone’s knocking?!'),x:6,y:6}],cap:T('Erzurum','Erzurum')},
+    {bg:'doorstep',chars:[{k:'you',x:30,y:2,w:42,mood:'happy'}],bub:[{txt:T('Kapı çalıyor?!','Someone’s knocking?!'),x:6,y:6}],cap:rc(7)},
     {bg:'doorstep',chars:[{k:'me',x:6,y:2,w:40,mood:'love'},{k:'c5',x:58,y:2,w:34,mood:'happy',acc:'mail'}],bub:[{txt:T(`Sürpriz! Geldim ${YOU()}!`,`Surprise! I’m here, ${YOU()}!`),x:30,y:4,r:1}],cap:'📦'},
-    {bg:'sunset',wide:true,chars:[{k:'c1',x:4,y:6,w:15,mood:'love'},{k:'me',x:28,y:6,w:22,mood:'love'},{k:'you',x:48,y:6,w:22,mood:'love'},{k:'c5',x:76,y:6,w:15,mood:'love',acc:'mail'}],bub:[{txt:T('Artık 0 km! Hoş geldin aşkım 💕','Zero km now! Welcome home, love 💕'),x:26,y:6}],cap:T('Erzurum · Kavuşma','Erzurum · Together')}
+    {bg:'sunset',wide:true,chars:[{k:'c1',x:4,y:6,w:15,mood:'love'},{k:'me',x:28,y:6,w:22,mood:'love'},{k:'you',x:48,y:6,w:22,mood:'love'},{k:'c5',x:76,y:6,w:15,mood:'love',acc:'mail'}],bub:[{txt:T('Artık 0 km! Hoş geldin aşkım 💕','Zero km now! Welcome home, love 💕'),x:26,y:6}],cap:rc(7)+' · '+T('Kavuşma','Reunion')}
   ]
 };
+STORY[1]=()=>STORY.beat(1);STORY[2]=()=>STORY.beat(2);STORY[3]=()=>STORY.beat(3);STORY[4]=()=>STORY.beat(4);
 const LETTERS={
   intro:()=>T(`Sevgilim ${ME()},\naramızda koca bir yol var ama gönderdiğin her paket kalbime biraz daha yaklaşıyor.\n— ${YOU()}`,`Dear ${ME()},\nthere's a long road between us, but every parcel you send brings you a little closer to my heart.\n— ${YOU()}`),
-  1:()=>T(`Sıcak kahve elimde, buharı yüzüme değiyor ve seni düşünüyorum ☕\n— ${YOU()}`,`Hot coffee in my hands, steam on my face, and I'm thinking of you ☕\n— ${YOU()}`),
-  2:()=>T(`Yumak yünleri karıştırdı ama atkının yarısı bitti! Yakında seninle birlikte sarılacağız.\n— ${YOU()}`,`Fluff tangled the yarn, but half the scarf is done! Soon we'll wrap up in it together.\n— ${YOU()}`),
-  3:()=>T(`Bu gece kar çok yağıyor ama içim sıcacık. Hâlâ aynı aya bakıyoruz, değil mi?\n— ${YOU()}`,`It's snowing hard tonight, but I feel so warm. We're still looking at the same moon, right?\n— ${YOU()}`),
-  4:()=>T(`Camın önünden ayrılamıyorum. Her kapı sesinde sen geliyorsun sanıyorum. 200 km… çok az kaldı!\n— ${YOU()}`,`I can't leave the window. Every sound at the door feels like you. 200 km… so close!\n— ${YOU()}`),
+  1:()=>T(`${rc(2)} yakınlarındasın diye duydum! Sıcak kahve elimde, buharı yüzüme değiyor ve seni düşünüyorum ☕\n— ${YOU()}`,`I heard you're near ${rc(2)}! Hot coffee in my hands, steam on my face, and I'm thinking of you ☕\n— ${YOU()}`),
+  2:()=>T(`Yumak yünleri karıştırdı ama atkının yarısı bitti! ${rc(4)} yolunda üşüme diye örüyorum.\n— ${YOU()}`,`Fluff tangled the yarn, but half the scarf is done! I'm knitting it so you won't be cold on the way to ${rc(4)}.\n— ${YOU()}`),
+  3:()=>T(`Bu gece gökyüzü ne kadar güzel. Hâlâ aynı aya bakıyoruz, değil mi? ${rc(6)}’yı geçince bana yaz.\n— ${YOU()}`,`The sky is so beautiful tonight. We're still looking at the same moon, right? Write to me once you pass ${rc(6)}.\n— ${YOU()}`),
+  4:()=>T(`Camın önünden ayrılamıyorum. Her kapı sesinde sen geliyorsun sanıyorum. Çok az kaldı!\n— ${YOU()}`,`I can't leave the window. Every sound at the door feels like you. So close now!\n— ${YOU()}`),
   fin:()=>T(`Geldin! Artık mektuba da pakete de gerek yok… ama yine de birbirimize hediye göndermeye devam edelim, olur mu? 💕\n— ${YOU()}`,`You're here! We don't need letters or parcels anymore… but let's keep sending each other gifts anyway, okay? 💕\n— ${YOU()}`)
 };
-

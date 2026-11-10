@@ -4,13 +4,13 @@
    ---------------------------------------------------------------------
    DENGE TABLOSU (BAL, KMV, HV, UPS): oyunun ekonomisini buradan ayarla.
    ===================================================================== */
-const CELLS=25,KM_TOTAL=1000,KEY0='pofuduk-kuslar-v2',SLOTKEY='pk-active-slot',KEY1='pofuduk-kuslar-mesafe-ask-v1';
+const CELLS=25,KM_TOTAL=940,KEY0='pofuduk-kuslar-v2',SLOTKEY='pk-active-slot',KEY1='pofuduk-kuslar-mesafe-ask-v1';
 const MAXL={a:6,c:6};
 const BAL={
   energyBase:20,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
   regenMs:8000,regenPerPost:.10,regenPerCat:.02,
   kitMs:45000,kitMax:3,kitPerCat:.05,
-  unlockCost:5,orderEnergy:3,orderHearts:2,
+  unlockCost:5,orderEnergy:1,orderHearts:2,
   rushMs:100000,rushEvery:4,rushMult:2,
   boxChance:.10,boxMinLevel:3,
   buyEnergyCost:10,buyEnergyAmt:5,
@@ -23,9 +23,9 @@ const HV={a:[0,1,3,6,12,25,50],c:[0,2,5,9,16,30,60]};
 const UPS={blanket:{max:3,cost:[25,60,120]},post:{max:3,cost:[30,70,140]},nest:{max:3,cost:[40,90,180]}};
 const HATS={beanie:0,none:0,flower:25,bow:30,catears:40,crown:80};
 const THEMES={pink:0,autumn:60,snow:60};
-const CITY_TR=['İstanbul','Eskişehir','Ankara','Sivas','Erzincan','Erzurum'];
-const CITY_EN=['Istanbul','Eskisehir','Ankara','Sivas','Erzincan','Erzurum'];
-const AUTO_TRACK=['coffee','coffee','pati','snow','snow','reunion'];
+const ROUTE_TR=['İstanbul','Bolu','Ankara','Kapadokya','Toroslar','Çukurova','Tarsus','Adana'];
+const ROUTE_EN=['Istanbul','Bolu','Ankara','Cappadocia','Taurus Mts','Cukurova','Tarsus','Adana'];
+const CH_TRACK=['coffee','pati','coffee','pati','snow','pati','coffee','reunion'];
 
 /* ---------- yardımcılar ---------- */
 const $=s=>document.querySelector(s);
@@ -38,12 +38,17 @@ const lang=()=>(state&&state.settings&&state.settings.lang==='en')?'en':'tr';
 const T=(a,b)=>lang()==='en'?b:a;
 const ME=()=>state.settings.names.me||'Bird';
 const YOU=()=>state.settings.names.you||'Birdie';
-const cities=()=>{const c=(lang()==='en'?CITY_EN:CITY_TR).slice();return (state&&state.trip%2===0)?c.reverse():c};
+const dirB=()=>!!(state&&state.saga&&state.saga.dir==='B');
+/* yolculuk sırasıyla i. durak (0=başlangıç, 7=varış) */
+const rc=i=>{const r=lang()==='en'?ROUTE_EN:ROUTE_TR;return r[dirB()?7-i:i]};
+const cities=()=>[0,1,2,3,4,5,6,7].map(rc);
 function today(){const d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
 function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
 function seeded(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}h=h||1;return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%100000)/100000}}
 function stageOf(km){let s=0;BAL.stageAt.forEach(x=>{if(km<=x)s++});if(km<=0)s=5;return s}
-const energyMax=()=>BAL.energyBase+BAL.energyPerBlanket*state.up.blanket+BAL.energyPerCat*state.maxC;
+const chOf=n=>Math.min(7,((n-1)/10)|0);
+const curChap=()=>state&&state.saga?chOf(state.lv?state.lv.n:state.saga.n):0;
+const energyMax=()=>Math.max(1,(state.lv?state.lv.maxMoves:BAL.energyBase));
 const regenMs=()=>Math.round(BAL.regenMs*(1-BAL.regenPerPost*state.up.post)*(1-BAL.regenPerCat*state.maxC));
 const kitMs=()=>Math.round(BAL.kitMs*(1-BAL.kitPerCat*state.maxC));
 
@@ -53,7 +58,7 @@ function defState(settings){
   const board=Array(CELLS).fill(null);
   [6,7,11,13,17].forEach(i=>board[i]={t:'a',l:1,k:false});
   board[4]={t:'a',l:2,k:true};board[20]={t:'a',l:2,k:true};board[24]={t:'a',l:3,k:true};board[0]={t:'c',l:1,k:true};
-  return{v:2,board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
+  return{v:3,saga:null,lv:null,board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
     maxA:1,maxC:0,
     order:{reqs:[{t:'a',l:2,need:1,got:0}],done:false,say:0,rush:0},orderN:0,
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
@@ -79,8 +84,10 @@ function fix(s){
   s.board=s.board.map(c=>{
     if(!c)return null;const t=c.t||'a';
     if(t==='x')return{t:'x',l:1,k:false};
+    if(t==='w')return{t:'w',l:1,k:false};
+    if(t==='r')return{t:'r',l:clamp(c.l|0,1,3),k:false};
     if(!MAXL[t])return null;const l=c.l|0;if(l<1||l>MAXL[t])return null;
-    return{t,l,k:!!c.k};
+    const o={t,l,k:!!c.k};if(c.z)o.z=1;return o;
   });
   const num=(k,lo,hi)=>{s[k]=Number.isFinite(s[k])?clamp(s[k],lo,hi):d[k]};
   num('km',0,KM_TOTAL);num('hearts',0,1e7);num('energy',0,300);num('energyT',0,9e15);num('maxA',1,6);num('maxC',0,6);num('orderN',0,1e6);num('trip',1,999);
@@ -106,8 +113,25 @@ function fix(s){
   s.settings.names=Object.assign({me:'Bird',you:'Birdie'},s.settings.names||{});
   s.settings.lang=s.settings.lang==='en'?'en':'tr';
   s.tut=Object.assign(d.tut,s.tut||{});
-  s.won=!!s.won;s.v=2;
+  s.won=!!s.won;s.v=3;
+  s.saga=sanSaga(s.saga);s.lv=sanLv(s.lv);
   return s;
+}
+function sanSaga(g){
+  if(!g||typeof g!=='object')return null;
+  const o={dir:g.dir==='B'?'B':'A',n:clamp(g.n|0,1,80),stars:{}};
+  if(g.stars&&typeof g.stars==='object')for(const k in g.stars){const n=+k;if(n>=1&&n<=80)o.stars[n]=clamp(g.stars[k]|0,0,3)}
+  o.done=!!g.done;return o;
+}
+function sanLv(l){
+  if(!l||typeof l!=='object'||!Array.isArray(l.goals))return null;
+  try{
+    const o={n:clamp(l.n|0,1,80),maxMoves:clamp(l.maxMoves|0,1,400),spawned:clamp(l.spawned|0,0,9999),done:!!l.done,
+      goals:l.goals.filter(g=>g&&typeof g.k==='string').map(g=>({k:g.k,need:clamp(g.need|0,1,999),l:clamp(g.l|0,0,6)})).slice(0,4),
+      c:Object.assign({merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0},l.c||{}),
+      mech:Object.assign({},l.mech||{}),par:clamp(l.par|0,0,999),startHearts:l.startHearts|0,usedMoves:l.usedMoves|0};
+    return o.goals.length?o:null;
+  }catch(e){return null}
 }
 function migrateV1(){
   const raw=readStore(KEY1);if(!raw)return null;
@@ -245,7 +269,7 @@ const TRACK_ORDER=['auto','coffee','pati','snow','reunion'];
 function desiredTrack(){
   if(state.won&&state.km<=0)return 'reunion';
   const k=state.settings.track;
-  return(k==='auto'||!TRACKS[k])?AUTO_TRACK[stageOf(state.km)]:k;
+  return(k==='auto'||!TRACKS[k])?CH_TRACK[curChap()]:k;
 }
 function startMusic(){
   if(!AC||musicTimer||!state.settings.music)return;

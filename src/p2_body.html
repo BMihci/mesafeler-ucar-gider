@@ -1,9 +1,10 @@
 <body data-theme="pink">
 <div id="bg"></div>
+<div id="scene" aria-hidden="true"></div>
 <div class="awning"></div>
 <div id="app">
   <header class="top">
-    <div class="logo"><div class="logoCat" id="logoCat"></div><span class="l1" data-en="Distances Fly Away">Mesafeler Uçar Gider</span><span class="l2" data-en="Bird &amp; Birdie · Fluffy Birds 💞">Bird &amp; Birdie · Pofuduk Kuşlar 💞</span></div>
+    <div class="logo"><div class="logoCat" id="logoCat"></div><span class="l1" data-en="Distances Fly Away">Mesafeler Uçar Gider</span><span class="l2" data-en="Bird &amp; Birdie · Long-distance love 💞">Bird &amp; Birdie · Uzak mesafe aşkı 💞</span></div>
     <div class="hpill" id="heartPill">❤ <b id="hearts">0</b></div>
     <button class="ibtn" id="btnBook" aria-label="Defter">📖<i class="dot" id="bookDot"></i></button>
     <button class="ibtn" id="btnShop" aria-label="Dükkan">🛍️</button>
@@ -18,6 +19,11 @@
       <div class="runner" id="runner"></div>
       <div class="goal" id="goal"></div>
     </div>
+  </section>
+
+  <section class="panel lvcard" id="lvCard">
+    <div class="lv-top"><div class="lv-t" id="lvTitle"></div><button class="mapbtn" id="btnMap" aria-label="Harita">🗺️</button></div>
+    <div class="goals" id="goals"></div>
   </section>
 
   <section class="row">
@@ -76,7 +82,7 @@
       <span class="nlabel" id="nestLabel">Yuva · ✉️ üret</span>
     </button>
     <div class="panel energy">
-      <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
+      <div class="e-top"><span data-en="🌻 Moves">🌻 Hamle</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
       <div class="ebar"><i id="eFill"></i></div>
       <div class="e-note" id="eNote"></div>
     </div>
@@ -139,6 +145,59 @@
   <div class="tfoot" id="tFoot"></div>
 </div>
 
+<!-- Karakter seç -->
+<div class="modal" id="mChar">
+  <div class="mcard wide">
+    <div class="mhead"><h2 id="charH">Kimi oynamak istersin?</h2></div>
+    <div class="mbody">
+      <p class="mcap" id="charP"></p>
+      <div class="chars">
+        <button class="chbtn" data-dir="A"><div class="cha" id="chArtA"></div><b id="chNameA"></b><small id="chRouteA"></small></button>
+        <button class="chbtn" data-dir="B"><div class="cha" id="chArtB"></div><b id="chNameB"></b><small id="chRouteB"></small></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Harita -->
+<div class="modal" id="mMap">
+  <div class="mcard wide">
+    <div class="mhead"><h2 id="mapH">🗺️ Yolculuk Haritası</h2><button class="x" data-close="mMap">✕</button></div>
+    <div class="mbody" id="mapBody"></div>
+  </div>
+</div>
+
+<!-- Seviye girişi -->
+<div class="modal" id="mLvIntro">
+  <div class="mcard">
+    <div class="li-chap" id="liChap"></div>
+    <h2 class="li-h" id="liTitle"></h2>
+    <div class="li-goals" id="liGoals"></div>
+    <div class="li-mech" id="liMech"></div>
+    <div class="mbtns"><button class="btn" id="liStart">▶</button><button class="btn soft" id="liMap">🗺️</button></div>
+  </div>
+</div>
+
+<!-- Seviye tamam -->
+<div class="modal" id="mLvDone">
+  <div class="mcard">
+    <div class="ld-stars" id="ldStars"></div>
+    <h2 class="li-h" id="ldTitle"></h2>
+    <p class="mcap" id="ldText"></p>
+    <div class="mbtns"><button class="btn" id="ldNext"></button><button class="btn soft" id="ldMap">🗺️</button><button class="btn soft" id="ldAgain">↻</button></div>
+  </div>
+</div>
+
+<!-- Seviye kaybı -->
+<div class="modal" id="mLvFail">
+  <div class="mcard">
+    <div class="ld-stars" style="font-size:46px">😿</div>
+    <h2 class="li-h" id="lfTitle"></h2>
+    <p class="mcap" id="lfText"></p>
+    <div class="mbtns"><button class="btn" id="lfMoves"></button><button class="btn soft" id="lfRetry"></button><button class="btn soft" id="lfMap">🗺️</button></div>
+  </div>
+</div>
+
 <!-- Ayarlar -->
 <div class="modal" id="mSettings">
   <div class="mcard wide">
@@ -150,7 +209,7 @@
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
-      <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
+      <div class="mrow"><div><span data-en="♾️ Unlimited Moves">♾️ Sınırsız Hamle</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
     </div>
     <div class="mbtns">
       <button class="btn sm" id="btnSave2" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
