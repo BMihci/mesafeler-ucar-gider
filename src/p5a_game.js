@@ -34,7 +34,25 @@ function loop(t){
   if(parts.length)raf=requestAnimationFrame(loop);else{raf=0;ctx.clearRect(0,0,innerWidth,innerHeight)}
 }
 const PAL=['#FF7FA3','#FFB3C7','#FFD66B','#FFFFFF','#B9E8CD','#D1C2F6','#B6DCF8'];
+function sparkle(x,y,n){
+  if(matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  n=Math.min(n||8,14);const em=['⭐','✨','💖','🌟','💛','🎀','💗'];
+  for(let i=0;i<n;i++){
+    const e=document.createElement('div');e.className='spk';e.textContent=rnd(em);
+    const a=Math.random()*Math.PI*2,d=36+Math.random()*80,r=(Math.random()-.5)*260;
+    e.style.left=x+'px';e.style.top=y+'px';e.style.fontSize=(12+Math.random()*14)+'px';
+    document.body.appendChild(e);
+    if(e.animate){
+      const dx=Math.cos(a)*d,dy=Math.sin(a)*d;
+      const an=e.animate([{transform:'translate(-50%,-50%) scale(.2) rotate(0deg)',opacity:1},{transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+(dy-26)+'px)) scale(1.25) rotate('+r*.6+'deg)',opacity:1,offset:.55},{transform:'translate(calc(-50% + '+dx*1.2+'px),calc(-50% + '+(dy+34)+'px)) scale(.3) rotate('+r+'deg)',opacity:0}],{duration:650+Math.random()*450,easing:'cubic-bezier(.2,.8,.3,1)'});
+      an.onfinish=()=>e.remove();
+    }
+    setTimeout(()=>e.remove(),1300);
+  }
+}
+function sparkleEl(el,n){if(!el)return;const r=el.getBoundingClientRect();sparkle(r.left+r.width/2,r.top+r.height/2,n)}
 function burst(x,y,nh,ns){
+  sparkle(x,y,Math.min(6,Math.ceil((nh+ns)/3)));
   for(let i=0;i<nh;i++){const a=Math.random()*Math.PI*2,v=70+Math.random()*130;addPart({k:'h',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-90,g:240,r:(Math.random()-.5)*.6,vr:(Math.random()-.5)*2,s:6+Math.random()*7,c:rnd(['#FF7FA3','#FF5D8F','#FFB3C7']),life:1.1+Math.random()*.5,max:1.4})}
   for(let i=0;i<ns;i++){const a=Math.random()*Math.PI*2,v=60+Math.random()*150;addPart({k:'s',x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:120,r:0,vr:(Math.random()-.5)*6,s:4+Math.random()*5,c:rnd(['#FFD66B','#fff','#FFE9A8','#FFB3C7']),life:.7+Math.random()*.5,max:1})}
 }
@@ -396,7 +414,7 @@ function deliver(idx,oi,ri){
   req.got++;state.board[idx]=null;sel=null;
   const hh=HV[c.t][c.l];
   state.hearts+=hh;state.stats.items++;ev('item');
-  setTimeout(()=>{floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10)},430);
+  setTimeout(()=>{floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10);sparkle(cc.x,cc.y,6)},430);
   sfx('deliver');buzz(18);setMood('happy',2000);
   renderBoard();renderHUD();renderOrder();tutAdv('deliver');
   if(o.reqs.every(r=>r.got>=r.need)){
@@ -406,7 +424,7 @@ function deliver(idx,oi,ri){
     const en=BAL.orderEnergy+o.d+state.up.post;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+en);
     addCoins([1,2,4][o.d]);
     albumTick();
-    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+en+'🌻 +'+[1,2,4][o.d]+'🪙');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);renderHUD();renderOrder()},350);
+    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+en+'🌻 +'+[1,2,4][o.d]+'🪙');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);sparkleEl($('#feed'),12);sparkleEl($('#ords').children[oi],10);sparkleEl($('#nest'),8);renderHUD();renderOrder()},350);
     setTimeout(()=>{
       if(state.orders[oi]!==o)return;
       state.orders[oi]=makeOrder(o.d);renderOrder(oi);saveSoon();

@@ -545,5 +545,168 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
 .alb.on{background:radial-gradient(circle at 30% 25%,#fff,var(--t1) 55%,var(--t2))}.alb svg{width:84%;height:84%}
 .albcat svg{width:100%;height:100%}
 .albr{color:var(--ink2);font-weight:900;font-size:10.5px}
+
+/* =====================================================================
+   v10 · CANDY SKIN — Glossy / Jelly / Juicy 3D (yalnızca görsel katman)
+   ===================================================================== */
+:root{
+  --ink:#4B2377;--ink2:#8B5FC0;--paper:#FFFAFF;--pink:#FF4FA3;--pinkd:#D81B7C;--pink2:#FFB4DB;
+  --bg1:#9BE8FF;--bg2:#E7C9FF;--bg3:#FFC2E4;
+  --tray1:#A878FF;--tray2:#7A45E6;--trayE:#4F25B0;--cell:#F7EEFF;--cellS:#D9C2FA;
+  --sh:rgba(80,30,140,.38);
+  --gold1:#FFE066;--gold2:#FFB300;--gold3:#C97A00;
+  --jelly:cubic-bezier(.68,-.55,.26,1.55);
+}
+body[data-theme=autumn]{--bg1:#FFD9A0;--bg2:#FFC6A0;--bg3:#FFA9B8;--pink:#FF8A2B;--pinkd:#D9560E;--pink2:#FFD0A0}
+body[data-theme=snow]{--bg1:#BFE9FF;--bg2:#DCE4FF;--bg3:#F3D2FF;--pink:#3FA9FF;--pinkd:#1E7FDB;--pink2:#B6E0FF}
+body{background:
+  radial-gradient(circle at 15% 12%,rgba(255,255,255,.65) 0 70px,transparent 71px),
+  radial-gradient(circle at 88% 30%,rgba(255,255,255,.4) 0 50px,transparent 51px),
+  radial-gradient(circle at 70% 80%,rgba(255,240,120,.45) 0 90px,transparent 91px),
+  linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 52%,var(--bg3) 100%) fixed}
+body::before{opacity:.28}
+.awning{border-bottom:3px solid var(--gold3);background:repeating-linear-gradient(90deg,#FF4FA3 0 22px,#fff 22px 44px);box-shadow:0 3px 0 var(--gold2),0 6px 10px rgba(80,30,140,.25)}
+
+/* ---- cam gibi parlak paneller ---- */
+.panel{position:relative;border:3px solid var(--gold2);border-radius:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95) 0,rgba(255,255,255,0) 42%),linear-gradient(180deg,#FFF9FF,#FFE3F4);
+  box-shadow:0 5px 0 var(--gold3),0 0 0 2px rgba(255,255,255,.85) inset,0 -4px 8px rgba(255,79,163,.18) inset,0 10px 16px rgba(80,30,140,.22)}
+.hpill,.stat{border:3px solid var(--gold2);background:linear-gradient(180deg,#fff 0,#FFF1A8 55%,#FFD84A 100%);
+  box-shadow:0 4px 0 var(--gold3),inset 0 3px 0 rgba(255,255,255,.9),0 7px 10px rgba(80,30,140,.2);color:#5A2A00;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.stat{border-radius:14px}
+.ibtn{border:3px solid #fff;outline:2.5px solid var(--ink);background:radial-gradient(ellipse at 50% 0,rgba(255,255,255,.95) 0 35%,transparent 36%),linear-gradient(180deg,#5FE3FF,#19B4EE 60%,#0B8CD0);
+  box-shadow:0 4px 0 #0A5E96,inset 0 -4px 0 rgba(0,0,0,.12),0 8px 10px rgba(80,30,140,.3);transition:transform .18s var(--jelly)}
+.ibtn:active{transform:scale(.88,1.08) translateY(2px);box-shadow:0 1px 0 #0A5E96}
+.hpill.bump{animation:jbump .5s var(--jelly)}
+@keyframes jbump{0%{transform:scale(1)}35%{transform:scale(1.28,.82)}65%{transform:scale(.9,1.14)}100%{transform:scale(1)}}
+.dot{background:radial-gradient(circle at 35% 30%,#fff 0 2px,#FF6B9E 3px,#E0145F);border-color:#fff}
+.l1{-webkit-text-stroke:6px var(--ink);text-shadow:0 3px 0 var(--ink),0 5px 6px rgba(0,0,0,.25);background:none;color:#FFE95E}
+.l2{color:#fff;text-shadow:0 1px 0 var(--ink),0 0 6px rgba(75,35,119,.6)}
+
+/* ---- mesafe çubuğu ---- */
+.bar{border:2.5px solid var(--ink);height:14px;top:13px;background:repeating-linear-gradient(90deg,#fff 0 8px,#FFE0F1 8px 14px);box-shadow:inset 0 3px 3px rgba(75,35,119,.2)}
+.fill{background:linear-gradient(180deg,#FFB4DB 0,#FF4FA3 55%,#D81B7C 100%);box-shadow:inset 0 3px 0 rgba(255,255,255,.6)}
+
+/* ---- JELLY butonlar ---- */
+.btn{position:relative;border:3px solid var(--ink);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.28);
+  background:radial-gradient(ellipse 80% 45% at 50% 6%,rgba(255,255,255,.75) 0,rgba(255,255,255,0) 100%),linear-gradient(180deg,#FF8CC8 0,#FF3FA0 55%,#E0187F 100%);
+  box-shadow:0 5px 0 #9C0F5C,0 0 0 2px rgba(255,255,255,.55) inset,0 -5px 0 rgba(0,0,0,.14) inset,0 10px 14px rgba(80,30,140,.28);
+  transition:transform .2s var(--jelly),box-shadow .2s}
+.btn:hover{transform:scale(1.04)}
+.btn:active{transform:scale(1.07,.9) translateY(3px);box-shadow:0 1px 0 #9C0F5C,0 0 0 2px rgba(255,255,255,.55) inset,0 -3px 0 rgba(0,0,0,.14) inset}
+.btn.soft{color:var(--ink);text-shadow:0 1px 0 #fff;
+  background:radial-gradient(ellipse 80% 45% at 50% 6%,rgba(255,255,255,.95) 0,rgba(255,255,255,0) 100%),linear-gradient(180deg,#FFFFFF 0,#E6F8FF 55%,#B8E9FF 100%);
+  box-shadow:0 5px 0 #4FA7D0,0 0 0 2px rgba(255,255,255,.9) inset,0 -5px 0 rgba(0,0,0,.07) inset,0 10px 14px rgba(80,30,140,.2)}
+.btn.danger{background:radial-gradient(ellipse 80% 45% at 50% 6%,rgba(255,255,255,.7) 0,rgba(255,255,255,0) 100%),linear-gradient(180deg,#FFC36B,#FF8A1F 55%,#E36100);box-shadow:0 5px 0 #A64400,0 0 0 2px rgba(255,255,255,.5) inset,0 -5px 0 rgba(0,0,0,.14) inset,0 10px 14px rgba(80,30,140,.28)}
+.btn.dis{filter:grayscale(.7);opacity:.7}
+
+/* ---- siparişler: şeker kutuları ---- */
+.orow{border:2.5px solid #7FE0A8;background:linear-gradient(180deg,#fff 0,#E4FFEF 60%,#C7F5DB);box-shadow:inset 0 3px 0 rgba(255,255,255,.95),0 3px 0 #4FBF8B}
+.orow.d1{border-color:#FFA9D2;background:linear-gradient(180deg,#fff 0,#FFE9F5 60%,#FFD0E8);box-shadow:inset 0 3px 0 rgba(255,255,255,.95),0 3px 0 #E2639A}
+.orow.d2{border-color:#FFD25E;background:linear-gradient(180deg,#fff 0,#FFF6CC 60%,#FFE48A);box-shadow:inset 0 3px 0 rgba(255,255,255,.95),0 3px 0 #D99A00}
+.orow.d0{border-color:#7FE0A8}
+.odif{color:#FF9D00;text-shadow:0 1px 0 #fff,0 0 4px #FFE066}
+.orew{color:#C4126F;text-shadow:0 1px 0 #fff}
+.req{border:2.5px dashed #FF4FA3;background:linear-gradient(180deg,#fff,#FFF0F8);box-shadow:inset 0 2px 0 #fff;transition:transform .2s var(--jelly)}
+.req.want{border-color:#2FD98A;background:linear-gradient(180deg,#fff,#D9FFEA);animation:jpulse .9s ease-in-out infinite}
+@keyframes jpulse{50%{transform:scale(1.09,.95)}}
+.req.over{transform:scale(1.14,.92)}
+.mini{border:2.5px solid var(--ink);box-shadow:inset 0 3px 0 rgba(255,255,255,.9),inset 0 -3px 0 rgba(0,0,0,.1),0 2px 0 var(--t3)}
+.o-head{color:var(--ink);font-weight:900;text-shadow:0 1px 0 #fff}
+#orderReward{background:linear-gradient(180deg,#FFF1A8,#FFC93C);border:2px solid var(--gold3);border-radius:99px;padding:0 9px;font-style:normal;color:#6B3A00;box-shadow:inset 0 2px 0 #fff}
+
+/* ---- canlı görüşme penceresi: 3D altın çerçeve ---- */
+.feed{border:4px solid var(--gold2);border-radius:24px;background:#BDEBFF;
+  box-shadow:0 0 0 2.5px var(--ink),0 6px 0 2.5px var(--gold3),inset 0 0 0 3px rgba(255,255,255,.75),inset 0 -10px 18px rgba(255,79,163,.18),0 14px 20px rgba(80,30,140,.35)}
+.feed::after{content:"";position:absolute;left:8%;right:30%;top:3px;height:20%;border-radius:0 0 60% 60%/0 0 100% 100%;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));pointer-events:none;z-index:7}
+.live{background:linear-gradient(180deg,#FF7FB0,#E8195F);border:2px solid #fff;box-shadow:0 2px 0 var(--ink),0 0 8px rgba(255,79,163,.7)}
+.fname{background:linear-gradient(180deg,#8E4DFF,#5A24C8);border:1.5px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.fsay{border:2.5px solid var(--ink);box-shadow:0 3px 0 #FFB4DB,inset 0 2px 0 #fff}
+.pip{border:2.5px solid var(--gold2);box-shadow:0 2px 0 var(--gold3)}
+.fh{filter:drop-shadow(0 0 4px #fff);font-size:17px}
+.idle .fb-in{animation:jbreathe 2.6s ease-in-out infinite}
+@keyframes jbreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.05,.95)}}
+.hop .fb-in{animation:jhop .6s var(--jelly) 3}
+@keyframes jhop{0%,100%{transform:translateY(0) scale(1,1)}25%{transform:translateY(0) scale(1.12,.86)}50%{transform:translateY(-18px) scale(.9,1.14)}75%{transform:translateY(0) scale(1.1,.88)}}
+#feedBird svg,.pip svg{filter:drop-shadow(0 3px 2px rgba(80,30,140,.3))}
+
+/* ---- TAHTA ---- */
+.board{border:4px solid var(--gold2);border-radius:30px;
+  background:radial-gradient(ellipse 90% 30% at 50% 0,rgba(255,255,255,.4) 0,transparent 100%),repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px),linear-gradient(160deg,var(--tray1),var(--tray2));
+  box-shadow:0 8px 0 var(--trayE),0 0 0 3px var(--ink),0 0 0 6px var(--gold2),0 10px 0 6px var(--gold3),inset 0 4px 0 rgba(255,255,255,.4),inset 0 -8px 14px rgba(0,0,0,.2),0 24px 34px var(--sh)}
+.cell{border:2px solid rgba(255,255,255,.75);border-radius:19px;
+  background:radial-gradient(ellipse 70% 45% at 50% 12%,rgba(255,255,255,.95) 0,rgba(255,255,255,0) 100%),radial-gradient(circle at 50% 60%,var(--cell) 0,var(--cell) 55%,var(--cellS) 100%);
+  box-shadow:inset 0 -5px 0 var(--cellS),inset 0 3px 6px rgba(255,255,255,.9),0 2px 0 rgba(0,0,0,.18);transition:transform .22s var(--jelly),background .15s}
+.cell.empty::after{opacity:.16;filter:none}
+.cell:not(.empty):active{transform:scale(.9,1.06)}
+.cell.sel{outline:3px solid #FFE95E;outline-offset:0;transform:translateY(-3px) scale(1.04);background:radial-gradient(circle at 50% 40%,#FFFDE0,#FFF0A8);box-shadow:0 0 14px 3px rgba(255,230,90,.85),inset 0 -5px 0 #F7D86A}
+.cell.sel .item{animation:jwob .8s ease-in-out infinite}
+@keyframes jwob{0%,100%{transform:scale(1,1) rotate(0)}25%{transform:scale(1.1,.92) rotate(-4deg)}50%{transform:scale(.94,1.08) rotate(0)}75%{transform:scale(1.1,.92) rotate(4deg)}}
+.cell.over{transform:scale(1.1,.94);background:#FFE6F6}
+.cell.hint{box-shadow:inset 0 0 0 3px #5BE6A4,inset 0 -5px 0 #BDF3D8,0 0 10px rgba(91,230,164,.8)}
+
+/* ---- EŞYA KARTLARI: jöle şeker ---- */
+.item{border:3px solid var(--ink);border-radius:38%;
+  background:radial-gradient(ellipse 52% 30% at 34% 20%,rgba(255,255,255,.98) 0,rgba(255,255,255,0) 100%),radial-gradient(circle at 70% 85%,rgba(255,255,255,.35) 0,rgba(255,255,255,0) 40%),radial-gradient(circle at 36% 30%,#fff 0,var(--t1) 40%,var(--t2) 100%);
+  box-shadow:inset 0 5px 4px rgba(255,255,255,.9),inset 0 -8px 8px rgba(0,0,0,.14),inset 0 0 0 2px rgba(255,255,255,.35),0 4px 0 var(--t3),0 8px 8px rgba(75,35,119,.28)}
+.item .ico{filter:drop-shadow(0 2px 1px rgba(75,35,119,.28))}
+.item .lv{background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.7) 0 20%,transparent 21%),var(--t3);border:2px solid #fff;outline:2px solid var(--ink);text-shadow:0 1px 0 rgba(0,0,0,.35);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.t1{--t1:#FFC2DE;--t2:#FF78B4;--t3:#E02A84}
+.t2{--t1:#C8F5C0;--t2:#5FD66B;--t3:#25A33A}
+.t3{--t1:#FFE3A8;--t2:#FFA63D;--t3:#E07600}
+.t4{--t1:#E3CCFF;--t2:#A66BFF;--t3:#6E2FE0}
+.t5{--t1:#B5F0FF;--t2:#33C3F2;--t3:#0A8FCB}
+.t6{--t1:#FFF59A;--t2:#FFC61A;--t3:#D98F00}
+.kx{--t1:#FFF59A;--t2:#FFC61A;--t3:#D98F00}
+@keyframes boxShine{50%{box-shadow:inset 0 5px 4px rgba(255,255,255,.9),inset 0 -8px 8px rgba(0,0,0,.14),0 4px 0 var(--t3),0 0 18px 5px rgba(255,220,60,.95)}}
+@keyframes goldGlow{50%{box-shadow:inset 0 5px 4px rgba(255,255,255,.9),inset 0 -8px 8px rgba(0,0,0,.14),0 4px 0 var(--t3),0 0 20px 6px rgba(255,220,60,.95)}}
+.item.t6::after{content:"✦";position:absolute;right:8%;top:4%;font-size:calc(var(--cs)*.22);color:#fff;text-shadow:0 0 6px #FFD21F;animation:twk 1.4s ease-in-out infinite}
+@keyframes twk{50%{transform:scale(1.5) rotate(40deg);opacity:.6}}
+
+/* ---- JÖLE animasyonları (yaylanma) ---- */
+.a-spawn{animation:jpop .46s var(--jelly)}
+.a-merge{animation:jmerge .5s var(--jelly)}
+.a-move{animation:jland .3s var(--jelly)}
+.a-unlock{animation:jshake .45s}
+@keyframes jpop{0%{transform:scale(.1) rotate(-16deg);opacity:0}45%{transform:scale(1.28,.8);opacity:1}70%{transform:scale(.88,1.16)}100%{transform:scale(1)}}
+@keyframes jmerge{0%{transform:scale(.5)}30%{transform:scale(1.45,.78)}55%{transform:scale(.82,1.28)}78%{transform:scale(1.12,.92)}100%{transform:scale(1)}}
+@keyframes jland{0%{transform:scale(1.2,.8)}50%{transform:scale(.92,1.1)}100%{transform:scale(1)}}
+@keyframes jshake{20%{transform:rotate(-12deg) scale(1.15,.9)}50%{transform:rotate(10deg) scale(.92,1.12)}80%{transform:rotate(-4deg)}}
+.spk{position:fixed;z-index:120;pointer-events:none;line-height:1;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 2px #FFD21F)}
+
+/* ---- yuva / sepet ---- */
+.nest:active svg.ns{transform:scale(1.12,.84)}
+.nest svg.ns{transition:transform .22s var(--jelly);filter:drop-shadow(0 7px 4px rgba(80,30,140,.35))}
+.kit:active{transform:scale(.9,1.08)}
+.nlabel{text-shadow:0 1px 0 #fff}
+.energy{padding:6px 10px}
+#eFill{background:linear-gradient(180deg,#B8FF9E 0,#5BD64B 55%,#2FA82E);box-shadow:inset 0 3px 0 rgba(255,255,255,.6)}
+.e-track,.ebar{border:2.5px solid var(--ink);background:#fff;box-shadow:inset 0 3px 3px rgba(75,35,119,.2)}
+.jb{border:3px solid var(--ink);border-radius:18px;background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.85),transparent),linear-gradient(180deg,#FFFFFF,#D7F3FF 60%,#9ADFFB);box-shadow:0 4px 0 #3C97C7,inset 0 -3px 0 rgba(0,0,0,.08);transition:transform .2s var(--jelly)}
+.jb:active{transform:scale(.9,1.08)}
+.jb.on{background:linear-gradient(180deg,#FFF8B8,#FFD84A);box-shadow:0 4px 0 var(--gold3),0 0 14px rgba(255,220,60,.9)}
+.jb.jsell{background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.85),transparent),linear-gradient(180deg,#FFF6B0,#FFCF33 60%,#F0A800)}
+.jn{background:linear-gradient(180deg,#FF7FB0,#E8195F);color:#fff;border:2px solid #fff;outline:2px solid var(--ink)}
+
+/* ---- modallar ---- */
+.modal{background:radial-gradient(circle at 50% 30%,rgba(120,60,200,.45),rgba(50,15,100,.65));backdrop-filter:blur(4px)}
+.mcard{border:4px solid var(--gold2);border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95) 0,rgba(255,255,255,0) 30%),linear-gradient(180deg,#FFFDFF,#FFE6F6 60%,#FFD3EC);
+  box-shadow:0 0 0 3px var(--ink),0 7px 0 3px var(--gold3),inset 0 3px 0 rgba(255,255,255,.95),inset 0 -8px 16px rgba(255,79,163,.16),0 30px 50px rgba(50,15,100,.5);animation:jpop .5s var(--jelly)}
+.mcard h2{color:var(--ink);text-shadow:0 2px 0 #fff,0 3px 0 rgba(255,179,0,.5)}
+.mhead .x,.x{border:3px solid #fff;outline:2.5px solid var(--ink);background:linear-gradient(180deg,#FF8FB8,#E8195F);color:#fff;box-shadow:0 3px 0 #8E0F44;text-shadow:0 1px 0 rgba(0,0,0,.3);transition:transform .2s var(--jelly)}
+.x:active{transform:scale(.88)}
+.tabs button{border:3px solid var(--ink);border-radius:16px;background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.9),transparent),linear-gradient(180deg,#fff,#E4F6FF);box-shadow:0 3px 0 #6FB6DC;transition:transform .2s var(--jelly)}
+.tabs button.on{background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.8),transparent),linear-gradient(180deg,#FF9AD0,#FF3FA0);box-shadow:0 4px 0 #9C0F5C,0 0 10px rgba(255,79,163,.6);transform:translateY(-2px) scale(1.06)}
+.chip{border:2.5px solid var(--ink);background:linear-gradient(180deg,#fff,#EAF8FF);box-shadow:0 2px 0 #6FB6DC}
+.chip.on{background:linear-gradient(180deg,#FF9AD0,#FF3FA0);box-shadow:0 2px 0 #9C0F5C}
+.lrow,.sitem{border:2.5px solid var(--ink);background:linear-gradient(180deg,#fff 0,#FFF3FA);box-shadow:0 3px 0 #FFB4DB,inset 0 2px 0 #fff}
+.lrow .li{background:linear-gradient(180deg,#FFD6EC,#FF9AD0);border:2.5px solid var(--ink);box-shadow:inset 0 3px 0 rgba(255,255,255,.8)}
+.sitem.on{border-color:var(--gold3);background:linear-gradient(180deg,#FFFBD9,#FFEA8A);box-shadow:0 3px 0 var(--gold3),0 0 12px rgba(255,220,60,.7)}
+
+/* ---- yüzen yazılar ---- */
+.ftxt,.float{text-shadow:0 2px 0 var(--ink),0 0 8px #fff;font-weight:900}
+.toast{border:3px solid #fff;outline:2.5px solid var(--ink);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3);background:radial-gradient(ellipse 80% 45% at 50% 6%,rgba(255,255,255,.55),transparent),linear-gradient(180deg,#A878FF,#6A35E0);box-shadow:0 5px 0 #3A1585,0 10px 16px rgba(50,15,100,.4);transition:transform .45s var(--jelly)}
+.toast.show{transform:translate(-50%,0) scale(1)}
 </style>
 </head>

@@ -43,7 +43,7 @@ function birdSVG(o,mood){
   mood=mood||'idle';let eyes;
   if(mood==='happy')eyes='<path d="M39 59Q45 49 51 59M69 59Q75 49 81 59" stroke="#5B3A3A" stroke-width="4" fill="none" stroke-linecap="round"/>';
   else if(mood==='love')eyes='<path transform="translate(45 56) scale(.95)" d="'+HP+'" fill="#FF5D8F"/><path transform="translate(75 56) scale(.95)" d="'+HP+'" fill="#FF5D8F"/>';
-  else eyes='<g class="eyes"><circle cx="45" cy="57" r="5.5" fill="#5B3A3A"/><circle cx="75" cy="57" r="5.5" fill="#5B3A3A"/><circle cx="43.3" cy="55" r="1.9" fill="#fff"/><circle cx="73.3" cy="55" r="1.9" fill="#fff"/></g>';
+  else eyes='<g class="eyes"><ellipse cx="44" cy="58" rx="7" ry="8" fill="#4A2E3A"/><ellipse cx="76" cy="58" rx="7" ry="8" fill="#4A2E3A"/><ellipse cx="44" cy="62" rx="4.6" ry="3.2" fill="#8E5A78" opacity=".55"/><ellipse cx="76" cy="62" rx="4.6" ry="3.2" fill="#8E5A78" opacity=".55"/><circle cx="41.6" cy="54.6" r="3" fill="#fff"/><circle cx="73.6" cy="54.6" r="3" fill="#fff"/><circle cx="46.6" cy="61.5" r="1.4" fill="#fff"/><circle cx="78.6" cy="61.5" r="1.4" fill="#fff"/></g>';
   return '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
   +'<ellipse cx="60" cy="113" rx="32" ry="4" fill="rgba(107,74,69,.15)"/>'
   +'<path d="M48 106l-4 7M48 106v7M48 106l4 7M72 106l-4 7M72 106v7M72 106l4 7" stroke="#E8873A" stroke-width="3" fill="none" stroke-linecap="round"/>'
@@ -51,13 +51,15 @@ function birdSVG(o,mood){
   +'<g class="wl"><ellipse cx="19" cy="74" rx="11" ry="19" fill="'+o.wing+'" transform="rotate(18 19 74)"/></g>'
   +'<g class="wr"><ellipse cx="101" cy="74" rx="11" ry="19" fill="'+o.wing+'" transform="rotate(-18 101 74)"/></g>'
   +'<path d="M55 30Q50 14 57 17Q60 8 64 19Q71 14 65 30Z" fill="'+o.body+'"/>'
-  +'<ellipse cx="60" cy="68" rx="45" ry="40" fill="'+o.body+'"/></g>'
-  +'<ellipse cx="60" cy="82" rx="29" ry="22" fill="'+o.belly+'"/>'
+  +'<ellipse cx="60" cy="68" rx="48" ry="42" fill="'+o.body+'"/>'
+  +'<path d="M14 80Q18 112 60 110Q102 112 106 80Q96 100 60 100Q24 100 14 80Z" fill="#7A3B5E" opacity=".13"/></g>'
+  +'<ellipse cx="60" cy="84" rx="31" ry="23" fill="'+o.belly+'"/>'
+  +'<ellipse cx="52" cy="76" rx="14" ry="6" fill="#fff" opacity=".5" transform="rotate(-12 52 76)"/>'
   +'<path d="M50 84l3 4 3-4M64 88l3 4 3-4M72 80l3 4 3-4" stroke="'+INK+'" stroke-opacity=".28" stroke-width="2" fill="none" stroke-linecap="round"/>'
-  +'<path d="M30 52Q34 40 46 36" stroke="#fff" stroke-opacity=".7" stroke-width="4" fill="none" stroke-linecap="round"/>'
+  +'<ellipse cx="36" cy="40" rx="16" ry="7.5" fill="#fff" opacity=".6" transform="rotate(-32 36 40)"/><circle cx="21" cy="55" r="2.6" fill="#fff" opacity=".7"/><ellipse cx="86" cy="36" rx="5" ry="2.6" fill="#fff" opacity=".4" transform="rotate(30 86 36)"/>'
   +eyes
-  +'<ellipse cx="33" cy="68" rx="7" ry="4.5" fill="#FFA0B4" opacity=".8"/><ellipse cx="87" cy="68" rx="7" ry="4.5" fill="#FFA0B4" opacity=".8"/>'
-  +'<path d="M53 63h14l-7 9z" fill="#FF9F5A" '+st(2)+'/>'
+  +'<ellipse cx="29" cy="70" rx="9.5" ry="6" fill="#FF6F9A" opacity=".62"/><ellipse cx="91" cy="70" rx="9.5" ry="6" fill="#FF6F9A" opacity=".62"/><ellipse cx="27.5" cy="68.5" rx="4" ry="2" fill="#fff" opacity=".45"/><ellipse cx="89.5" cy="68.5" rx="4" ry="2" fill="#fff" opacity=".45"/>'
+  +'<path d="M52 65Q60 61 68 65Q66 74 60 75Q54 74 52 65Z" fill="#FFA84A" '+st(2)+'/><ellipse cx="58" cy="66.5" rx="3.4" ry="1.5" fill="#fff" opacity=".6"/>'
   +(o.acc||'')+'</svg>';
 }
 
