@@ -30,9 +30,7 @@
   <section class="row">
     <div class="panel order" id="orderCard">
       <div class="o-head"><span id="orderTitle">📦 Birdie'nin Siparişi</span><em id="orderReward"></em></div>
-      <p class="o-say" id="orderSay"></p>
-      <div class="rush" id="rush"><i></i><span></span></div>
-      <div class="reqs" id="reqs"></div>
+      <div id="ords"></div>
     </div>
     <div class="feed idle" id="feed" aria-label="Canlı görüntülü arama">
       <svg class="scene" viewBox="0 0 104 132" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -71,7 +69,7 @@
     <button class="nest" id="nest" aria-label="Yuva">
       <svg class="ns" viewBox="0 0 140 110" aria-hidden="true">
         <ellipse cx="70" cy="101" rx="52" ry="7" fill="rgba(107,74,69,.18)"/>
-        <ellipse cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
+        <ellipse class="nb1" cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
         <g class="nchick" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round">
           <ellipse cx="70" cy="52" rx="27" ry="25" fill="#FFE08A"/>
           <path d="M64 29q-4-13 2-11 1-8 5 2 6-4 1 9z" fill="#FFE08A"/>
@@ -80,14 +78,15 @@
           <path d="M66 57h8l-4 5z" fill="#FF9F5A" stroke-width="2"/>
           <ellipse cx="53" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/><ellipse cx="87" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/>
         </g>
-        <path d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
+        <path class="nb2" d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
+        <path class="nb3" d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
         <path transform="translate(116 36) scale(1.1)" d="M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z" fill="#FF8FB0" stroke="#6B4A45" stroke-width="2"/>
       </svg>
+      <span class="nd nd-t" id="ndT"></span><span class="nd nd-l" id="ndL"></span><span class="nd nd-r" id="ndR"></span>
       <span class="nlabel" id="nestLabel">Yuva · ✉️ üret</span>
     </button>
     <div class="panel energy">
-      <div class="e-top"><span data-en="🌻 Moves">🌻 Hamle</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
+      <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
       <div class="ebar"><i id="eFill"></i></div>
       <div class="e-note" id="eNote"></div>
     </div>
@@ -249,7 +248,7 @@
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
-      <div class="mrow"><div><span data-en="♾️ Unlimited Moves">♾️ Sınırsız Hamle</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
+      <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
     </div>
     <div class="mbtns">
       <button class="btn sm" id="btnSave2" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
@@ -283,7 +282,7 @@
 <div class="modal" id="mShop">
   <div class="mcard wide">
     <div class="mhead"><h2 data-en="🛍️ Shop">🛍️ Dükkan</h2><button class="x" data-close="mShop">✕</button></div>
-    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> &nbsp; 🐥 <b id="shopLives">3</b></div>
+    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> </div>
     <div class="tabs" id="shopTabs"></div>
     <div class="mbody" id="shopBody"></div>
   </div>

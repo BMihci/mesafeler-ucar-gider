@@ -10,7 +10,7 @@ const QPOOL=[
   {id:'box',need:2,ev:'box',h:10,t:()=>T('2 sürpriz kutusu aç','Open 2 surprise boxes')},
   {id:'pet',need:5,ev:'pet',h:8,t:()=>T('Kedileri 5 kez sev','Pet the cats 5 times')},
   {id:'lvl4',need:1,ev:'lvl4',h:15,t:()=>T('Seviye 4 eşya yap','Make a level 4 item')},
-  {id:'rush',need:1,ev:'rush',h:18,e:4,t:()=>T('1 hızlı kargo yetiştir','Finish 1 rush parcel')},
+  {id:'rush',need:1,ev:'rush',h:18,e:4,t:()=>T('1 zor (★★★) sipariş tamamla','Finish 1 hard (★★★) order')},
   {id:'kit',need:3,ev:'kitten',h:8,t:()=>T('Sepetten 3 yavru al','Take 3 kittens from the basket')}
 ];
 const QMAP={};QPOOL.forEach(q=>QMAP[q.id]=q);
@@ -24,7 +24,7 @@ const ACH=[
   {id:'c3',h:20,n:()=>T('Kedi Dostu','Cat Friend'),d:()=>T('3. kediye ulaş','Reach the 3rd cat'),ok:s=>s.maxC>=3},
   {id:'c6',h:60,n:()=>T('Kedi Krallığı','Cat Kingdom'),d:()=>T('Altın Pati’yi bul','Find Golden Paw'),ok:s=>s.maxC>=6},
   {id:'b5',h:15,n:()=>T('Sürpriz Avcısı','Surprise Hunter'),d:()=>T('5 kutu aç','Open 5 boxes'),ok:s=>s.stats.boxes>=5},
-  {id:'r3',h:25,n:()=>T('Hızlı Postacı','Speedy Courier'),d:()=>T('3 hızlı kargo yetiştir','Finish 3 rush parcels'),ok:s=>s.stats.rush>=3},
+  {id:'r3',h:25,n:()=>T('Usta Postacı','Master Courier'),d:()=>T('3 zor (★★★) sipariş tamamla','Finish 3 hard (★★★) orders'),ok:s=>s.stats.rush>=3},
   {id:'s3',h:10,n:()=>T('Üç Gün','Three Days'),d:()=>T('3 gün üst üste gir','Log in 3 days in a row'),ok:s=>s.daily.streak>=3},
   {id:'s7',h:30,n:()=>T('Bir Hafta Sevgi','A Week of Love'),d:()=>T('7 gün üst üste gir','Log in 7 days in a row'),ok:s=>s.daily.streak>=7},
   {id:'g1',h:15,n:()=>T('Posta Güvercini','Carrier Pigeon'),d:()=>T('Bir partner hediyesi gönder ya da aç','Send or open a partner gift'),ok:s=>s.stats.gifts>=1},
@@ -66,7 +66,7 @@ function claimQuest(id){
   sfx('heart');toast('+'+d.h+'❤'+(d.e?' +'+d.e+'🌻':''));renderHUD();renderBook();saveSoon();
 }
 function claimable(){ensureQuests();return dailyView().due||state.quests.list.some(q=>q.done&&!q.claimed)}
-function updateBookDot(){const d=$('#bookDot');if(d&&state)d.classList.toggle('on',!!claimable())}
+function updateBookDot(){const d=$('#bookDot');if(d&&state)d.classList.toggle('on',!!claimable()||albumReady().length>0)}
 
 /* ---------- günlük hediye ---------- */
 const DAILY=[{h:5},{e:6},{box:1},{h:12},{kit:3},{h:20,e:5},{cat:3,h:25}];
@@ -91,16 +91,17 @@ function maybeDaily(){if(state.tut.done&&dailyView().due)openBook('daily')}
 
 /* ---------- defter ---------- */
 let bookTab='daily',giftSel=null,lastCode='',giftMsgVal='',giftInVal='';
-const BOOK_TABS=[['daily','📅'],['ach','🏆'],['letters','💌'],['cats','🐱'],['partner','💞']];
+const BOOK_TABS=[['daily','📅'],['ach','🏆'],['letters','💌'],['cats','🐱'],['partner','💞'],['album','📖']];
 function openBook(tab){if(tab)bookTab=tab;showModal('mBook',renderBook)}
 function tabDot(k){
   if(k==='daily')return claimable();
+  if(k==='album')return albumReady().length>0;
   return false;
 }
 function renderBook(){
   $('#bookTabs').innerHTML=BOOK_TABS.map(([k,i])=>'<button data-tab="'+k+'" class="'+(k===bookTab?'on':'')+'">'+i+(tabDot(k)?'<i class="dot on"></i>':'')+'</button>').join('');
   const b=$('#bookBody');
-  ({daily:renderDaily,ach:renderAch,letters:renderLetters,cats:renderCats,partner:renderPartner})[bookTab](b);
+  ({daily:renderDaily,ach:renderAch,letters:renderLetters,cats:renderCats,partner:renderPartner,album:renderAlbum})[bookTab](b);
   updateBookDot();
 }
 function renderDaily(b){
@@ -142,6 +143,60 @@ function viewLetter(id){
   if(!LETTERS[id])return;
   showNote({art:'<div style="font-size:56px">💌</div>',title:letterTitle(id),text:LETTERS[id](),ok:T('Kalbime sakla 💕','Keep it close 💕')});
 }
+
+/* ---------- koleksiyon albümü ---------- */
+const ALB_REWARD={coins:40};
+const ALB_NEST={flower:['decor','bunt'],camp:['decor','tent'],kitchen:['decor','tea'],winter:['skin','night']};
+const albKeys=()=>['post'].concat(Object.keys(SETS).filter(k=>k!=='post'&&SETS[k].it)).concat(['cat']);
+const albMax=k=>k==='cat'?state.maxC:collMax(k);
+const albName=k=>k==='cat'?T('Kediler','Cats'):T(SETS[k].n[0],SETS[k].n[1]);
+const albDone=k=>albMax(k)>=6;
+function albumReady(){
+  if(!state)return [];
+  const r=albKeys().filter(k=>albDone(k)&&!state.albumClaimed[k]);
+  if(albKeys().every(albDone)&&!state.albumClaimed.complete)r.push('complete');
+  return r;
+}
+let albToasted={};
+function albumTick(){
+  if(!state)return;
+  albumReady().forEach(k=>{if(!albToasted[k]){albToasted[k]=1;toast(T('📖 Albüm sayfası tamam! Ödülü Defter\'den al','📖 Album page complete! Claim it in the Book'));updateBookDot()}});
+}
+function claimAlbum(k){
+  if(!albumReady().includes(k))return;
+  state.albumClaimed[k]=true;
+  let msg;
+  if(k==='complete'){addCoins(300);state.hearts+=100;state.jk.hammer++;state.jk.magnet++;state.jk.star++;msg=T('+300 🪙 +100 ❤ + 3 joker!','+300 🪙 +100 ❤ + 3 jokers!')}
+  else{
+    addCoins(ALB_REWARD.coins);state.hearts+=20;msg='+'+ALB_REWARD.coins+' 🪙 +20 ❤';
+    const nu=ALB_NEST[k];
+    if(nu){
+      if(nu[0]==='decor'){if(!state.nest.owned.includes(nu[1]))state.nest.owned.push(nu[1]);msg+=' + '+NEST_DECOR[nu[1]].e}
+      else{if(!state.nest.skins.includes(nu[1]))state.nest.skins.push(nu[1]);msg+=' + 🪺'}
+    }
+  }
+  sfx('levelup');burst(innerWidth/2,innerHeight*.4,14,20);toast('📖 '+msg);trk('album_claim',{k});
+  renderBook();renderHUD();renderJokers();saveSoon();
+}
+function renderAlbum(b){
+  const keys=albKeys();let have=0,tot=keys.length*6;keys.forEach(k=>have+=Math.min(6,albMax(k)));
+  let h='<div class="sec">'+T('Koleksiyon Albümü','Collection Album')+' · '+have+'/'+tot+'</div>';
+  h+='<div class="albbar"><i style="width:'+Math.round(have/tot*100)+'%"></i></div>';
+  const comp=albumReady().includes('complete'),compDone=state.albumClaimed.complete;
+  h+='<div class="lrow"><div class="li">🏆</div><div class="lt">'+T('Tüm albüm tamamlanınca','When the whole album is full')+'<small>+300 🪙 +100 ❤ + 3 joker</small></div>'+(compDone?'<span class="chip on">✔</span>':comp?'<button class="btn sm" data-alb="complete">'+T('Al','Claim')+'</button>':'<span class="chip">'+keys.filter(albDone).length+'/'+keys.length+'</span>')+'</div>';
+  keys.forEach(k=>{
+    const mx=Math.min(6,albMax(k)),done=mx>=6,cl=state.albumClaimed[k];
+    let row='<div class="albrow"><div class="albh"><b>'+albName(k)+'</b><span>'+mx+'/6</span>'+(cl?'<span class="chip on">✔</span>':done?'<button class="btn sm" data-alb="'+k+'">'+T('Ödül','Claim')+'</button>':'')+'</div><div class="albs">';
+    for(let l=1;l<=6;l++){
+      const on=l<=mx;
+      row+='<div class="alb t'+l+(on?' on':'')+'">'+(on?(k==='cat'?'<div class="albcat">'+catSVG(CATS[l],'idle')+'</div>':itemIcon('a',l,k)):'<span>❔</span>')+'</div>';
+    }
+    const nu=ALB_NEST[k];
+    h+=row+'</div><small class="albr">🪙 '+ALB_REWARD.coins+' · ❤ 20'+(nu?' · '+(nu[0]==='decor'?NEST_DECOR[nu[1]].e+' '+T(NEST_DECOR[nu[1]].n[0],NEST_DECOR[nu[1]].n[1]):'🪺 '+T(NEST_SKINS[nu[1]].n[0],NEST_SKINS[nu[1]].n[1])):'')+'</small></div>';
+  });
+  b.innerHTML=h;
+}
+$('#bookBody').addEventListener('click',e=>{const b=e.target.closest('[data-alb]');if(b)claimAlbum(b.dataset.alb)});
 function renderCats(b){
   const m=state.maxC;
   let h='<div class="sec">'+T('Kedi Bonusu','Cat Bonus')+'</div><div class="lrow"><div class="li">🌻</div><div class="lt">+'+m+' '+T('maks. enerji','max energy')+'<small>'+T('Enerji yenilenmesi %'+Math.round(m*2)+', kedi sepeti %'+Math.round(m*5)+' daha hızlı','Energy regen '+Math.round(m*2)+'% and cat basket '+Math.round(m*5)+'% faster')+'</small></div></div>';
@@ -326,7 +381,7 @@ $('#btnReset').addEventListener('click',e=>{
 const TUT=[
   {adv:'merge',spot:{cells:[6,7]},t:()=>T('Birleştir!','Merge!'),x:()=>T('Yan yana iki ✉️’ı sürükle (ya da sırayla dokun): Fotoğraf olsun!','Drag one ✉️ onto the other (or tap both) to make a Photo!')},
   {adv:'deliver',spot:{sel:'#orderCard'},t:()=>T('Kargola!','Deliver!'),x:()=>T(YOU()+' bir 🖼️ istiyor. Fotoğrafı sipariş kartına bırak!',YOU()+' wants a 🖼️. Drop the Photo on the order card!')},
-  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir ama 1 hamle harcar! Hamlen bitmeden hedefleri tamamla 🌻','Tap the nest for a new ✉️, but it costs 1 move! Finish the goals before moves run out 🌻')},
+  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir ama 1 🌻 enerji harcar! Enerji zamanla yenilenir; siparişler de enerji kazandırır','Tap the nest for a new ✉️, but it costs 1 🌻 energy! Energy refills over time and orders give some back')},
   {adv:'ok',spot:{sel:'#kitBtn'},t:()=>T('Kediler! 🐱','Cats! 🐱'),x:()=>T('Sepetten yavru kedi al, aynı kedileri birleştir. Her yeni kedi sana bonus enerji verir. Gezen kedileri sevmeyi unutma 🐾','Take kittens from the basket and merge matching cats. Every new cat gives bonus energy. Pet the wandering cats too 🐾')},
   {adv:'ok',spot:{sel:'#btnBook'},t:()=>T('Defter 📖','Journal 📖'),x:()=>T('Üstteki kartta seviye hedefin, 🗺️ ile haritan var. Defterde günlük hediye, görevler ve kediler seni bekliyor!','Your level goals are on the card above, and 🗺️ opens the map. The journal holds daily gifts, quests and cats!')}
 ];
@@ -363,11 +418,12 @@ function bootState(st){
   state=st||defState(prev?JSON.parse(JSON.stringify(prev)):null);
   state.settings.names.me=cleanName(state.settings.names.me)||'Bird';
   state.settings.names.you=cleanName(state.settings.names.you)||'Birdie';
-  if(!state.order||state.order.done||(state.order.rush&&state.order.rush<Date.now()))state.order=makeOrder(false);
+  ensureOrders();
+  if(state.energy>energyMax()+BAL.energyOverfill)state.energy=energyMax();
   sel=null;fxMap={};lastCode='';giftSel=null;lastHearts=-1;
   tickEnergy();tickKit();ensureQuests();tickLives();
   shownKm=state.km;
-  applyTheme();applyBoardSkin();renderStats();renderJokers();renderArt();renderAll();updateKm(false);syncSettings();
+  applyTheme();applyBoardSkin();applyNest();renderStats();renderJokers();renderArt();renderAll();updateKm(false);syncSettings();
   if(AC)applyTrack();
 }
 function slotInfo(n){
@@ -453,8 +509,8 @@ $('#tSet').addEventListener('click',()=>{ensureAudio();sfx('tap');showModal('mSe
 $('#tHow').addEventListener('click',()=>{
   ensureAudio();sfx('tap');
   showNote({art:'<div style="font-size:56px">📖</div>',title:T('Nasıl Oynanır?','How to Play'),
-   text:T('🎯 Her seviyenin bir hedefi ve hamle sınırı var. Yuvaya her dokunuş 1 hamle harcar.\n🔀 Aynı iki eşyayı birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Siparişleri teslim et: hedef olur, hamle kazandırır.\n🐱 Kediler de birleşir; her yeni kedi bonus hamle verir.\n🗺️ 80 seviyeyi geç, İstanbul ile Adana arasını kapat. Her 10 seviyede yeni tema ve yeni engel gelir!\n\nSonunda Bird ve Birdie kavuşur! 💞',
-   'Every level has goals and a move limit. Each nest tap costs 1 move.\nMerge two matching items: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\nDeliver orders: they can be goals and earn moves.\nMerge cats too; each new cat gives bonus moves.\nClear 80 levels to close the gap between Istanbul and Adana. Every 10 levels brings a new theme and a new hazard!\n\nIn the end Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
+   text:T('🎯 Her seviyenin hedefleri var. Yuvaya her dokunuş 1 🌻 enerji harcar; enerji zamanla yenilenir. Tahtan seviyeler arasında kalıcıdır.\n🔀 Aynı iki eşyayı birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Aynı anda 3 sipariş açık (★ kolay … ★★★ zor): teslim et, enerji ve altın kazan.\n💰 Tahta dolarsa Sat ile eşyaları altına çevir.\n📖 Albümü doldur, 🏡 yuvanı süsle.\n🐱 Kediler de birleşir; her yeni kedi bonus enerji verir.\n🗺️ 80 seviyeyi geç, İstanbul ile Adana arasını kapat. Her 10 seviyede yeni tema ve yeni engel gelir!\n\nSonunda Bird ve Birdie kavuşur! 💞',
+   'Every level has goals. Each nest tap costs 1 🌻 energy, which refills over time. Your board persists between levels.\nMerge two matching items: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\n3 orders are open at once (★ easy … ★★★ hard): deliver them for energy and coins.\n💰 If the board fills up, Sell items for coins.\n📖 Fill the album, 🏡 decorate your nest.\nMerge cats too; each new cat gives bonus energy.\nClear 80 levels to close the gap between Istanbul and Adana. Every 10 levels brings a new theme and a new hazard!\n\nIn the end Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
 });
 $('#tLang').addEventListener('click',()=>{sfx('tap');state.settings.lang=state.settings.lang==='en'?'tr':'en';renderAll();syncSettings();if(started)saveSoon();else try{localStorage.setItem(KEY,JSON.stringify(Object.assign({},readSlot(curSlot())||state,{settings:state.settings})))}catch(e){}});
 $('#tMusic').addEventListener('click',()=>{
@@ -478,7 +534,7 @@ function init(){
   roamStart();
   showTitle();
   if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
-  window.__PK={birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
+  window.__PK={applyNest,albumReady,claimAlbum,birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
 }
 init();
 })();

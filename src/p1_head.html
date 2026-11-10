@@ -514,5 +514,36 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
   .colR .jbar{position:static;background:none;backdrop-filter:none;margin:0 auto;width:var(--bw);max-width:100%}
   .colR .nestRow{width:var(--bw);max-width:100%;margin:0 auto}
 }
+
+/* v9: çoklu sipariş, yuva süsleri, albüm */
+.orow{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:14px;margin-top:4px;background:#FFF8FB;border:2px solid #FFD6E3;position:relative}
+.orow.d0{border-color:#CFEFDD;background:#F5FFF9}.orow.d2{border-color:#FFD99A;background:#FFFAEE}
+.orow.done{opacity:.75;background:#EEFFF4}.orow.swap{animation:slideIn .45s}
+.orow .reqs{flex:1;display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.odif{font-size:9px;font-weight:900;color:#E3A21A;width:22px;text-align:center;line-height:1}
+.orow.d0 .odif{color:#4FBF8B}
+.orew{font-size:10px;font-weight:900;line-height:1.15;text-align:right;color:var(--pinkd);white-space:nowrap}
+.orow{padding:3px 5px;margin-top:3px;min-height:44px}
+.orow .req{flex:0 0 auto;padding:2px 8px 2px 3px;gap:5px;border-width:2px}
+.orow .req .rt b{display:none}.orow .req .rt span{font-size:13px}
+.orow .mini{width:34px;height:34px}
+.orow .reqs{gap:5px;flex-wrap:nowrap}
+.orow .req{min-width:0}
+@media(min-width:900px){.orow .req .rt b{display:block}}
+#stLives{display:none!important}
+.nest .nb1{fill:var(--nst1,#D9A06C)}.nest .nb2{fill:var(--nst2,#E8B98A)}.nest .nb3{stroke:var(--nst3,#B97A4E)}
+.nd{position:absolute;font-size:24px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.nd-t{top:-10px;left:50%;margin-left:-12px}.nd-l{left:-8px;bottom:14px}.nd-r{right:-8px;bottom:14px}
+.nsw{width:46px;height:30px;border-radius:50%;background:var(--a);border:2.5px solid var(--ink);box-shadow:inset 0 -9px 0 var(--b),0 3px 0 var(--c)}
+.jb.jsell{background:#FFF3C9}
+.albbar{height:12px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden;margin:2px 0 8px}
+.albbar i{display:block;height:100%;background:linear-gradient(90deg,#FFB6CF,#FF7FA5)}
+.albrow{padding:6px 4px;border-bottom:1.5px dashed #FFD6E3}
+.albh{display:flex;align-items:center;gap:8px;font-size:13px}.albh b{flex:1}.albh span{font-weight:900;color:var(--pinkd)}
+.albs{display:flex;gap:5px;margin:5px 0 2px}
+.alb{flex:1;aspect-ratio:1;max-width:46px;border:2px solid var(--ink);border-radius:12px;display:grid;place-items:center;background:#f4eef0;font-size:16px;overflow:hidden}
+.alb.on{background:radial-gradient(circle at 30% 25%,#fff,var(--t1) 55%,var(--t2))}.alb svg{width:84%;height:84%}
+.albcat svg{width:100%;height:100%}
+.albr{color:var(--ink2);font-weight:900;font-size:10.5px}
 </style>
 </head>

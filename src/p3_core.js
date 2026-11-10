@@ -7,13 +7,13 @@
 const CELLS=25,KM_TOTAL=940,KEY0='pofuduk-kuslar-v2',SLOTKEY='pk-active-slot',KEY1='pofuduk-kuslar-mesafe-ask-v1';
 const MAXL={a:6,c:6};
 const BAL={
-  energyBase:20,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
-  regenMs:8000,regenPerPost:.10,regenPerCat:.02,
+  energyBase:50,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
+  regenMs:50000,regenPerPost:.10,regenPerCat:.02,
   kitMs:45000,kitMax:3,kitPerCat:.05,
-  unlockCost:5,orderEnergy:1,orderHearts:2,
+  unlockCost:5,orderEnergy:2,orderHearts:2,
   rushMs:100000,rushEvery:4,rushMult:2,
   boxChance:.10,boxMinLevel:3,
-  buyEnergyCost:30,buyEnergyAmt:5,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
+  buyEnergyCost:30,buyEnergyAmt:8,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
   stageAt:[800,600,400,200],
   beatHearts:[0,15,20,25,30,35,40,50],beatEnergy:5,
   nestL2:.12
@@ -24,6 +24,26 @@ const UPS={blanket:{max:3,cost:[150,350,700]},post:{max:3,cost:[180,400,800]},ne
 const HATS={beanie:0,none:0,flower:100,bow:120,catears:160,crown:400,cap:140,sailor:180,chef:220};
 const ACCS={none:0,glasses:110,phones:150,star:130,pin:90,bow:260,halo:420,sparkle:600};
 const BOARDS={wood:0,candy:300,night:350,mint:300,marble:450,sunset:400,sakura:600,forest:500,galaxy:750,gold:950};
+/* yuva dekorasyonu: skin = {renk, ad, fiyat}; decor = {slot l/r/t, emoji, fiyat, kaynak} */
+const NEST_SKINS={
+  twig:{n:['Dal Yuva','Twig Nest'],c:['#C99560','#E8C28A','#9A6B3B'],cost:0},
+  moss:{n:['Yosun Yuva','Moss Nest'],c:['#7BB27A','#B7E0A8','#4F8A53'],cost:120},
+  rose:{n:['Gül Yuva','Rose Nest'],c:['#F28BA8','#FFC6D6','#C65577'],cost:180},
+  cloud:{n:['Bulut Yuva','Cloud Nest'],c:['#BFD8F5','#F2F8FF','#86A9D6'],cost:240},
+  gold:{n:['Altın Yuva','Golden Nest'],c:['#F2C14E','#FFE9A0','#C08A1E'],cost:400},
+  night:{n:['Gece Yuvası','Night Nest'],c:['#6C6BB5','#A9A8E8','#40407F'],cost:0,album:'night'}
+};
+const NEST_DECOR={
+  lamp:{slot:'t',e:'🏮',n:['Fener','Lantern'],cost:90},
+  star:{slot:'t',e:'⭐',n:['Yıldız','Star'],cost:140},
+  bunt:{slot:'t',e:'🎏',n:['Bayrak','Bunting'],cost:0,album:'flower'},
+  plant:{slot:'l',e:'🪴',n:['Saksı','Plant'],cost:70},
+  mail:{slot:'l',e:'📮',n:['Posta Kutusu','Mailbox'],cost:110},
+  tent:{slot:'l',e:'⛺',n:['Çadır','Tent'],cost:0,album:'camp'},
+  cake:{slot:'r',e:'🧁',n:['Kek','Cupcake'],cost:80},
+  heart:{slot:'r',e:'💝',n:['Kalp Hediye','Gift Heart'],cost:130},
+  tea:{slot:'r',e:'🫖',n:['Çaydanlık','Teapot'],cost:0,album:'kitchen'}
+};
 const JOKERS={hammer:{intro:6,cost:40,ico:'🔨'},magnet:{intro:14,cost:55,ico:'🧲'},star:{intro:24,cost:70,ico:'✨'}};
 const THEMES={pink:0,autumn:60,snow:60};
 const ROUTE_TR=['İstanbul','Bolu','Ankara','Kapadokya','Toroslar','Çukurova','Tarsus','Adana'];
@@ -51,7 +71,7 @@ function seeded(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charC
 function stageOf(km){let s=0;BAL.stageAt.forEach(x=>{if(km<=x)s++});if(km<=0)s=5;return s}
 const chOf=n=>Math.min(7,((n-1)/10)|0);
 const curChap=()=>state&&state.saga?chOf(state.lv?state.lv.n:state.saga.n):0;
-const energyMax=()=>Math.max(1,(state.lv?state.lv.maxMoves:BAL.energyBase));
+const energyMax=()=>BAL.energyBase+state.up.blanket*BAL.energyPerBlanket+state.maxC*BAL.energyPerCat;
 const regenMs=()=>Math.round(BAL.regenMs*(1-BAL.regenPerPost*state.up.post)*(1-BAL.regenPerCat*state.maxC));
 const kitMs=()=>Math.round(BAL.kitMs*(1-BAL.kitPerCat*state.maxC));
 
@@ -63,7 +83,7 @@ function defState(settings){
   board[4]={t:'a',l:2,k:true};board[20]={t:'a',l:2,k:true};board[24]={t:'a',l:3,k:true};board[0]={t:'c',l:1,k:true};
   return{v:4,saga:null,lv:null,coins:0,lives:{n:3,t:Date.now()},jk:{hammer:0,magnet:0,star:0},jg:{},dsc:{},mini:{tokens:0,day:''},weekly:{w:0,done:false},adT:0,lvs:{},board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
     maxA:1,maxC:0,
-    order:{reqs:[{t:'a',l:2,need:1,got:0}],done:false,say:0,rush:0},orderN:0,
+    orders:null,orderN:0,nest:{skin:'twig',skins:['twig'],decor:{l:'',r:'',t:''},owned:[]},albumClaimed:{},
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
     up:{blanket:0,post:0,nest:0},
     cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood']},
@@ -96,9 +116,15 @@ function fix(s){
   const num=(k,lo,hi)=>{s[k]=Number.isFinite(s[k])?clamp(s[k],lo,hi):d[k]};
   num('km',0,KM_TOTAL);num('hearts',0,1e7);num('energy',0,300);num('energyT',0,9e15);num('maxA',1,6);num('maxC',0,6);num('orderN',0,1e6);num('trip',1,999);
   s.kit=Object.assign(d.kit,s.kit||{});s.kit.n=clamp(s.kit.n|0,0,9);if(!Number.isFinite(s.kit.t))s.kit.t=Date.now();
-  const o=s.order;
-  s.order=(o&&Array.isArray(o.reqs)&&o.reqs.length&&o.reqs.every(r=>r&&(r.t==='a'||r.t==='c')&&r.l>=1&&r.l<=6&&r.need>=1))
-    ?{reqs:o.reqs.map(r=>{const q={t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)};if(r.t==='a'&&r.s&&SETS[r.s]&&r.s!=='post'&&SETS[r.s].it)q.s=r.s;return q}),done:!!o.done,say:o.say|0,rush:Number(o.rush)||0}:null;
+  const okReq=r=>r&&(r.t==='a'||r.t==='c')&&r.l>=1&&r.l<=6&&r.need>=1;
+  const sanO=o=>(o&&Array.isArray(o.reqs)&&o.reqs.length&&o.reqs.length<=3&&o.reqs.every(okReq))
+    ?{reqs:o.reqs.map(r=>{const q={t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)};if(r.t==='a'&&r.s&&SETS[r.s]&&r.s!=='post'&&SETS[r.s].it)q.s=r.s;return q}),done:!!o.done,say:o.say|0,d:clamp(o.d|0,0,2)}:null;
+  s.orders=Array.isArray(s.orders)&&s.orders.length===3&&s.orders.every(x=>sanO(x))?s.orders.map(sanO):null;
+  const nn=s.nest||{};const NSK=Object.keys(NEST_SKINS),NDC=Object.keys(NEST_DECOR);
+  s.nest={skin:NSK.includes(nn.skin)?nn.skin:'twig',skins:(Array.isArray(nn.skins)?nn.skins:[]).filter(x=>NSK.includes(x)),decor:{l:'',r:'',t:''},owned:(Array.isArray(nn.owned)?nn.owned:[]).filter(x=>NDC.includes(x))};
+  if(!s.nest.skins.includes('twig'))s.nest.skins.unshift('twig');
+  ['l','r','t'].forEach(k=>{const v=nn.decor&&nn.decor[k];s.nest.decor[k]=(NDC.includes(v)&&s.nest.owned.includes(v)&&NEST_DECOR[v].slot===k)?v:''});
+  const ac=s.albumClaimed;s.albumClaimed={};if(ac&&typeof ac==='object')Object.keys(ac).forEach(k=>{if(/^[a-z]{2,12}$/.test(k)&&ac[k])s.albumClaimed[k]=true});
   s.story=Object.assign(d.story,s.story||{});s.story.beat=clamp(s.story.beat|0,0,4);
   s.letters=Array.isArray(s.letters)?s.letters.filter(x=>typeof x==='string').slice(0,40):[];
   s.notes=Array.isArray(s.notes)?s.notes.slice(0,30):[];

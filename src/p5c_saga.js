@@ -13,14 +13,14 @@ const REGION=[
 ];
 const REGION_TITLE=[['İstanbul · Boğaz','Istanbul · Bosphorus'],['Bolu · Çam Ormanı','Bolu · Pine Forest'],['Ankara · Bozkır','Ankara · Steppe'],['Kapadokya · Peribacaları','Cappadocia · Fairy Chimneys'],['Toroslar · Karlı Zirveler','Taurus · Snowy Peaks'],['Çukurova · Pamuk Ovası','Cukurova · Cotton Plain'],['Tarsus · Akdeniz Kıyısı','Tarsus · Mediterranean Coast'],['Adana · Kebap & Taşköprü','Adana · Kebab & Stone Bridge']];
 const MECH=[
-  {k:'base',ico:'📦',n:['Sipariş & Hamle','Orders & Moves'],d:['Hedefleri tamamla! Yuvaya her dokunuş 1 hamle harcar; hamlen biterse seviye kaybedilir. Sipariş teslim etmek ekstra hamle kazandırır.','Complete the goals! Every nest tap costs 1 move; run out and the level is lost. Delivering orders earns extra moves.']},
+  {k:'base',ico:'📦',n:['Sipariş & Enerji','Orders & Energy'],d:['Hedefleri tamamla! Yuvaya her dokunuş 1 🌻 enerji harcar; enerji zamanla yenilenir. Tahtan seviyeler arasında korunur. Üç sipariş aynı anda açık: ★ kolay, ★★★ zor ama ödülü büyük!','Complete the goals! Every nest tap costs 1 🌻 energy, which refills over time. Your board carries over between levels. Three orders are open at once: ★ easy, ★★★ hard but worth more!']},
   {k:'rocks',ico:'🪨',n:['Taşlar','Rocks'],d:['Yolu taşlar kapatıyor! Bir taşın yanında birleştirme yapınca taş çatlar ve kırılır.','Rocks block the road! Merge next to a rock to crack and break it.']},
   {k:'wind',ico:'🌬️',n:['Rüzgâr','Wind'],d:['Birkaç hamlede bir rüzgâr eşyalarından birini başka bir yere savurur. Planını esnek tut!','Every few moves the wind blows an item to another spot. Stay flexible!']},
   {k:'balloon',ico:'🎈',n:['Balon Jokeri','Balloon Joker'],d:['Balonu bir eşyanın üstüne bırak: eşya 1 seviye atlar! Büyük birleştirmelerden balon düşebilir.','Drop a balloon on any item to raise it one level! Big merges may drop more.']},
   {k:'ice',ico:'🧊',n:['Buz','Ice'],d:['Buzlu eşyalar kıpırdamaz. Yanında birleştirme yapınca buz çözülür.','Frozen items are stuck. Merge next to them to thaw the ice.']},
-  {k:'rush',ico:'⚡',n:['Aceleli Kargo','Rush Parcels'],d:['Artık tüm siparişlerin süresi var! Süre dolmadan yetiştir, yoksa sipariş değişir.','All orders now have a timer! Deliver before it runs out or the order changes.']},
+  {k:'rush',ico:'⚡',n:['Büyük Siparişler','Big Orders'],d:['Siparişler büyüdü: daha yüksek seviye eşyalar istiyorlar ama ödülleri de büyük. Tahta doluyorsa 💰 Sat ile yer aç!','Orders got bigger: they ask for higher-level items but pay more. If the board fills up, use 💰 Sell to make room!']},
   {k:'wave',ico:'🌊',n:['Dalga','Waves'],d:['Dalgalar zaman zaman bir sırayı yana kaydırır. Eşyaların yer değiştirir!','Waves sometimes slide a whole row sideways. Your items shift around!']},
-  {k:'final',ico:'👑',n:['Büyük Final','Grand Finale'],d:['Bütün engeller bir arada! Taş, rüzgâr, buz, dalga ve aceleli kargo… Sevgiline az kaldı!','Every obstacle together! Rocks, wind, ice, waves and rush parcels… so close to your love!']}
+  {k:'final',ico:'👑',n:['Büyük Final','Grand Finale'],d:['Bütün engeller bir arada! Taş, rüzgâr, buz, yosun ve dalga… Sevgiline az kaldı!','Every obstacle together! Rocks, wind, ice, moss and waves… so close to your love!']}
 ];
 const LVNEED_OLD=[1, 4, 4, 7, 3, 4, 5, 5, 5, 8, 12, 9, 5, 7, 7, 5, 13, 8, 5, 10, 6, 15, 13, 11, 11, 10, 13, 13, 12, 22, 9, 21, 21, 12, 14, 14, 13, 18, 11, 11, 12, 29, 12, 21, 17, 16, 14, 14, 14, 17, 15, 34, 15, 26, 19, 17, 17, 19, 32, 29, 18, 44, 19, 31, 24, 22, 20, 37, 21, 27, 22, 51, 22, 41, 28, 28, 24, 31, 24, 30];
 const LVNEED_PREV=[1, 4, 7, 10, 6, 8, 5, 9, 8, 24, 5, 10, 11, 9, 9, 12, 9, 9, 13, 22, 6, 15, 18, 13, 9, 15, 30, 13, 20, 32, 0, 18, 30, 22, 13, 22, 34, 17, 28, 32, 2, 23, 22, 13, 15, 17, 24, 10, 17, 41, 7, 29, 24, 19, 19, 21, 12, 16, 32, 29, 25, 35, 30, 26, 22, 26, 27, 18, 37, 50, 22, 40, 19, 41, 25, 24, 14, 12, 20, 47];
@@ -51,8 +51,7 @@ function themeFor(n){
   if(CAT_IDX.includes(idx)&&n>=5){const t=LTHEMES.cats;return{id:'cats',sets:t.sets.slice(0,ns)}}
   const nonCat=[0,1,2,3,5,6,8,9],k=nonCat.indexOf(idx);
   const pool=REGION_THEMES[routeIdx(ch)];
-  const id=pool[(k+ch)%pool.length],all=LTHEMES[id].sets;
-  const rot=(n*2)%3,sets=[0,1,2].map(i=>all[(i+rot)%3]).slice(0,ns);
+  const id=pool[idx<5?0:1],sets=LTHEMES[id].sets.slice(0,ns);
   return{id,sets};
 }
 
@@ -137,9 +136,22 @@ function buildBoard(g){
   return b;
 }
 
+/* kalıcı tahta: yeni seviyede mevcut tahtaya engeller ve birkaç başlangıç eşyası eklenir */
+function addObstacles(g){
+  const r=g.rnd,m=g.mech,B=state.board;
+  const free=[];for(let i=0;i<CELLS;i++)if(!B[i])free.push(i);
+  for(let i=free.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[free[i],free[j]]=[free[j],free[i]]}
+  const keepFree=7,room=()=>free.length>keepFree;
+  const cnt=t=>B.filter(c=>c&&c.t===t).length;
+  const mkI=(l,extra)=>{const k=g.sets[Math.floor(r()*g.sets.length)];const o=k==='cat'?{t:'c',l:1,k:false}:(k==='post'||!SETS[k].it?{t:'a',l,k:false}:{t:'a',s:k,l,k:false});return Object.assign(o,extra||{})};
+  for(let i=cnt('r');i<m.rocks&&room();i++)B[free.pop()]={t:'r',l:m.rockHp,k:false};
+  for(let i=B.filter(c=>c&&c.z).length;i<m.ice&&room();i++){const q=mkI(r()<.35?2:1);if(q.t==='c')q.t='a',delete q.s;B[free.pop()]=Object.assign(q,{z:1})}
+  for(let i=cnt('w');i<m.balloons&&room();i++)B[free.pop()]={t:'w',l:1,k:false};
+  for(let i=B.filter(c=>c&&c.g).length;i<m.fog&&room();i++)B[free.pop()]=mkI(1,{g:1});
+  if(g.n%4===0&&!cnt('x')&&room())B[free.pop()]={t:'x',l:1,k:false};
+  for(let i=0;i<g.a0&&room();i++)B[free.pop()]=mkI(1);
+}
 function tryStart(n,opt){
-  tickLives();
-  if(state.lives.n<=0){openLives();return false}
   startLevel(n,opt);return true;
 }
 let introGrants=[];
@@ -148,10 +160,20 @@ function startLevel(n,opt){
   const g=genLevel(n),bonus=state.up.blanket*BAL.energyPerBlanket+state.maxC*BAL.energyPerCat;
   state.lv={n,sets:g.sets,theme:g.theme,maxMoves:g.moves+bonus,spawned:0,usedMoves:0,done:false,goals:g.goals.map(x=>x.s?{k:x.k,l:x.l,need:x.need,s:x.s}:{k:x.k,l:x.l,need:x.need}),weekly:!!opt.weekly,
     c:{merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0,moss:0,fog:0},mech:g.mech,par:g.par,startHearts:state.hearts};
-  state.board=buildBoard(g);
-  state.energy=state.lv.maxMoves;state.energyT=Date.now();
-  state.kit.n=g.kits;state.kit.t=Date.now();
-  state.order=makeOrder(false);
+  if(n===1||opt.fresh||!state.board.some(Boolean))state.board=buildBoard(g);
+  else{
+    // tema değişince eski zincirlerin eşyaları otomatik satılır (tahta tıkanmasın)
+    let got=0;
+    state.board.forEach((c,i)=>{if(!c||(c.t!=='a'&&c.t!=='c')||c.k||c.z||c.g)return;const k=c.t==='c'?'cat':(c.s||'post');if(!g.sets.includes(k)){got+=SELL[c.l]||1;state.board[i]=null}});
+    if(got>0){addCoins(got);setTimeout(()=>toast(T('🧹 Eski temanın eşyaları satıldı: +'+got+' 🪙','🧹 Old-theme items sold: +'+got+' 🪙')),600)}
+    addObstacles(g);
+  }
+  if(n===1||opt.fresh){state.energy=energyMax();state.energyT=Date.now()}
+  state.kit.n=Math.max(state.kit.n,g.kits);
+  if(n===1||opt.fresh)state.orders=null;
+  ensureOrders();
+  { const ok=k=>g.sets.includes(k);
+    state.orders=state.orders.map(o=>o.reqs.every(r=>ok(r.t==='c'?'cat':(r.s||'post')))?o:makeOrder(o.d)); }
   state.won=false;
   jMode=null;document.body.classList.remove('jmode');
   introGrants=(opt.retry||opt.silent)?[]:grantJokers(n);
@@ -278,8 +300,7 @@ function isStuck(){
   if((unl||state.energy>0)&&emptyCells().length)return false;
   for(let i=0;i<CELLS;i++)for(let j=i+1;j<CELLS;j++)if(canMerge(B[i],B[j]))return false;
   if(B.some(c=>c&&c.t==='w')&&B.some(isUp))return false;
-  const o=state.order;
-  if(o&&!o.done&&B.some(c=>c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&o.reqs.some(r=>r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need)))return false;
+  if(B.some(c=>c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&findReq(c,null)))return false;
   if(state.kit.n>0&&emptyCells().length&&state.lv.goals.some(g=>g.k==='mkC'&&goalHave(g)<g.need))return false;
   if(B.some(c=>c&&c.k)&&state.hearts>=BAL.unlockCost)return false;
   return true;
@@ -287,16 +308,16 @@ function isStuck(){
 function showFail(){
   if(!lvActive()||mCur)return;
   const noMoves=state.energy<=0&&!state.settings.unlimited;
-  const ls=state.lvs[state.lv.n]||(state.lvs[state.lv.n]={t:0,f:0});ls.f++;
-  trk('level_fail',{n:state.lv.n,noMoves});
+  trk('level_stuck',{n:state.lv.n,noMoves});
   showModal('mLvFail',()=>{
-    $('#lfTitle').textContent=noMoves?T('Hamlen bitti!','Out of moves!'):T('Tahta tıkandı!','The board is jammed!');
+    $('#lfTitle').textContent=noMoves?T('Enerjin bitti! 🌻','Out of energy! 🌻'):T('Tahta tıkandı! 🧺','The board is jammed! 🧺');
     $('#lfText').textContent=noMoves
-      ?T('Altınla '+BAL.buyEnergyAmt+' hamle alıp devam edersen can kaybetmezsin. Pes edersen 1 can gider.','Buy '+BAL.buyEnergyAmt+' moves with coins and you keep your life. Give up and you lose 1 life.')
-      :T('Hiçbir birleştirme yapılamıyor ve yer kalmadı. Baştan denersen 1 can gider.','No merges left and no space. Trying again costs 1 life.');
-    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' hamle · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' moves · '+BAL.buyEnergyCost+' 🪙');
-    const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' hamle','🎬 Watch ad · +'+BAL.buyEnergyAmt+' moves');
-    $('#lfRetry').textContent=T('↻ Baştan (−1 🐥)','↻ Retry (−1 🐥)');
+      ?T('Bekleyebilirsin: enerji zamanla yenilenir. Ya da altınla / reklamla '+BAL.buyEnergyAmt+' enerji al.','You can wait: energy refills over time. Or get '+BAL.buyEnergyAmt+' energy with coins / an ad.')
+      :T('Birleşecek eşya ve boş yer kalmadı. 💰 Sat ile birkaç eşyayı altına çevirip yer aç.','No merges and no space left. Use 💰 Sell to turn a few items into coins and free space.');
+    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' enerji · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' energy · '+BAL.buyEnergyCost+' 🪙');
+    const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' enerji','🎬 Watch ad · +'+BAL.buyEnergyAmt+' energy');
+    const r=$('#lfRetry');r.style.display=noMoves?'none':'';r.textContent=T('💰 Sat modunu aç','💰 Open sell mode');
+    $('#lfMap').textContent=noMoves?T('⏳ Bekleyeceğim','⏳ I will wait'):T('Kapat','Close');
   });
   sfx('err');
 }
@@ -306,8 +327,8 @@ $('#lfMoves').addEventListener('click',()=>{
   closeModal('mLvFail');renderHUD();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
 });
 $('#lfAd').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(()=>openAd('moves'),280)});
-$('#lfRetry').addEventListener('click',()=>{const n=state.lv.n,w=state.lv.weekly;closeModal('mLvFail');loseLife();setTimeout(()=>tryStart(n,{retry:true,weekly:w}),280)});
-$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail');loseLife();setTimeout(openMap,300)});
+$('#lfRetry').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(()=>setJMode('sell'),250)});
+$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail')});
 
 /* ---------- seviye tamam ---------- */
 function levelComplete(){
@@ -380,7 +401,7 @@ function showLevelIntro(){
   showModal('mLvIntro',()=>{
     $('#liChap').textContent=T(REGION_TITLE[routeIdx(ch)][0],REGION_TITLE[routeIdx(ch)][1]).toUpperCase()+' · '+T('BÖLÜM ','CHAPTER ')+(ch+1);
     $('#liTitle').textContent=T('Seviye ','Level ')+L.n+(L.n%10===0?' 👑':'');
-    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+L.maxMoves+' '+T('hamle','moves')+' · '+T('tahmini ~','est. ~')+Math.max(3,L.par)+'</div>'+themeBadge(L);
+    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+T('tahmini ~','est. ~')+Math.max(3,L.par)+' '+T('yuva dokunuşu','nest taps')+'</div>'+themeBadge(L);
     const gl=introGrants.map(j=>JOKER_TXT[j]()).join('\n');
     $('#liMech').textContent=(mechLine(L)+(gl?(mechLine(L)?'\n\n':'')+gl:''));
     $('#liStart').textContent=T('▶ Başla','▶ Start');

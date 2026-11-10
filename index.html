@@ -514,6 +514,37 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
   .colR .jbar{position:static;background:none;backdrop-filter:none;margin:0 auto;width:var(--bw);max-width:100%}
   .colR .nestRow{width:var(--bw);max-width:100%;margin:0 auto}
 }
+
+/* v9: çoklu sipariş, yuva süsleri, albüm */
+.orow{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:14px;margin-top:4px;background:#FFF8FB;border:2px solid #FFD6E3;position:relative}
+.orow.d0{border-color:#CFEFDD;background:#F5FFF9}.orow.d2{border-color:#FFD99A;background:#FFFAEE}
+.orow.done{opacity:.75;background:#EEFFF4}.orow.swap{animation:slideIn .45s}
+.orow .reqs{flex:1;display:flex;flex-wrap:wrap;gap:5px;min-width:0}
+.odif{font-size:9px;font-weight:900;color:#E3A21A;width:22px;text-align:center;line-height:1}
+.orow.d0 .odif{color:#4FBF8B}
+.orew{font-size:10px;font-weight:900;line-height:1.15;text-align:right;color:var(--pinkd);white-space:nowrap}
+.orow{padding:3px 5px;margin-top:3px;min-height:44px}
+.orow .req{flex:0 0 auto;padding:2px 8px 2px 3px;gap:5px;border-width:2px}
+.orow .req .rt b{display:none}.orow .req .rt span{font-size:13px}
+.orow .mini{width:34px;height:34px}
+.orow .reqs{gap:5px;flex-wrap:nowrap}
+.orow .req{min-width:0}
+@media(min-width:900px){.orow .req .rt b{display:block}}
+#stLives{display:none!important}
+.nest .nb1{fill:var(--nst1,#D9A06C)}.nest .nb2{fill:var(--nst2,#E8B98A)}.nest .nb3{stroke:var(--nst3,#B97A4E)}
+.nd{position:absolute;font-size:24px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.nd-t{top:-10px;left:50%;margin-left:-12px}.nd-l{left:-8px;bottom:14px}.nd-r{right:-8px;bottom:14px}
+.nsw{width:46px;height:30px;border-radius:50%;background:var(--a);border:2.5px solid var(--ink);box-shadow:inset 0 -9px 0 var(--b),0 3px 0 var(--c)}
+.jb.jsell{background:#FFF3C9}
+.albbar{height:12px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden;margin:2px 0 8px}
+.albbar i{display:block;height:100%;background:linear-gradient(90deg,#FFB6CF,#FF7FA5)}
+.albrow{padding:6px 4px;border-bottom:1.5px dashed #FFD6E3}
+.albh{display:flex;align-items:center;gap:8px;font-size:13px}.albh b{flex:1}.albh span{font-weight:900;color:var(--pinkd)}
+.albs{display:flex;gap:5px;margin:5px 0 2px}
+.alb{flex:1;aspect-ratio:1;max-width:46px;border:2px solid var(--ink);border-radius:12px;display:grid;place-items:center;background:#f4eef0;font-size:16px;overflow:hidden}
+.alb.on{background:radial-gradient(circle at 30% 25%,#fff,var(--t1) 55%,var(--t2))}.alb svg{width:84%;height:84%}
+.albcat svg{width:100%;height:100%}
+.albr{color:var(--ink2);font-weight:900;font-size:10.5px}
 </style>
 </head>
 <body data-theme="pink">
@@ -548,9 +579,7 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
   <section class="row">
     <div class="panel order" id="orderCard">
       <div class="o-head"><span id="orderTitle">📦 Birdie'nin Siparişi</span><em id="orderReward"></em></div>
-      <p class="o-say" id="orderSay"></p>
-      <div class="rush" id="rush"><i></i><span></span></div>
-      <div class="reqs" id="reqs"></div>
+      <div id="ords"></div>
     </div>
     <div class="feed idle" id="feed" aria-label="Canlı görüntülü arama">
       <svg class="scene" viewBox="0 0 104 132" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -589,7 +618,7 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
     <button class="nest" id="nest" aria-label="Yuva">
       <svg class="ns" viewBox="0 0 140 110" aria-hidden="true">
         <ellipse cx="70" cy="101" rx="52" ry="7" fill="rgba(107,74,69,.18)"/>
-        <ellipse cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
+        <ellipse class="nb1" cx="70" cy="72" rx="56" ry="28" fill="#D9A06C" stroke="#6B4A45" stroke-width="3"/>
         <g class="nchick" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round">
           <ellipse cx="70" cy="52" rx="27" ry="25" fill="#FFE08A"/>
           <path d="M64 29q-4-13 2-11 1-8 5 2 6-4 1 9z" fill="#FFE08A"/>
@@ -598,14 +627,15 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
           <path d="M66 57h8l-4 5z" fill="#FF9F5A" stroke-width="2"/>
           <ellipse cx="53" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/><ellipse cx="87" cy="59" rx="4.5" ry="3" fill="#FFA9B8" stroke="none"/>
         </g>
-        <path d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
+        <path class="nb2" d="M14 74Q14 102 70 102Q126 102 126 74Q98 88 70 88Q42 88 14 74Z" fill="#E8B98A" stroke="#6B4A45" stroke-width="3" stroke-linejoin="round"/>
+        <path class="nb3" d="M30 90l8 7M52 96l5 7M82 96l-4 7M106 90l-8 7" stroke="#B97A4E" stroke-width="3" stroke-linecap="round"/>
         <path transform="translate(116 36) scale(1.1)" d="M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z" fill="#FF8FB0" stroke="#6B4A45" stroke-width="2"/>
       </svg>
+      <span class="nd nd-t" id="ndT"></span><span class="nd nd-l" id="ndL"></span><span class="nd nd-r" id="ndR"></span>
       <span class="nlabel" id="nestLabel">Yuva · ✉️ üret</span>
     </button>
     <div class="panel energy">
-      <div class="e-top"><span data-en="🌻 Moves">🌻 Hamle</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
+      <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
       <div class="ebar"><i id="eFill"></i></div>
       <div class="e-note" id="eNote"></div>
     </div>
@@ -767,7 +797,7 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
-      <div class="mrow"><div><span data-en="♾️ Unlimited Moves">♾️ Sınırsız Hamle</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
+      <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
     </div>
     <div class="mbtns">
       <button class="btn sm" id="btnSave2" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
@@ -801,7 +831,7 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
 <div class="modal" id="mShop">
   <div class="mcard wide">
     <div class="mhead"><h2 data-en="🛍️ Shop">🛍️ Dükkan</h2><button class="x" data-close="mShop">✕</button></div>
-    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> &nbsp; 🐥 <b id="shopLives">3</b></div>
+    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> </div>
     <div class="tabs" id="shopTabs"></div>
     <div class="mbody" id="shopBody"></div>
   </div>
@@ -849,13 +879,13 @@ body[data-board=sunset]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#
 const CELLS=25,KM_TOTAL=940,KEY0='pofuduk-kuslar-v2',SLOTKEY='pk-active-slot',KEY1='pofuduk-kuslar-mesafe-ask-v1';
 const MAXL={a:6,c:6};
 const BAL={
-  energyBase:20,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
-  regenMs:8000,regenPerPost:.10,regenPerCat:.02,
+  energyBase:50,energyPerBlanket:4,energyPerCat:1,energyOverfill:20,
+  regenMs:50000,regenPerPost:.10,regenPerCat:.02,
   kitMs:45000,kitMax:3,kitPerCat:.05,
-  unlockCost:5,orderEnergy:1,orderHearts:2,
+  unlockCost:5,orderEnergy:2,orderHearts:2,
   rushMs:100000,rushEvery:4,rushMult:2,
   boxChance:.10,boxMinLevel:3,
-  buyEnergyCost:30,buyEnergyAmt:5,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
+  buyEnergyCost:30,buyEnergyAmt:8,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
   stageAt:[800,600,400,200],
   beatHearts:[0,15,20,25,30,35,40,50],beatEnergy:5,
   nestL2:.12
@@ -866,6 +896,26 @@ const UPS={blanket:{max:3,cost:[150,350,700]},post:{max:3,cost:[180,400,800]},ne
 const HATS={beanie:0,none:0,flower:100,bow:120,catears:160,crown:400,cap:140,sailor:180,chef:220};
 const ACCS={none:0,glasses:110,phones:150,star:130,pin:90,bow:260,halo:420,sparkle:600};
 const BOARDS={wood:0,candy:300,night:350,mint:300,marble:450,sunset:400,sakura:600,forest:500,galaxy:750,gold:950};
+/* yuva dekorasyonu: skin = {renk, ad, fiyat}; decor = {slot l/r/t, emoji, fiyat, kaynak} */
+const NEST_SKINS={
+  twig:{n:['Dal Yuva','Twig Nest'],c:['#C99560','#E8C28A','#9A6B3B'],cost:0},
+  moss:{n:['Yosun Yuva','Moss Nest'],c:['#7BB27A','#B7E0A8','#4F8A53'],cost:120},
+  rose:{n:['Gül Yuva','Rose Nest'],c:['#F28BA8','#FFC6D6','#C65577'],cost:180},
+  cloud:{n:['Bulut Yuva','Cloud Nest'],c:['#BFD8F5','#F2F8FF','#86A9D6'],cost:240},
+  gold:{n:['Altın Yuva','Golden Nest'],c:['#F2C14E','#FFE9A0','#C08A1E'],cost:400},
+  night:{n:['Gece Yuvası','Night Nest'],c:['#6C6BB5','#A9A8E8','#40407F'],cost:0,album:'night'}
+};
+const NEST_DECOR={
+  lamp:{slot:'t',e:'🏮',n:['Fener','Lantern'],cost:90},
+  star:{slot:'t',e:'⭐',n:['Yıldız','Star'],cost:140},
+  bunt:{slot:'t',e:'🎏',n:['Bayrak','Bunting'],cost:0,album:'flower'},
+  plant:{slot:'l',e:'🪴',n:['Saksı','Plant'],cost:70},
+  mail:{slot:'l',e:'📮',n:['Posta Kutusu','Mailbox'],cost:110},
+  tent:{slot:'l',e:'⛺',n:['Çadır','Tent'],cost:0,album:'camp'},
+  cake:{slot:'r',e:'🧁',n:['Kek','Cupcake'],cost:80},
+  heart:{slot:'r',e:'💝',n:['Kalp Hediye','Gift Heart'],cost:130},
+  tea:{slot:'r',e:'🫖',n:['Çaydanlık','Teapot'],cost:0,album:'kitchen'}
+};
 const JOKERS={hammer:{intro:6,cost:40,ico:'🔨'},magnet:{intro:14,cost:55,ico:'🧲'},star:{intro:24,cost:70,ico:'✨'}};
 const THEMES={pink:0,autumn:60,snow:60};
 const ROUTE_TR=['İstanbul','Bolu','Ankara','Kapadokya','Toroslar','Çukurova','Tarsus','Adana'];
@@ -893,7 +943,7 @@ function seeded(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charC
 function stageOf(km){let s=0;BAL.stageAt.forEach(x=>{if(km<=x)s++});if(km<=0)s=5;return s}
 const chOf=n=>Math.min(7,((n-1)/10)|0);
 const curChap=()=>state&&state.saga?chOf(state.lv?state.lv.n:state.saga.n):0;
-const energyMax=()=>Math.max(1,(state.lv?state.lv.maxMoves:BAL.energyBase));
+const energyMax=()=>BAL.energyBase+state.up.blanket*BAL.energyPerBlanket+state.maxC*BAL.energyPerCat;
 const regenMs=()=>Math.round(BAL.regenMs*(1-BAL.regenPerPost*state.up.post)*(1-BAL.regenPerCat*state.maxC));
 const kitMs=()=>Math.round(BAL.kitMs*(1-BAL.kitPerCat*state.maxC));
 
@@ -905,7 +955,7 @@ function defState(settings){
   board[4]={t:'a',l:2,k:true};board[20]={t:'a',l:2,k:true};board[24]={t:'a',l:3,k:true};board[0]={t:'c',l:1,k:true};
   return{v:4,saga:null,lv:null,coins:0,lives:{n:3,t:Date.now()},jk:{hammer:0,magnet:0,star:0},jg:{},dsc:{},mini:{tokens:0,day:''},weekly:{w:0,done:false},adT:0,lvs:{},board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
     maxA:1,maxC:0,
-    order:{reqs:[{t:'a',l:2,need:1,got:0}],done:false,say:0,rush:0},orderN:0,
+    orders:null,orderN:0,nest:{skin:'twig',skins:['twig'],decor:{l:'',r:'',t:''},owned:[]},albumClaimed:{},
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
     up:{blanket:0,post:0,nest:0},
     cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood']},
@@ -938,9 +988,15 @@ function fix(s){
   const num=(k,lo,hi)=>{s[k]=Number.isFinite(s[k])?clamp(s[k],lo,hi):d[k]};
   num('km',0,KM_TOTAL);num('hearts',0,1e7);num('energy',0,300);num('energyT',0,9e15);num('maxA',1,6);num('maxC',0,6);num('orderN',0,1e6);num('trip',1,999);
   s.kit=Object.assign(d.kit,s.kit||{});s.kit.n=clamp(s.kit.n|0,0,9);if(!Number.isFinite(s.kit.t))s.kit.t=Date.now();
-  const o=s.order;
-  s.order=(o&&Array.isArray(o.reqs)&&o.reqs.length&&o.reqs.every(r=>r&&(r.t==='a'||r.t==='c')&&r.l>=1&&r.l<=6&&r.need>=1))
-    ?{reqs:o.reqs.map(r=>{const q={t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)};if(r.t==='a'&&r.s&&SETS[r.s]&&r.s!=='post'&&SETS[r.s].it)q.s=r.s;return q}),done:!!o.done,say:o.say|0,rush:Number(o.rush)||0}:null;
+  const okReq=r=>r&&(r.t==='a'||r.t==='c')&&r.l>=1&&r.l<=6&&r.need>=1;
+  const sanO=o=>(o&&Array.isArray(o.reqs)&&o.reqs.length&&o.reqs.length<=3&&o.reqs.every(okReq))
+    ?{reqs:o.reqs.map(r=>{const q={t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)};if(r.t==='a'&&r.s&&SETS[r.s]&&r.s!=='post'&&SETS[r.s].it)q.s=r.s;return q}),done:!!o.done,say:o.say|0,d:clamp(o.d|0,0,2)}:null;
+  s.orders=Array.isArray(s.orders)&&s.orders.length===3&&s.orders.every(x=>sanO(x))?s.orders.map(sanO):null;
+  const nn=s.nest||{};const NSK=Object.keys(NEST_SKINS),NDC=Object.keys(NEST_DECOR);
+  s.nest={skin:NSK.includes(nn.skin)?nn.skin:'twig',skins:(Array.isArray(nn.skins)?nn.skins:[]).filter(x=>NSK.includes(x)),decor:{l:'',r:'',t:''},owned:(Array.isArray(nn.owned)?nn.owned:[]).filter(x=>NDC.includes(x))};
+  if(!s.nest.skins.includes('twig'))s.nest.skins.unshift('twig');
+  ['l','r','t'].forEach(k=>{const v=nn.decor&&nn.decor[k];s.nest.decor[k]=(NDC.includes(v)&&s.nest.owned.includes(v)&&NEST_DECOR[v].slot===k)?v:''});
+  const ac=s.albumClaimed;s.albumClaimed={};if(ac&&typeof ac==='object')Object.keys(ac).forEach(k=>{if(/^[a-z]{2,12}$/.test(k)&&ac[k])s.albumClaimed[k]=true});
   s.story=Object.assign(d.story,s.story||{});s.story.beat=clamp(s.story.beat|0,0,4);
   s.letters=Array.isArray(s.letters)?s.letters.filter(x=>typeof x==='string').slice(0,40):[];
   s.notes=Array.isArray(s.notes)?s.notes.slice(0,30):[];
@@ -1655,7 +1711,6 @@ function place(c,fx){const e=emptyCells();if(!e.length)return -1;const i=rnd(e);
 
 /* ---------- enerji / kedi sepeti ---------- */
 function tickEnergy(){
-  state.energyT=Date.now();return;
   const now=Date.now(),max=energyMax();
   if(state.energy>=max){state.energyT=now;return}
   const ms=regenMs(),d=Math.floor((now-state.energyT)/ms);
@@ -1674,8 +1729,8 @@ function renderEnergy(){
   let note;
   if(unl)note=T('Sınırsız (test modu) ♾️','Unlimited (test mode) ♾️');
   else if(!state.lv||state.lv.done)note=T('Bir seviye başlat 🗺️','Start a level 🗺️');
-  else if(state.energy<=0)note=T('Hamle bitti! Siparişle hamle kazan 📦','Out of moves! Orders give moves 📦');
-  else note=T('Yuvaya her dokunuş 1 hamle','Each nest tap costs 1 move');
+  else if(state.energy<=0)note=T('Enerji bitti! Siparişler enerji kazandırır 📦','Out of energy! Orders give energy 📦');
+  else note=T('Yuvaya her dokunuş 1 enerji · zamanla yenilenir','1 energy per nest tap · refills over time');
   $('#eNote').textContent=note;
 }
 function renderKit(){
@@ -1699,7 +1754,7 @@ function spawn(){
   ensureAudio();
   const unl=state.settings.unlimited,nest=$('#nest');
   if(!lvActive()){sfx('err');toast(T('Önce haritadan bir seviye seç 🗺️','Pick a level on the map first 🗺️'));bounceEl(nest);return}
-  if(!unl&&state.energy<=0){sfx('err');toast(T('Hamle bitti! Sipariş teslim ederek ya da ❤ ile hamle kazan','Out of moves! Deliver orders or buy moves with ❤'));bounceEl(nest);afterAction();return}
+  if(!unl&&state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da altınla enerji al','Out of energy! Deliver orders, wait, or buy energy with coins'));bounceEl(nest);afterAction();return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}
   if(!unl)state.energy--;
   const l=Math.random()<BAL.nestL2*state.up.nest?2:1;
@@ -1738,14 +1793,14 @@ function showCatCard(l,b){
 function discover(t,l,sk){
   if(t==='a'&&sk&&sk!=='post'&&SETS[sk]&&SETS[sk].it){
     if(l>(state.dsc[sk]||0)){
-      state.dsc[sk]=l;const b=l;state.hearts+=b;renderCollection();
+      state.dsc[sk]=l;const b=l;state.hearts+=b;renderCollection();albumTick();
       toast(T('Yeni eşya: ','New item: ')+itemName('a',l,sk)+'! +'+b+'❤');sfx('levelup');
     }
   }else if(t==='a'&&l>state.maxA){
-    state.maxA=l;const b=l*2;state.hearts+=b;renderCollection();
+    state.maxA=l;const b=l*2;state.hearts+=b;renderCollection();albumTick();
     toast(T('Yeni eşya: ','New item: ')+itemName('a',l)+'! +'+b+'❤');sfx('levelup');checkAch();
   }else if(t==='c'&&l>state.maxC){
-    state.maxC=l;const b=l*4;state.hearts+=b;sfx('levelup');showCatCard(l,b);checkAch();
+    state.maxC=l;const b=l*4;state.hearts+=b;albumTick();sfx('levelup');showCatCard(l,b);checkAch();
   }
 }
 function merge(from,to){
@@ -1828,8 +1883,7 @@ function lvSets(){return (state.lv&&state.lv.sets&&state.lv.sets.length)?state.l
 /* hedefe ihtiyaç duyulan zincirler: açık sipariş + hedef eşya */
 function wantedSets(){
   const w=[];
-  const o=state.order;
-  if(o&&!o.done)o.reqs.forEach(r=>{if(r.got<r.need){const k=r.t==='c'?'cat':(r.s||'post');if(!w.includes(k))w.push(k)}});
+  (state.orders||[]).forEach(o=>{if(o&&!o.done)o.reqs.forEach(r=>{if(r.got<r.need){const k=r.t==='c'?'cat':(r.s||'post');if(!w.includes(k))w.push(k)}})});
   const L=state.lv;
   if(L&&!L.done)L.goals.forEach(g=>{
     if(g.k==='mkA'&&goalHave(g)<g.need){const k=g.s||'post';if(!w.includes(k))w.push(k)}
@@ -1856,55 +1910,52 @@ function newItem(l){
   if(k==='cat')return{t:'c',l:1,k:false};
   return (k==='post'||!SETS[k]||!SETS[k].it)?{t:'a',l,k:false}:{t:'a',s:k,l,k:false};
 }
-function makeOrder(rush){
+function makeOrder(d){
+  d=d==null?1:d;
   const m=state.lv?state.lv.mech:null,lo=m?m.oLo:2,hi=m?m.oHi:3;
-  const count=(m&&m.multi&&Math.random()<m.multi)?2:1,reqs=[],used=new Set();
-  const sets=lvSets();
-  for(let n=0,tr=0;n<count&&tr<40;tr++){
+  const sets=lvSets(),reqs=[],used=new Set(),cnt=(d===2&&(!state.lv||state.lv.n>=4))?2:1;
+  for(let n=0,tr=0;n<cnt&&tr<60;tr++){
     const k=rnd(sets);
-    if(k==='cat'){
-      const l=rint(2,Math.min(4,Math.max(2,hi)));const key='c'+l;if(used.has(key))continue;used.add(key);
-      reqs.push({t:'c',l,need:1,got:0});n++;continue;
-    }
-    const l=rint(lo,hi),key=k+l;if(used.has(key))continue;used.add(key);
-    const need=(l===1)?rint(2,3):((l===2&&Math.random()<.3)?2:1);
+    let l=d===0?Math.max(1,lo-1+(Math.random()<.5?0:1)):d===1?rint(lo,hi):rint(Math.max(lo,hi-1),Math.min(6,hi+(hi<5?1:0)));
+    if(k==='cat'){l=clamp(l,2,4);const key='c'+l;if(used.has(key))continue;used.add(key);reqs.push({t:'c',l,need:1,got:0});n++;continue}
+    const key=k+l;if(used.has(key))continue;used.add(key);
+    const need=(l===1)?rint(2,3):((l===2&&d<2&&Math.random()<.5)?2:1);
     const q={t:'a',l,need,got:0};if(k!=='post'&&SETS[k]&&SETS[k].it)q.s=k;
     reqs.push(q);n++;
   }
   if(!reqs.length)reqs.push({t:'a',l:2,need:1,got:0});
-  const isRush=!!(rush||(m&&m.rush));
-  return{reqs,done:false,say:Math.floor(Math.random()*SAYS.length),rush:isRush?Date.now()+(m&&m.rushMs?m.rushMs:BAL.rushMs):0};
+  return{reqs,done:false,say:0,d};
 }
-const reqEl=i=>$('#reqs').children[i];
+function ensureOrders(){
+  if(!state.orders||state.orders.length!==3)state.orders=[makeOrder(0),makeOrder(1),makeOrder(2)];
+}
 const reqIcon=r=>'<div class="mini t'+r.l+'">'+itemIcon(r.t,r.l,r.s)+'</div>';
 function orderReward(o){
   let h=0;o.reqs.forEach(r=>{const left=r.need-r.got;h+=HV[r.t][r.l]*left});
-  const m=o.rush?BAL.rushMult:1;return{km:0,h:h*m};
+  return{h:h+BAL.orderHearts*(o.d+1),e:BAL.orderEnergy+o.d+state.up.post,c:[1,2,4][o.d]};
 }
-function renderOrder(animate){
-  const o=state.order,card=$('#orderCard');
-  $('#orderTitle').textContent=T('📦 Sipariş: ','📦 Order from ')+YOU();
-  $('#reqs').innerHTML=o.reqs.map((r,i)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-r="'+i+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l,r.s)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('');
+const reqEl=(oi,ri)=>$('#ords').querySelector('.req[data-o="'+oi+'"][data-r="'+ri+'"]');
+function orderRowHTML(o,i){
   const rw=orderReward(o);
-  $('#orderReward').textContent=o.done?T('Gönderildi 🎁','Sent 🎁'):(o.rush?'⚡ ':'')+'+'+rw.h+' ❤ · +'+(BAL.orderEnergy+state.up.post)+' 🌻';
-  $('#orderSay').textContent=o.done?T('Çok teşekkür ederim! 💕','Thank you so much! 💕'):(o.rush?T('Acil kargo! Süre dolmadan yetiştir ⚡','Rush parcel! Deliver before time runs out ⚡'):'“'+SAYS[o.say%SAYS.length]()+'”');
-  card.classList.toggle('done',!!o.done);card.classList.toggle('rushing',!!o.rush&&!o.done);
-  if(animate){card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap')}
-  updateWant();tickRush();
+  return '<div class="orow d'+o.d+(o.done?' done':'')+'" data-o="'+i+'"><div class="odif">'+'★'.repeat(o.d+1)+'</div><div class="reqs">'+
+    o.reqs.map((r,j)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-o="'+i+'" data-r="'+j+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l,r.s)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('')+
+    '</div><div class="orew">'+(o.done?'✔':'+'+rw.h+'❤<br>+'+rw.e+'🌻<br>+'+rw.c+'🪙')+'</div></div>';
 }
-function tickRush(){
-  const o=state.order,box=$('#rush');
-  if(!o||!o.rush||o.done){box.classList.remove('on');return}
-  const left=o.rush-Date.now();
-  if(left<=0){
-    toast(T('Kargo gecikti 🥺 Yeni sipariş geldi','The parcel was late 🥺 A new order arrived'));
-    state.order=makeOrder(false);renderOrder(true);saveSoon();return;
-  }
-  box.classList.add('on');box.firstChild.style.width=Math.min(100,left/(state.lv&&state.lv.mech.rushMs||BAL.rushMs)*100)+'%';box.lastChild.textContent='⚡ '+Math.ceil(left/1000)+T(' sn',' s');
+function renderOrder(swapIdx){
+  ensureOrders();
+  $('#orderTitle').textContent=T('📦 Siparişler · ','📦 Orders · ')+YOU();
+  $('#orderReward').textContent=state.orders.filter(o=>o.done).length+'/3';
+  $('#ords').innerHTML=state.orders.map(orderRowHTML).join('');
+  if(typeof swapIdx==='number'){const e=$('#ords').children[swapIdx];if(e){e.classList.add('swap')}}
+  updateWant();
 }
+function tickRush(){}
 function updateWant(){
   const c=sel!=null?state.board[sel]:null;
-  [...$('#reqs').children].forEach((el,i)=>{const r=state.order.reqs[i];el.classList.toggle('want',!!(c&&r&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need&&!state.order.done))});
+  [...$('#ords').querySelectorAll('.req')].forEach(el=>{
+    const o=state.orders[+el.dataset.o],r=o&&o.reqs[+el.dataset.r];
+    el.classList.toggle('want',!!(c&&r&&!o.done&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need));
+  });
 }
 function fly(rect,toEl,c){
   const to=toEl.getBoundingClientRect(),g=document.createElement('div');
@@ -1915,40 +1966,45 @@ function fly(rect,toEl,c){
   const a=g.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+dx*.5+'px,'+(dy*.5-30)+'px) scale(1.1)',opacity:1,offset:.45},{transform:'translate('+dx+'px,'+dy+'px) scale(.3)',opacity:.2}],{duration:520,easing:'ease-in-out'});
   a.onfinish=()=>g.remove();setTimeout(()=>g.remove(),900);
 }
-function deliver(idx,ri){
-  const o=state.order,c=state.board[idx],req=o.reqs[ri];
-  if(!c||c.k||c.z||c.g||c.t==='x'||c.t==='r'||c.t==='m'||c.t==='w'||!req||o.done||!lvActive())return false;
-  const chip=reqEl(ri);
+function findReq(c,oi){
+  if(!c)return null;
+  const rng=oi==null?[0,1,2]:[oi];
+  for(const i of rng){const o=state.orders[i];if(!o||o.done)continue;const j=o.reqs.findIndex(r=>r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need);if(j>=0)return{oi:i,ri:j}}
+  return null;
+}
+function deliver(idx,oi,ri){
+  const o=state.orders[oi],c=state.board[idx],req=o&&o.reqs[ri];
+  if(!c||c.k||c.z||c.g||c.t==='x'||c.t==='r'||c.t==='m'||c.t==='w'||!req||o.done||!state.saga)return false;
+  const chip=reqEl(oi,ri);
   if(req.t!==c.t||req.l!==c.l||(req.s||'')!==(c.s||'')){sfx('err');toast(T('Şunu istiyor: ','Wants: ')+itemName(req.t,req.l,req.s));bounceEl(chip);return false}
   if(req.got>=req.need){sfx('err');toast(T('Bu istek zaten tamam ✔️','This one is already done ✔️'));bounceEl(chip);return false}
   const rect=cellEls[idx].getBoundingClientRect(),cc=elCenter(chip);
   fly(rect,chip,c);
   req.got++;state.board[idx]=null;sel=null;
-  const mult=o.rush?BAL.rushMult:1;
-  const hh=HV[c.t][c.l]*mult;
+  const hh=HV[c.t][c.l];
   state.hearts+=hh;state.stats.items++;ev('item');
-  setTimeout(()=>{
-    floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10);
-  },430);
+  setTimeout(()=>{floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10)},430);
   sfx('deliver');buzz(18);setMood('happy',2000);
   renderBoard();renderHUD();renderOrder();tutAdv('deliver');
   if(o.reqs.every(r=>r.got>=r.need)){
-    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');
-    if(o.rush){state.stats.rush++;ev('rush')}
-    const bh=BAL.orderHearts*mult;state.hearts+=bh;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+BAL.orderEnergy+state.up.post);
-    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+(BAL.orderEnergy+state.up.post)+'🌻');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);renderHUD();$('#orderCard').classList.add('done');$('#orderReward').textContent=T('Gönderildi 🎁','Sent 🎁');$('#rush').classList.remove('on')},600);
+    const rw=orderReward(Object.assign({},o,{reqs:o.reqs.map(r=>Object.assign({},r,{got:0}))}));
+    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');if(o.d===2){state.stats.rush++;ev('rush')}
+    const bh=BAL.orderHearts*(o.d+1);state.hearts+=bh;
+    const en=BAL.orderEnergy+o.d+state.up.post;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+en);
+    addCoins([1,2,4][o.d]);
+    albumTick();
+    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+en+'🌻 +'+[1,2,4][o.d]+'🪙');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);renderHUD();renderOrder()},350);
     setTimeout(()=>{
-      if(state.lv&&state.lv.done)return;
-      state.order=makeOrder(false);renderOrder(true);if(state.order.rush){sfx('order');toast(T('⚡ Aceleli kargo! Süre işliyor','⚡ Rush parcel! The clock is ticking'))}
-      saveSoon();
-    },1000);
+      if(state.orders[oi]!==o)return;
+      state.orders[oi]=makeOrder(o.d);renderOrder(oi);saveSoon();
+    },1100);
   }
   afterAction();saveSoon();return true;
 }
 $('#orderCard').addEventListener('click',e=>{
   const r=e.target.closest('.req');if(!r)return;
   if(sel==null){toast(T('Önce tahtadan bir eşya seç 👆','Pick an item on the board first 👆'));return}
-  deliver(sel,+r.dataset.r);
+  deliver(sel,+r.dataset.o,+r.dataset.r);
 });
 
 /* ---------- sürükle & bırak ---------- */
@@ -1993,11 +2049,11 @@ function endDrag(e,cancel){
     const to=+cellE.dataset.i;
     if(to===d.i){renderBoard();return}
     act(d.i,to);
-  }else if(reqE){deliver(d.i,+reqE.dataset.r)}
+  }else if(reqE){deliver(d.i,+reqE.dataset.o,+reqE.dataset.r)}
   else if(ordE){
     const c=state.board[d.i];
-    const ri=state.order.reqs.findIndex(r=>c&&r.t===c.t&&r.l===c.l&&r.got<r.need);
-    if(ri>=0)deliver(d.i,ri);else{sfx('err');toast(T(YOU()+' bunu istemedi 🥺',YOU()+' didn’t ask for that 🥺'));bounceEl(ordE)}
+    const rowE=el.closest('.orow'),f=findReq(c,rowE?+rowE.dataset.o:null)||findReq(c,null);
+    if(f)deliver(d.i,f.oi,f.ri);else{sfx('err');toast(T(YOU()+' bunu istemedi 🥺',YOU()+' didn’t ask for that 🥺'));bounceEl(ordE)}
   }else renderBoard();
 }
 addEventListener('pointerup',e=>endDrag(e,false));
@@ -2141,14 +2197,14 @@ const REGION=[
 ];
 const REGION_TITLE=[['İstanbul · Boğaz','Istanbul · Bosphorus'],['Bolu · Çam Ormanı','Bolu · Pine Forest'],['Ankara · Bozkır','Ankara · Steppe'],['Kapadokya · Peribacaları','Cappadocia · Fairy Chimneys'],['Toroslar · Karlı Zirveler','Taurus · Snowy Peaks'],['Çukurova · Pamuk Ovası','Cukurova · Cotton Plain'],['Tarsus · Akdeniz Kıyısı','Tarsus · Mediterranean Coast'],['Adana · Kebap & Taşköprü','Adana · Kebab & Stone Bridge']];
 const MECH=[
-  {k:'base',ico:'📦',n:['Sipariş & Hamle','Orders & Moves'],d:['Hedefleri tamamla! Yuvaya her dokunuş 1 hamle harcar; hamlen biterse seviye kaybedilir. Sipariş teslim etmek ekstra hamle kazandırır.','Complete the goals! Every nest tap costs 1 move; run out and the level is lost. Delivering orders earns extra moves.']},
+  {k:'base',ico:'📦',n:['Sipariş & Enerji','Orders & Energy'],d:['Hedefleri tamamla! Yuvaya her dokunuş 1 🌻 enerji harcar; enerji zamanla yenilenir. Tahtan seviyeler arasında korunur. Üç sipariş aynı anda açık: ★ kolay, ★★★ zor ama ödülü büyük!','Complete the goals! Every nest tap costs 1 🌻 energy, which refills over time. Your board carries over between levels. Three orders are open at once: ★ easy, ★★★ hard but worth more!']},
   {k:'rocks',ico:'🪨',n:['Taşlar','Rocks'],d:['Yolu taşlar kapatıyor! Bir taşın yanında birleştirme yapınca taş çatlar ve kırılır.','Rocks block the road! Merge next to a rock to crack and break it.']},
   {k:'wind',ico:'🌬️',n:['Rüzgâr','Wind'],d:['Birkaç hamlede bir rüzgâr eşyalarından birini başka bir yere savurur. Planını esnek tut!','Every few moves the wind blows an item to another spot. Stay flexible!']},
   {k:'balloon',ico:'🎈',n:['Balon Jokeri','Balloon Joker'],d:['Balonu bir eşyanın üstüne bırak: eşya 1 seviye atlar! Büyük birleştirmelerden balon düşebilir.','Drop a balloon on any item to raise it one level! Big merges may drop more.']},
   {k:'ice',ico:'🧊',n:['Buz','Ice'],d:['Buzlu eşyalar kıpırdamaz. Yanında birleştirme yapınca buz çözülür.','Frozen items are stuck. Merge next to them to thaw the ice.']},
-  {k:'rush',ico:'⚡',n:['Aceleli Kargo','Rush Parcels'],d:['Artık tüm siparişlerin süresi var! Süre dolmadan yetiştir, yoksa sipariş değişir.','All orders now have a timer! Deliver before it runs out or the order changes.']},
+  {k:'rush',ico:'⚡',n:['Büyük Siparişler','Big Orders'],d:['Siparişler büyüdü: daha yüksek seviye eşyalar istiyorlar ama ödülleri de büyük. Tahta doluyorsa 💰 Sat ile yer aç!','Orders got bigger: they ask for higher-level items but pay more. If the board fills up, use 💰 Sell to make room!']},
   {k:'wave',ico:'🌊',n:['Dalga','Waves'],d:['Dalgalar zaman zaman bir sırayı yana kaydırır. Eşyaların yer değiştirir!','Waves sometimes slide a whole row sideways. Your items shift around!']},
-  {k:'final',ico:'👑',n:['Büyük Final','Grand Finale'],d:['Bütün engeller bir arada! Taş, rüzgâr, buz, dalga ve aceleli kargo… Sevgiline az kaldı!','Every obstacle together! Rocks, wind, ice, waves and rush parcels… so close to your love!']}
+  {k:'final',ico:'👑',n:['Büyük Final','Grand Finale'],d:['Bütün engeller bir arada! Taş, rüzgâr, buz, yosun ve dalga… Sevgiline az kaldı!','Every obstacle together! Rocks, wind, ice, moss and waves… so close to your love!']}
 ];
 const LVNEED_OLD=[1, 4, 4, 7, 3, 4, 5, 5, 5, 8, 12, 9, 5, 7, 7, 5, 13, 8, 5, 10, 6, 15, 13, 11, 11, 10, 13, 13, 12, 22, 9, 21, 21, 12, 14, 14, 13, 18, 11, 11, 12, 29, 12, 21, 17, 16, 14, 14, 14, 17, 15, 34, 15, 26, 19, 17, 17, 19, 32, 29, 18, 44, 19, 31, 24, 22, 20, 37, 21, 27, 22, 51, 22, 41, 28, 28, 24, 31, 24, 30];
 const LVNEED_PREV=[1, 4, 7, 10, 6, 8, 5, 9, 8, 24, 5, 10, 11, 9, 9, 12, 9, 9, 13, 22, 6, 15, 18, 13, 9, 15, 30, 13, 20, 32, 0, 18, 30, 22, 13, 22, 34, 17, 28, 32, 2, 23, 22, 13, 15, 17, 24, 10, 17, 41, 7, 29, 24, 19, 19, 21, 12, 16, 32, 29, 25, 35, 30, 26, 22, 26, 27, 18, 37, 50, 22, 40, 19, 41, 25, 24, 14, 12, 20, 47];
@@ -2179,8 +2235,7 @@ function themeFor(n){
   if(CAT_IDX.includes(idx)&&n>=5){const t=LTHEMES.cats;return{id:'cats',sets:t.sets.slice(0,ns)}}
   const nonCat=[0,1,2,3,5,6,8,9],k=nonCat.indexOf(idx);
   const pool=REGION_THEMES[routeIdx(ch)];
-  const id=pool[(k+ch)%pool.length],all=LTHEMES[id].sets;
-  const rot=(n*2)%3,sets=[0,1,2].map(i=>all[(i+rot)%3]).slice(0,ns);
+  const id=pool[idx<5?0:1],sets=LTHEMES[id].sets.slice(0,ns);
   return{id,sets};
 }
 
@@ -2265,9 +2320,22 @@ function buildBoard(g){
   return b;
 }
 
+/* kalıcı tahta: yeni seviyede mevcut tahtaya engeller ve birkaç başlangıç eşyası eklenir */
+function addObstacles(g){
+  const r=g.rnd,m=g.mech,B=state.board;
+  const free=[];for(let i=0;i<CELLS;i++)if(!B[i])free.push(i);
+  for(let i=free.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[free[i],free[j]]=[free[j],free[i]]}
+  const keepFree=7,room=()=>free.length>keepFree;
+  const cnt=t=>B.filter(c=>c&&c.t===t).length;
+  const mkI=(l,extra)=>{const k=g.sets[Math.floor(r()*g.sets.length)];const o=k==='cat'?{t:'c',l:1,k:false}:(k==='post'||!SETS[k].it?{t:'a',l,k:false}:{t:'a',s:k,l,k:false});return Object.assign(o,extra||{})};
+  for(let i=cnt('r');i<m.rocks&&room();i++)B[free.pop()]={t:'r',l:m.rockHp,k:false};
+  for(let i=B.filter(c=>c&&c.z).length;i<m.ice&&room();i++){const q=mkI(r()<.35?2:1);if(q.t==='c')q.t='a',delete q.s;B[free.pop()]=Object.assign(q,{z:1})}
+  for(let i=cnt('w');i<m.balloons&&room();i++)B[free.pop()]={t:'w',l:1,k:false};
+  for(let i=B.filter(c=>c&&c.g).length;i<m.fog&&room();i++)B[free.pop()]=mkI(1,{g:1});
+  if(g.n%4===0&&!cnt('x')&&room())B[free.pop()]={t:'x',l:1,k:false};
+  for(let i=0;i<g.a0&&room();i++)B[free.pop()]=mkI(1);
+}
 function tryStart(n,opt){
-  tickLives();
-  if(state.lives.n<=0){openLives();return false}
   startLevel(n,opt);return true;
 }
 let introGrants=[];
@@ -2276,10 +2344,20 @@ function startLevel(n,opt){
   const g=genLevel(n),bonus=state.up.blanket*BAL.energyPerBlanket+state.maxC*BAL.energyPerCat;
   state.lv={n,sets:g.sets,theme:g.theme,maxMoves:g.moves+bonus,spawned:0,usedMoves:0,done:false,goals:g.goals.map(x=>x.s?{k:x.k,l:x.l,need:x.need,s:x.s}:{k:x.k,l:x.l,need:x.need}),weekly:!!opt.weekly,
     c:{merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0,moss:0,fog:0},mech:g.mech,par:g.par,startHearts:state.hearts};
-  state.board=buildBoard(g);
-  state.energy=state.lv.maxMoves;state.energyT=Date.now();
-  state.kit.n=g.kits;state.kit.t=Date.now();
-  state.order=makeOrder(false);
+  if(n===1||opt.fresh||!state.board.some(Boolean))state.board=buildBoard(g);
+  else{
+    // tema değişince eski zincirlerin eşyaları otomatik satılır (tahta tıkanmasın)
+    let got=0;
+    state.board.forEach((c,i)=>{if(!c||(c.t!=='a'&&c.t!=='c')||c.k||c.z||c.g)return;const k=c.t==='c'?'cat':(c.s||'post');if(!g.sets.includes(k)){got+=SELL[c.l]||1;state.board[i]=null}});
+    if(got>0){addCoins(got);setTimeout(()=>toast(T('🧹 Eski temanın eşyaları satıldı: +'+got+' 🪙','🧹 Old-theme items sold: +'+got+' 🪙')),600)}
+    addObstacles(g);
+  }
+  if(n===1||opt.fresh){state.energy=energyMax();state.energyT=Date.now()}
+  state.kit.n=Math.max(state.kit.n,g.kits);
+  if(n===1||opt.fresh)state.orders=null;
+  ensureOrders();
+  { const ok=k=>g.sets.includes(k);
+    state.orders=state.orders.map(o=>o.reqs.every(r=>ok(r.t==='c'?'cat':(r.s||'post')))?o:makeOrder(o.d)); }
   state.won=false;
   jMode=null;document.body.classList.remove('jmode');
   introGrants=(opt.retry||opt.silent)?[]:grantJokers(n);
@@ -2406,8 +2484,7 @@ function isStuck(){
   if((unl||state.energy>0)&&emptyCells().length)return false;
   for(let i=0;i<CELLS;i++)for(let j=i+1;j<CELLS;j++)if(canMerge(B[i],B[j]))return false;
   if(B.some(c=>c&&c.t==='w')&&B.some(isUp))return false;
-  const o=state.order;
-  if(o&&!o.done&&B.some(c=>c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&o.reqs.some(r=>r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need)))return false;
+  if(B.some(c=>c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&findReq(c,null)))return false;
   if(state.kit.n>0&&emptyCells().length&&state.lv.goals.some(g=>g.k==='mkC'&&goalHave(g)<g.need))return false;
   if(B.some(c=>c&&c.k)&&state.hearts>=BAL.unlockCost)return false;
   return true;
@@ -2415,16 +2492,16 @@ function isStuck(){
 function showFail(){
   if(!lvActive()||mCur)return;
   const noMoves=state.energy<=0&&!state.settings.unlimited;
-  const ls=state.lvs[state.lv.n]||(state.lvs[state.lv.n]={t:0,f:0});ls.f++;
-  trk('level_fail',{n:state.lv.n,noMoves});
+  trk('level_stuck',{n:state.lv.n,noMoves});
   showModal('mLvFail',()=>{
-    $('#lfTitle').textContent=noMoves?T('Hamlen bitti!','Out of moves!'):T('Tahta tıkandı!','The board is jammed!');
+    $('#lfTitle').textContent=noMoves?T('Enerjin bitti! 🌻','Out of energy! 🌻'):T('Tahta tıkandı! 🧺','The board is jammed! 🧺');
     $('#lfText').textContent=noMoves
-      ?T('Altınla '+BAL.buyEnergyAmt+' hamle alıp devam edersen can kaybetmezsin. Pes edersen 1 can gider.','Buy '+BAL.buyEnergyAmt+' moves with coins and you keep your life. Give up and you lose 1 life.')
-      :T('Hiçbir birleştirme yapılamıyor ve yer kalmadı. Baştan denersen 1 can gider.','No merges left and no space. Trying again costs 1 life.');
-    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' hamle · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' moves · '+BAL.buyEnergyCost+' 🪙');
-    const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' hamle','🎬 Watch ad · +'+BAL.buyEnergyAmt+' moves');
-    $('#lfRetry').textContent=T('↻ Baştan (−1 🐥)','↻ Retry (−1 🐥)');
+      ?T('Bekleyebilirsin: enerji zamanla yenilenir. Ya da altınla / reklamla '+BAL.buyEnergyAmt+' enerji al.','You can wait: energy refills over time. Or get '+BAL.buyEnergyAmt+' energy with coins / an ad.')
+      :T('Birleşecek eşya ve boş yer kalmadı. 💰 Sat ile birkaç eşyayı altına çevirip yer aç.','No merges and no space left. Use 💰 Sell to turn a few items into coins and free space.');
+    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' enerji · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' energy · '+BAL.buyEnergyCost+' 🪙');
+    const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' enerji','🎬 Watch ad · +'+BAL.buyEnergyAmt+' energy');
+    const r=$('#lfRetry');r.style.display=noMoves?'none':'';r.textContent=T('💰 Sat modunu aç','💰 Open sell mode');
+    $('#lfMap').textContent=noMoves?T('⏳ Bekleyeceğim','⏳ I will wait'):T('Kapat','Close');
   });
   sfx('err');
 }
@@ -2434,8 +2511,8 @@ $('#lfMoves').addEventListener('click',()=>{
   closeModal('mLvFail');renderHUD();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
 });
 $('#lfAd').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(()=>openAd('moves'),280)});
-$('#lfRetry').addEventListener('click',()=>{const n=state.lv.n,w=state.lv.weekly;closeModal('mLvFail');loseLife();setTimeout(()=>tryStart(n,{retry:true,weekly:w}),280)});
-$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail');loseLife();setTimeout(openMap,300)});
+$('#lfRetry').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(()=>setJMode('sell'),250)});
+$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail')});
 
 /* ---------- seviye tamam ---------- */
 function levelComplete(){
@@ -2508,7 +2585,7 @@ function showLevelIntro(){
   showModal('mLvIntro',()=>{
     $('#liChap').textContent=T(REGION_TITLE[routeIdx(ch)][0],REGION_TITLE[routeIdx(ch)][1]).toUpperCase()+' · '+T('BÖLÜM ','CHAPTER ')+(ch+1);
     $('#liTitle').textContent=T('Seviye ','Level ')+L.n+(L.n%10===0?' 👑':'');
-    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+L.maxMoves+' '+T('hamle','moves')+' · '+T('tahmini ~','est. ~')+Math.max(3,L.par)+'</div>'+themeBadge(L);
+    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+T('tahmini ~','est. ~')+Math.max(3,L.par)+' '+T('yuva dokunuşu','nest taps')+'</div>'+themeBadge(L);
     const gl=introGrants.map(j=>JOKER_TXT[j]()).join('\n');
     $('#liMech').textContent=(mechLine(L)+(gl?(mechLine(L)?'\n\n':'')+gl:''));
     $('#liStart').textContent=T('▶ Başla','▶ Start');
@@ -2691,7 +2768,7 @@ function openAd(kind){
   showModal('mAd',()=>{
     $('#adTitle').textContent=T('🎬 Reklam (demo)','🎬 Ad (demo)');
     $('#adText').textContent=kind==='life'?T('Bir can için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for a life.')
-      :kind==='moves'?T('+'+BAL.buyEnergyAmt+' hamle için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for +'+BAL.buyEnergyAmt+' moves.')
+      :kind==='moves'?T('+'+BAL.buyEnergyAmt+' enerji için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for +'+BAL.buyEnergyAmt+' energy.')
       :T('+'+BAL.adCoins+' 🪙 için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for +'+BAL.adCoins+' 🪙.');
     $('#adCancel').textContent=T('Vazgeç','Cancel');
     $('#adClaim').disabled=true;paintAd();
@@ -2746,6 +2823,7 @@ const JDESC={
   magnet:['En düşük seviyeli bir çifti otomatik birleştirir.','Auto-merges the lowest matching pair.'],
   star:['Bir eşyayı +1 seviye yükseltir ve çevresini çözer.','Raises an item +1 level and thaws its neighbours.']
 };
+const SELL=[0,1,2,4,9,20,45];
 const JOKER_TXT={};
 for(const j in JOKERS)JOKER_TXT[j]=()=>JOKERS[j].ico+' '+T('Yeni joker: ','New joker: ')+T(JNAME[j][0],JNAME[j][1])+' +1! — '+T(JDESC[j][0],JDESC[j][1]);
 function grantJokers(n){
@@ -2757,7 +2835,7 @@ function grantJokers(n){
   }
   return got;
 }
-function jokerUnlocked(j){return (state.saga?Math.max(state.saga.n,state.lv?state.lv.n:0):0)>=JOKERS[j].intro}
+function jokerUnlocked(j){if(j==='sell')return true;return (state.saga?Math.max(state.saga.n,state.lv?state.lv.n:0):0)>=JOKERS[j].intro}
 function renderJokers(){
   const bar=$('#jbar');if(!bar||!state)return;
   const on=!!state.lv&&!!state.saga;
@@ -2765,7 +2843,7 @@ function renderJokers(){
   bar.innerHTML=Object.keys(JOKERS).map(j=>{
     const un=jokerUnlocked(j),n=state.jk[j];
     return '<button class="jb'+(un?'':' jlock')+(n?'':' empty')+(jMode===j?' on':'')+'" data-j="'+j+'"><span class="ji">'+(un?JOKERS[j].ico:'🔒')+'</span>'+(un?'<small>'+T(JNAME[j][0],JNAME[j][1])+'</small><span class="jn">'+n+'</span>':'<small>L'+JOKERS[j].intro+'</small>')+'</button>';
-  }).join('');
+  }).join('')+'<button class="jb jsell'+(jMode==='sell'?' on':'')+'" data-j="sell"><span class="ji">💰</span><small>'+T('Sat','Sell')+'</small></button>';
 }
 $('#jbar').addEventListener('click',e=>{
   const b=e.target.closest('.jb');if(!b)return;
@@ -2773,9 +2851,10 @@ $('#jbar').addEventListener('click',e=>{
 });
 function setJMode(j){
   jMode=j;document.body.classList.toggle('jmode',!!j);renderJokers();
-  if(j)say(T('Dokunacağın hedefi seç (iptal için jokere tekrar dokun)','Tap a target (tap the joker again to cancel)'));
+  if(j==='sell')say(T('Satmak istediğin eşyaya dokun 💰 (çıkmak için Sat\'a tekrar dokun)','Tap an item to sell it 💰 (tap Sell again to exit)'));else if(j)say(T('Dokunacağın hedefi seç (iptal için jokere tekrar dokun)','Tap a target (tap the joker again to cancel)'));
 }
 function useJoker(j){
+  if(j==='sell'){if(jMode==='sell'){setJMode(null);return}sfx('tap');setJMode('sell');return}
   if(!lvActive()){toast(T('Joker için bir seviyede olmalısın','Start a level to use jokers'));return}
   if(!jokerUnlocked(j)){sfx('err');toast(T('Bu joker seviye '+JOKERS[j].intro+'’de açılır','Unlocks at level '+JOKERS[j].intro));return}
   if(jMode===j){setJMode(null);return}
@@ -2805,6 +2884,12 @@ function jokerTarget(i){
   if(!j)return;
   if(!c){toast(T('Boş hücre','Empty cell'));return}
   const p=cellCenter(i);let ok=false;
+  if(j==='sell'){
+    if((c.t!=='a'&&c.t!=='c')||c.k||c.z||c.g){sfx('err');toast(T('Bu eşya satılamaz','This cannot be sold'));return}
+    const v=SELL[c.l]||1;state.board[i]=null;addCoins(v);trk('sell',{l:c.l});
+    floatText('+'+v+' 🪙',p.x,p.y);burst(p.x,p.y,6,12);sfx('coin');sel=null;
+    renderBoard();renderHUD();updateWant();afterAction();saveSoon();return;
+  }
   if(j==='hammer'){
     if(c.t==='x'||c.t==='w'||c.t==='a'||c.t==='c'||c.t==='r'||c.t==='m'){
       if(c.t==='m'){state.board[i]=null;lvEv('moss');ok=true}
@@ -2856,15 +2941,34 @@ function regionCatGrid(){
 /* ---------- dükkan ---------- */
 let shopTab='joker';
 const UP_META={
-  blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('Her seviyede +'+BAL.energyPerBlanket+' hamle','+'+BAL.energyPerBlanket+' moves every level')},
-  post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('Her siparişte +1 ekstra hamle','+1 extra move per order')},
+  blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('+'+BAL.energyPerBlanket+' maks. enerji','+'+BAL.energyPerBlanket+' max energy')},
+  post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('Her siparişte +1 ekstra enerji','+1 extra energy per order')},
   nest:{ico:'🪺',n:()=>T('Büyük Yuva','Bigger Nest'),d:()=>T('Yuvadan %'+(BAL.nestL2*100)+' ihtimalle Fotoğraf','+'+(BAL.nestL2*100)+'% chance of a Photo')}
 };
 Object.assign(HAT_NAMES,{cap:['Şapka','Cap'],sailor:['Denizci','Sailor'],chef:['Aşçı Kepi','Chef Hat']});
 const ACC_NAMES={none:['Aksesuarsız','None'],glasses:['Gözlük','Glasses'],phones:['Kulaklık','Headphones'],star:['Yıldız Tokası','Star Clip'],pin:['Rozet','Pin'],bow:['Papyon','Bow Tie'],halo:['Hare','Halo'],sparkle:['Parıltı','Sparkles']};
 const BOARD_NAMES={wood:['Ahşap','Wood'],candy:['Şeker','Candy'],night:['Gece','Night'],mint:['Nane','Mint'],marble:['Mermer','Marble'],sunset:['Gün Batımı','Sunset'],sakura:['Sakura','Sakura'],forest:['Orman','Forest'],galaxy:['Galaksi','Galaxy'],gold:['Altın','Gold']};
 const BOARD_COL={wood:['#E9C48F','#C9955C'],candy:['#FFC2D8','#FFF3F8'],night:['#6F77B8','#D9DDF5'],mint:['#A8E4CB','#F0FFF8'],marble:['#E9E6EE','#FFFFFF'],sunset:['#FFB38A','#FFF0E2'],sakura:['#F5A3C2','#FFF5F9'],forest:['#5FA36A','#F0FBEA'],galaxy:['#3B2F73','#E6DEFA'],gold:['#DDAE3E','#FFF8E0']};
-const SHOP_TABS=[['joker','🔨'],['wear','🎀'],['board','🎨'],['up','⬆️'],['free','🎬']];
+const SHOP_TABS=[['joker','🔨'],['wear','🎀'],['board','🎨'],['nest','🏡'],['up','⬆️'],['free','🎬']];
+const SLOT_N={t:['Üst','Top'],l:['Sol','Left'],r:['Sağ','Right']};
+function applyNest(){
+  if(!state||!state.nest)return;
+  const el=$('#nest');if(!el)return;
+  const c=NEST_SKINS[state.nest.skin].c;
+  el.style.setProperty('--nst1',c[0]);el.style.setProperty('--nst2',c[1]);el.style.setProperty('--nst3',c[2]);
+  ['l','r','t'].forEach(s=>{const d=state.nest.decor[s],n=$('#nd'+s.toUpperCase());if(n)n.textContent=d?NEST_DECOR[d].e:''});
+}
+function skinOwned(k){return state.nest.skins.includes(k)}
+function useSkin(k){
+  if(!skinOwned(k)){const c=NEST_SKINS[k].cost;if(NEST_SKINS[k].album||!needCoins(c))return;spendCoins(c);state.nest.skins.push(k)}
+  state.nest.skin=k;sfx('levelup');applyNest();renderShop();saveSoon();
+}
+function useDecor(k){
+  const D=NEST_DECOR[k];
+  if(!state.nest.owned.includes(k)){if(D.album||!needCoins(D.cost))return;spendCoins(D.cost);state.nest.owned.push(k)}
+  state.nest.decor[D.slot]=state.nest.decor[D.slot]===k?'':k;
+  sfx('levelup');applyNest();renderShop();saveSoon();
+}
 function applyBoardSkin(){
   const b=(state&&state.cos&&state.cos.board)||'wood';
   if(b==='wood')delete document.body.dataset.board;else document.body.dataset.board=b;
@@ -2899,20 +3003,34 @@ function renderShop(){
       h+='<div class="sitem'+(on?' on':'')+'"><div class="sart"><div class="swatch" style="background:'+c[0]+'">'+'<i style="--c2:'+c[1]+'"></i>'.repeat(9)+'</div></div>'+T(BOARD_NAMES[k][0],BOARD_NAMES[k][1])+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="board:'+k+'">'+(own?T('Kullan','Use'):BOARDS[k]+' 🪙')+'</button>')+'</div>';
     }
     h+='</div>';
+  }else if(shopTab==='nest'){
+    h+='<div class="sec">'+T('Yuva Rengi','Nest Skin')+'</div><div class="shopgrid">';
+    for(const k in NEST_SKINS){
+      const S=NEST_SKINS[k],own=skinOwned(k),on=state.nest.skin===k;
+      h+='<div class="sitem'+(on?' on':'')+'"><div class="sart"><div class="nsw" style="--a:'+S.c[0]+';--b:'+S.c[1]+';--c:'+S.c[2]+'"></div></div>'+T(S.n[0],S.n[1])+(on?'<span class="chip on">✔</span>':(!own&&S.album)?'<span class="chip">📖 '+T('Albüm','Album')+'</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="skin:'+k+'">'+(own?T('Kullan','Use'):S.cost+' 🪙')+'</button>')+'</div>';
+    }
+    h+='</div>';
+    ['t','l','r'].forEach(sl=>{
+      h+='<div class="sec">'+T('Süs · '+SLOT_N[sl][0],'Decor · '+SLOT_N[sl][1])+'</div><div class="shopgrid">';
+      for(const k in NEST_DECOR){
+        const D=NEST_DECOR[k];if(D.slot!==sl)continue;
+        const own=state.nest.owned.includes(k),on=state.nest.decor[sl]===k;
+        h+='<div class="sitem'+(on?' on':'')+'"><div class="sart" style="font-size:34px">'+D.e+'</div>'+T(D.n[0],D.n[1])+(on?'<button class="btn sm soft" data-act="decor:'+k+'">'+T('Kaldır','Remove')+'</button>':(!own&&D.album)?'<span class="chip">📖 '+T('Albüm','Album')+'</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="decor:'+k+'">'+(own?T('Kullan','Use'):D.cost+' 🪙')+'</button>')+'</div>';
+      }
+      h+='</div>';
+    });
   }else if(shopTab==='up'){
     h+='<div class="sec">'+T('Kalıcı Yükseltmeler','Permanent Upgrades')+'</div>';
     for(const k in UPS){
       const u=UPS[k],lv=state.up[k],m=UP_META[k];
       h+='<div class="lrow"><div class="li">'+m.ico+'</div><div class="lt">'+m.n()+'<small>'+m.d()+' · '+T('Seviye ','Lv ')+lv+'/'+u.max+'</small></div>'+(lv>=u.max?'<span class="chip on">MAX</span>':'<button class="btn sm" data-act="up:'+k+'">'+u.cost[lv]+' 🪙</button>')+'</div>';
     }
-    h+='<div class="sec">'+T('Hamle & Can','Moves & Lives')+'</div>';
-    h+='<div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('hamle','moves')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' 🪙</button></div>';
-    h+='<div class="lrow"><div class="li">🐥</div><div class="lt">+1 '+T('can','life')+'<small>'+state.lives.n+'/'+BAL.lifeMax+'</small></div><button class="btn sm" data-act="life">'+BAL.lifeCost+' 🪙</button></div>';
+    h+='<div class="sec">'+T('Enerji','Energy')+'</div>';
+    h+='<div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('enerji','energy')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' 🪙</button></div>';
   }else{
     const cd=BAL.adCoinCd-(Date.now()-state.adT),ready=cd<=0;
     h+='<div class="sec">'+T('Bedava Altın','Free Coins')+'</div>';
     h+='<div class="lrow"><div class="li">🎬</div><div class="lt">+'+BAL.adCoins+' 🪙<small>'+(ready?T('Reklam (demo): '+BAL.adMs/1000+' sn bekle','Ad (demo): wait '+BAL.adMs/1000+'s'):T('Tekrar için ','Again in ')+fmtLeft(cd))+'</small></div><button class="btn sm'+(ready?'':' dis')+'" data-act="adcoins">'+T('İzle','Watch')+'</button></div>';
-    h+='<div class="lrow"><div class="li">🐥</div><div class="lt">+1 '+T('can','life')+'<small>'+T('Reklam (demo): '+BAL.adMs/1000+' sn bekle','Ad (demo): wait '+BAL.adMs/1000+'s')+'</small></div><button class="btn sm'+(state.lives.n<BAL.lifeMax?'':' dis')+'" data-act="adlife">'+T('İzle','Watch')+'</button></div>';
     h+='<div class="mcap" style="margin-top:8px">'+T('Altın: seviye bitirerek, bölüm patronlarını yenerek, mini oyunla ve haftalık meydan okumayla kazanılır.','Earn coins by clearing levels, beating chapter bosses, the mini-game and the weekly challenge.')+'</div>';
   }
   $('#shopBody').innerHTML=h;renderStats();
@@ -2953,7 +3071,7 @@ $('#shopBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.classList.contains('dis'))return;
   const [a,x]=b.dataset.act.split(':');
   if(a==='joker')buyJoker(x);else if(a==='up')buyUp(x);else if(a==='energy')buyEnergy();else if(a==='life')buyLife();
-  else if(a==='hat')useHat(x);else if(a==='acc')useAcc(x);else if(a==='board')useBoard(x);
+  else if(a==='skin')useSkin(x);else if(a==='decor')useDecor(x);else if(a==='hat')useHat(x);else if(a==='acc')useAcc(x);else if(a==='board')useBoard(x);
   else if(a==='adcoins'){closeModal('mShop');setTimeout(()=>openAd('coins'),280)}
   else if(a==='adlife'){closeModal('mShop');setTimeout(()=>openAd('life'),280)}
 });
@@ -3023,7 +3141,7 @@ const QPOOL=[
   {id:'box',need:2,ev:'box',h:10,t:()=>T('2 sürpriz kutusu aç','Open 2 surprise boxes')},
   {id:'pet',need:5,ev:'pet',h:8,t:()=>T('Kedileri 5 kez sev','Pet the cats 5 times')},
   {id:'lvl4',need:1,ev:'lvl4',h:15,t:()=>T('Seviye 4 eşya yap','Make a level 4 item')},
-  {id:'rush',need:1,ev:'rush',h:18,e:4,t:()=>T('1 hızlı kargo yetiştir','Finish 1 rush parcel')},
+  {id:'rush',need:1,ev:'rush',h:18,e:4,t:()=>T('1 zor (★★★) sipariş tamamla','Finish 1 hard (★★★) order')},
   {id:'kit',need:3,ev:'kitten',h:8,t:()=>T('Sepetten 3 yavru al','Take 3 kittens from the basket')}
 ];
 const QMAP={};QPOOL.forEach(q=>QMAP[q.id]=q);
@@ -3037,7 +3155,7 @@ const ACH=[
   {id:'c3',h:20,n:()=>T('Kedi Dostu','Cat Friend'),d:()=>T('3. kediye ulaş','Reach the 3rd cat'),ok:s=>s.maxC>=3},
   {id:'c6',h:60,n:()=>T('Kedi Krallığı','Cat Kingdom'),d:()=>T('Altın Pati’yi bul','Find Golden Paw'),ok:s=>s.maxC>=6},
   {id:'b5',h:15,n:()=>T('Sürpriz Avcısı','Surprise Hunter'),d:()=>T('5 kutu aç','Open 5 boxes'),ok:s=>s.stats.boxes>=5},
-  {id:'r3',h:25,n:()=>T('Hızlı Postacı','Speedy Courier'),d:()=>T('3 hızlı kargo yetiştir','Finish 3 rush parcels'),ok:s=>s.stats.rush>=3},
+  {id:'r3',h:25,n:()=>T('Usta Postacı','Master Courier'),d:()=>T('3 zor (★★★) sipariş tamamla','Finish 3 hard (★★★) orders'),ok:s=>s.stats.rush>=3},
   {id:'s3',h:10,n:()=>T('Üç Gün','Three Days'),d:()=>T('3 gün üst üste gir','Log in 3 days in a row'),ok:s=>s.daily.streak>=3},
   {id:'s7',h:30,n:()=>T('Bir Hafta Sevgi','A Week of Love'),d:()=>T('7 gün üst üste gir','Log in 7 days in a row'),ok:s=>s.daily.streak>=7},
   {id:'g1',h:15,n:()=>T('Posta Güvercini','Carrier Pigeon'),d:()=>T('Bir partner hediyesi gönder ya da aç','Send or open a partner gift'),ok:s=>s.stats.gifts>=1},
@@ -3079,7 +3197,7 @@ function claimQuest(id){
   sfx('heart');toast('+'+d.h+'❤'+(d.e?' +'+d.e+'🌻':''));renderHUD();renderBook();saveSoon();
 }
 function claimable(){ensureQuests();return dailyView().due||state.quests.list.some(q=>q.done&&!q.claimed)}
-function updateBookDot(){const d=$('#bookDot');if(d&&state)d.classList.toggle('on',!!claimable())}
+function updateBookDot(){const d=$('#bookDot');if(d&&state)d.classList.toggle('on',!!claimable()||albumReady().length>0)}
 
 /* ---------- günlük hediye ---------- */
 const DAILY=[{h:5},{e:6},{box:1},{h:12},{kit:3},{h:20,e:5},{cat:3,h:25}];
@@ -3104,16 +3222,17 @@ function maybeDaily(){if(state.tut.done&&dailyView().due)openBook('daily')}
 
 /* ---------- defter ---------- */
 let bookTab='daily',giftSel=null,lastCode='',giftMsgVal='',giftInVal='';
-const BOOK_TABS=[['daily','📅'],['ach','🏆'],['letters','💌'],['cats','🐱'],['partner','💞']];
+const BOOK_TABS=[['daily','📅'],['ach','🏆'],['letters','💌'],['cats','🐱'],['partner','💞'],['album','📖']];
 function openBook(tab){if(tab)bookTab=tab;showModal('mBook',renderBook)}
 function tabDot(k){
   if(k==='daily')return claimable();
+  if(k==='album')return albumReady().length>0;
   return false;
 }
 function renderBook(){
   $('#bookTabs').innerHTML=BOOK_TABS.map(([k,i])=>'<button data-tab="'+k+'" class="'+(k===bookTab?'on':'')+'">'+i+(tabDot(k)?'<i class="dot on"></i>':'')+'</button>').join('');
   const b=$('#bookBody');
-  ({daily:renderDaily,ach:renderAch,letters:renderLetters,cats:renderCats,partner:renderPartner})[bookTab](b);
+  ({daily:renderDaily,ach:renderAch,letters:renderLetters,cats:renderCats,partner:renderPartner,album:renderAlbum})[bookTab](b);
   updateBookDot();
 }
 function renderDaily(b){
@@ -3155,6 +3274,60 @@ function viewLetter(id){
   if(!LETTERS[id])return;
   showNote({art:'<div style="font-size:56px">💌</div>',title:letterTitle(id),text:LETTERS[id](),ok:T('Kalbime sakla 💕','Keep it close 💕')});
 }
+
+/* ---------- koleksiyon albümü ---------- */
+const ALB_REWARD={coins:40};
+const ALB_NEST={flower:['decor','bunt'],camp:['decor','tent'],kitchen:['decor','tea'],winter:['skin','night']};
+const albKeys=()=>['post'].concat(Object.keys(SETS).filter(k=>k!=='post'&&SETS[k].it)).concat(['cat']);
+const albMax=k=>k==='cat'?state.maxC:collMax(k);
+const albName=k=>k==='cat'?T('Kediler','Cats'):T(SETS[k].n[0],SETS[k].n[1]);
+const albDone=k=>albMax(k)>=6;
+function albumReady(){
+  if(!state)return [];
+  const r=albKeys().filter(k=>albDone(k)&&!state.albumClaimed[k]);
+  if(albKeys().every(albDone)&&!state.albumClaimed.complete)r.push('complete');
+  return r;
+}
+let albToasted={};
+function albumTick(){
+  if(!state)return;
+  albumReady().forEach(k=>{if(!albToasted[k]){albToasted[k]=1;toast(T('📖 Albüm sayfası tamam! Ödülü Defter\'den al','📖 Album page complete! Claim it in the Book'));updateBookDot()}});
+}
+function claimAlbum(k){
+  if(!albumReady().includes(k))return;
+  state.albumClaimed[k]=true;
+  let msg;
+  if(k==='complete'){addCoins(300);state.hearts+=100;state.jk.hammer++;state.jk.magnet++;state.jk.star++;msg=T('+300 🪙 +100 ❤ + 3 joker!','+300 🪙 +100 ❤ + 3 jokers!')}
+  else{
+    addCoins(ALB_REWARD.coins);state.hearts+=20;msg='+'+ALB_REWARD.coins+' 🪙 +20 ❤';
+    const nu=ALB_NEST[k];
+    if(nu){
+      if(nu[0]==='decor'){if(!state.nest.owned.includes(nu[1]))state.nest.owned.push(nu[1]);msg+=' + '+NEST_DECOR[nu[1]].e}
+      else{if(!state.nest.skins.includes(nu[1]))state.nest.skins.push(nu[1]);msg+=' + 🪺'}
+    }
+  }
+  sfx('levelup');burst(innerWidth/2,innerHeight*.4,14,20);toast('📖 '+msg);trk('album_claim',{k});
+  renderBook();renderHUD();renderJokers();saveSoon();
+}
+function renderAlbum(b){
+  const keys=albKeys();let have=0,tot=keys.length*6;keys.forEach(k=>have+=Math.min(6,albMax(k)));
+  let h='<div class="sec">'+T('Koleksiyon Albümü','Collection Album')+' · '+have+'/'+tot+'</div>';
+  h+='<div class="albbar"><i style="width:'+Math.round(have/tot*100)+'%"></i></div>';
+  const comp=albumReady().includes('complete'),compDone=state.albumClaimed.complete;
+  h+='<div class="lrow"><div class="li">🏆</div><div class="lt">'+T('Tüm albüm tamamlanınca','When the whole album is full')+'<small>+300 🪙 +100 ❤ + 3 joker</small></div>'+(compDone?'<span class="chip on">✔</span>':comp?'<button class="btn sm" data-alb="complete">'+T('Al','Claim')+'</button>':'<span class="chip">'+keys.filter(albDone).length+'/'+keys.length+'</span>')+'</div>';
+  keys.forEach(k=>{
+    const mx=Math.min(6,albMax(k)),done=mx>=6,cl=state.albumClaimed[k];
+    let row='<div class="albrow"><div class="albh"><b>'+albName(k)+'</b><span>'+mx+'/6</span>'+(cl?'<span class="chip on">✔</span>':done?'<button class="btn sm" data-alb="'+k+'">'+T('Ödül','Claim')+'</button>':'')+'</div><div class="albs">';
+    for(let l=1;l<=6;l++){
+      const on=l<=mx;
+      row+='<div class="alb t'+l+(on?' on':'')+'">'+(on?(k==='cat'?'<div class="albcat">'+catSVG(CATS[l],'idle')+'</div>':itemIcon('a',l,k)):'<span>❔</span>')+'</div>';
+    }
+    const nu=ALB_NEST[k];
+    h+=row+'</div><small class="albr">🪙 '+ALB_REWARD.coins+' · ❤ 20'+(nu?' · '+(nu[0]==='decor'?NEST_DECOR[nu[1]].e+' '+T(NEST_DECOR[nu[1]].n[0],NEST_DECOR[nu[1]].n[1]):'🪺 '+T(NEST_SKINS[nu[1]].n[0],NEST_SKINS[nu[1]].n[1])):'')+'</small></div>';
+  });
+  b.innerHTML=h;
+}
+$('#bookBody').addEventListener('click',e=>{const b=e.target.closest('[data-alb]');if(b)claimAlbum(b.dataset.alb)});
 function renderCats(b){
   const m=state.maxC;
   let h='<div class="sec">'+T('Kedi Bonusu','Cat Bonus')+'</div><div class="lrow"><div class="li">🌻</div><div class="lt">+'+m+' '+T('maks. enerji','max energy')+'<small>'+T('Enerji yenilenmesi %'+Math.round(m*2)+', kedi sepeti %'+Math.round(m*5)+' daha hızlı','Energy regen '+Math.round(m*2)+'% and cat basket '+Math.round(m*5)+'% faster')+'</small></div></div>';
@@ -3339,7 +3512,7 @@ $('#btnReset').addEventListener('click',e=>{
 const TUT=[
   {adv:'merge',spot:{cells:[6,7]},t:()=>T('Birleştir!','Merge!'),x:()=>T('Yan yana iki ✉️’ı sürükle (ya da sırayla dokun): Fotoğraf olsun!','Drag one ✉️ onto the other (or tap both) to make a Photo!')},
   {adv:'deliver',spot:{sel:'#orderCard'},t:()=>T('Kargola!','Deliver!'),x:()=>T(YOU()+' bir 🖼️ istiyor. Fotoğrafı sipariş kartına bırak!',YOU()+' wants a 🖼️. Drop the Photo on the order card!')},
-  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir ama 1 hamle harcar! Hamlen bitmeden hedefleri tamamla 🌻','Tap the nest for a new ✉️, but it costs 1 move! Finish the goals before moves run out 🌻')},
+  {adv:'spawn',spot:{sel:'#nest'},t:()=>T('Yuva','The Nest'),x:()=>T('Yuvaya dokun: yeni ✉️ gelir ama 1 🌻 enerji harcar! Enerji zamanla yenilenir; siparişler de enerji kazandırır','Tap the nest for a new ✉️, but it costs 1 🌻 energy! Energy refills over time and orders give some back')},
   {adv:'ok',spot:{sel:'#kitBtn'},t:()=>T('Kediler! 🐱','Cats! 🐱'),x:()=>T('Sepetten yavru kedi al, aynı kedileri birleştir. Her yeni kedi sana bonus enerji verir. Gezen kedileri sevmeyi unutma 🐾','Take kittens from the basket and merge matching cats. Every new cat gives bonus energy. Pet the wandering cats too 🐾')},
   {adv:'ok',spot:{sel:'#btnBook'},t:()=>T('Defter 📖','Journal 📖'),x:()=>T('Üstteki kartta seviye hedefin, 🗺️ ile haritan var. Defterde günlük hediye, görevler ve kediler seni bekliyor!','Your level goals are on the card above, and 🗺️ opens the map. The journal holds daily gifts, quests and cats!')}
 ];
@@ -3376,11 +3549,12 @@ function bootState(st){
   state=st||defState(prev?JSON.parse(JSON.stringify(prev)):null);
   state.settings.names.me=cleanName(state.settings.names.me)||'Bird';
   state.settings.names.you=cleanName(state.settings.names.you)||'Birdie';
-  if(!state.order||state.order.done||(state.order.rush&&state.order.rush<Date.now()))state.order=makeOrder(false);
+  ensureOrders();
+  if(state.energy>energyMax()+BAL.energyOverfill)state.energy=energyMax();
   sel=null;fxMap={};lastCode='';giftSel=null;lastHearts=-1;
   tickEnergy();tickKit();ensureQuests();tickLives();
   shownKm=state.km;
-  applyTheme();applyBoardSkin();renderStats();renderJokers();renderArt();renderAll();updateKm(false);syncSettings();
+  applyTheme();applyBoardSkin();applyNest();renderStats();renderJokers();renderArt();renderAll();updateKm(false);syncSettings();
   if(AC)applyTrack();
 }
 function slotInfo(n){
@@ -3466,8 +3640,8 @@ $('#tSet').addEventListener('click',()=>{ensureAudio();sfx('tap');showModal('mSe
 $('#tHow').addEventListener('click',()=>{
   ensureAudio();sfx('tap');
   showNote({art:'<div style="font-size:56px">📖</div>',title:T('Nasıl Oynanır?','How to Play'),
-   text:T('🎯 Her seviyenin bir hedefi ve hamle sınırı var. Yuvaya her dokunuş 1 hamle harcar.\n🔀 Aynı iki eşyayı birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Siparişleri teslim et: hedef olur, hamle kazandırır.\n🐱 Kediler de birleşir; her yeni kedi bonus hamle verir.\n🗺️ 80 seviyeyi geç, İstanbul ile Adana arasını kapat. Her 10 seviyede yeni tema ve yeni engel gelir!\n\nSonunda Bird ve Birdie kavuşur! 💞',
-   'Every level has goals and a move limit. Each nest tap costs 1 move.\nMerge two matching items: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\nDeliver orders: they can be goals and earn moves.\nMerge cats too; each new cat gives bonus moves.\nClear 80 levels to close the gap between Istanbul and Adana. Every 10 levels brings a new theme and a new hazard!\n\nIn the end Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
+   text:T('🎯 Her seviyenin hedefleri var. Yuvaya her dokunuş 1 🌻 enerji harcar; enerji zamanla yenilenir. Tahtan seviyeler arasında kalıcıdır.\n🔀 Aynı iki eşyayı birleştir: Mektup → Fotoğraf → Kahve → Atkı → Peluş → Uçak Bileti.\n📦 Aynı anda 3 sipariş açık (★ kolay … ★★★ zor): teslim et, enerji ve altın kazan.\n💰 Tahta dolarsa Sat ile eşyaları altına çevir.\n📖 Albümü doldur, 🏡 yuvanı süsle.\n🐱 Kediler de birleşir; her yeni kedi bonus enerji verir.\n🗺️ 80 seviyeyi geç, İstanbul ile Adana arasını kapat. Her 10 seviyede yeni tema ve yeni engel gelir!\n\nSonunda Bird ve Birdie kavuşur! 💞',
+   'Every level has goals. Each nest tap costs 1 🌻 energy, which refills over time. Your board persists between levels.\nMerge two matching items: Letter → Photo → Coffee → Scarf → Plush → Plane Ticket.\n3 orders are open at once (★ easy … ★★★ hard): deliver them for energy and coins.\n💰 If the board fills up, Sell items for coins.\n📖 Fill the album, 🏡 decorate your nest.\nMerge cats too; each new cat gives bonus energy.\nClear 80 levels to close the gap between Istanbul and Adana. Every 10 levels brings a new theme and a new hazard!\n\nIn the end Bird and Birdie reunite! 💞'),ok:T('Anladım','Got it')});
 });
 $('#tLang').addEventListener('click',()=>{sfx('tap');state.settings.lang=state.settings.lang==='en'?'tr':'en';renderAll();syncSettings();if(started)saveSoon();else try{localStorage.setItem(KEY,JSON.stringify(Object.assign({},readSlot(curSlot())||state,{settings:state.settings})))}catch(e){}});
 $('#tMusic').addEventListener('click',()=>{
@@ -3491,7 +3665,7 @@ function init(){
   roamStart();
   showTitle();
   if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
-  window.__PK={birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
+  window.__PK={applyNest,albumReady,claimAlbum,birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
 }
 init();
 })();

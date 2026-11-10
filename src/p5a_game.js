@@ -124,7 +124,6 @@ function place(c,fx){const e=emptyCells();if(!e.length)return -1;const i=rnd(e);
 
 /* ---------- enerji / kedi sepeti ---------- */
 function tickEnergy(){
-  state.energyT=Date.now();return;
   const now=Date.now(),max=energyMax();
   if(state.energy>=max){state.energyT=now;return}
   const ms=regenMs(),d=Math.floor((now-state.energyT)/ms);
@@ -143,8 +142,8 @@ function renderEnergy(){
   let note;
   if(unl)note=T('Sınırsız (test modu) ♾️','Unlimited (test mode) ♾️');
   else if(!state.lv||state.lv.done)note=T('Bir seviye başlat 🗺️','Start a level 🗺️');
-  else if(state.energy<=0)note=T('Hamle bitti! Siparişle hamle kazan 📦','Out of moves! Orders give moves 📦');
-  else note=T('Yuvaya her dokunuş 1 hamle','Each nest tap costs 1 move');
+  else if(state.energy<=0)note=T('Enerji bitti! Siparişler enerji kazandırır 📦','Out of energy! Orders give energy 📦');
+  else note=T('Yuvaya her dokunuş 1 enerji · zamanla yenilenir','1 energy per nest tap · refills over time');
   $('#eNote').textContent=note;
 }
 function renderKit(){
@@ -168,7 +167,7 @@ function spawn(){
   ensureAudio();
   const unl=state.settings.unlimited,nest=$('#nest');
   if(!lvActive()){sfx('err');toast(T('Önce haritadan bir seviye seç 🗺️','Pick a level on the map first 🗺️'));bounceEl(nest);return}
-  if(!unl&&state.energy<=0){sfx('err');toast(T('Hamle bitti! Sipariş teslim ederek ya da ❤ ile hamle kazan','Out of moves! Deliver orders or buy moves with ❤'));bounceEl(nest);afterAction();return}
+  if(!unl&&state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da altınla enerji al','Out of energy! Deliver orders, wait, or buy energy with coins'));bounceEl(nest);afterAction();return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}
   if(!unl)state.energy--;
   const l=Math.random()<BAL.nestL2*state.up.nest?2:1;
@@ -207,14 +206,14 @@ function showCatCard(l,b){
 function discover(t,l,sk){
   if(t==='a'&&sk&&sk!=='post'&&SETS[sk]&&SETS[sk].it){
     if(l>(state.dsc[sk]||0)){
-      state.dsc[sk]=l;const b=l;state.hearts+=b;renderCollection();
+      state.dsc[sk]=l;const b=l;state.hearts+=b;renderCollection();albumTick();
       toast(T('Yeni eşya: ','New item: ')+itemName('a',l,sk)+'! +'+b+'❤');sfx('levelup');
     }
   }else if(t==='a'&&l>state.maxA){
-    state.maxA=l;const b=l*2;state.hearts+=b;renderCollection();
+    state.maxA=l;const b=l*2;state.hearts+=b;renderCollection();albumTick();
     toast(T('Yeni eşya: ','New item: ')+itemName('a',l)+'! +'+b+'❤');sfx('levelup');checkAch();
   }else if(t==='c'&&l>state.maxC){
-    state.maxC=l;const b=l*4;state.hearts+=b;sfx('levelup');showCatCard(l,b);checkAch();
+    state.maxC=l;const b=l*4;state.hearts+=b;albumTick();sfx('levelup');showCatCard(l,b);checkAch();
   }
 }
 function merge(from,to){
@@ -297,8 +296,7 @@ function lvSets(){return (state.lv&&state.lv.sets&&state.lv.sets.length)?state.l
 /* hedefe ihtiyaç duyulan zincirler: açık sipariş + hedef eşya */
 function wantedSets(){
   const w=[];
-  const o=state.order;
-  if(o&&!o.done)o.reqs.forEach(r=>{if(r.got<r.need){const k=r.t==='c'?'cat':(r.s||'post');if(!w.includes(k))w.push(k)}});
+  (state.orders||[]).forEach(o=>{if(o&&!o.done)o.reqs.forEach(r=>{if(r.got<r.need){const k=r.t==='c'?'cat':(r.s||'post');if(!w.includes(k))w.push(k)}})});
   const L=state.lv;
   if(L&&!L.done)L.goals.forEach(g=>{
     if(g.k==='mkA'&&goalHave(g)<g.need){const k=g.s||'post';if(!w.includes(k))w.push(k)}
@@ -325,55 +323,52 @@ function newItem(l){
   if(k==='cat')return{t:'c',l:1,k:false};
   return (k==='post'||!SETS[k]||!SETS[k].it)?{t:'a',l,k:false}:{t:'a',s:k,l,k:false};
 }
-function makeOrder(rush){
+function makeOrder(d){
+  d=d==null?1:d;
   const m=state.lv?state.lv.mech:null,lo=m?m.oLo:2,hi=m?m.oHi:3;
-  const count=(m&&m.multi&&Math.random()<m.multi)?2:1,reqs=[],used=new Set();
-  const sets=lvSets();
-  for(let n=0,tr=0;n<count&&tr<40;tr++){
+  const sets=lvSets(),reqs=[],used=new Set(),cnt=(d===2&&(!state.lv||state.lv.n>=4))?2:1;
+  for(let n=0,tr=0;n<cnt&&tr<60;tr++){
     const k=rnd(sets);
-    if(k==='cat'){
-      const l=rint(2,Math.min(4,Math.max(2,hi)));const key='c'+l;if(used.has(key))continue;used.add(key);
-      reqs.push({t:'c',l,need:1,got:0});n++;continue;
-    }
-    const l=rint(lo,hi),key=k+l;if(used.has(key))continue;used.add(key);
-    const need=(l===1)?rint(2,3):((l===2&&Math.random()<.3)?2:1);
+    let l=d===0?Math.max(1,lo-1+(Math.random()<.5?0:1)):d===1?rint(lo,hi):rint(Math.max(lo,hi-1),Math.min(6,hi+(hi<5?1:0)));
+    if(k==='cat'){l=clamp(l,2,4);const key='c'+l;if(used.has(key))continue;used.add(key);reqs.push({t:'c',l,need:1,got:0});n++;continue}
+    const key=k+l;if(used.has(key))continue;used.add(key);
+    const need=(l===1)?rint(2,3):((l===2&&d<2&&Math.random()<.5)?2:1);
     const q={t:'a',l,need,got:0};if(k!=='post'&&SETS[k]&&SETS[k].it)q.s=k;
     reqs.push(q);n++;
   }
   if(!reqs.length)reqs.push({t:'a',l:2,need:1,got:0});
-  const isRush=!!(rush||(m&&m.rush));
-  return{reqs,done:false,say:Math.floor(Math.random()*SAYS.length),rush:isRush?Date.now()+(m&&m.rushMs?m.rushMs:BAL.rushMs):0};
+  return{reqs,done:false,say:0,d};
 }
-const reqEl=i=>$('#reqs').children[i];
+function ensureOrders(){
+  if(!state.orders||state.orders.length!==3)state.orders=[makeOrder(0),makeOrder(1),makeOrder(2)];
+}
 const reqIcon=r=>'<div class="mini t'+r.l+'">'+itemIcon(r.t,r.l,r.s)+'</div>';
 function orderReward(o){
   let h=0;o.reqs.forEach(r=>{const left=r.need-r.got;h+=HV[r.t][r.l]*left});
-  const m=o.rush?BAL.rushMult:1;return{km:0,h:h*m};
+  return{h:h+BAL.orderHearts*(o.d+1),e:BAL.orderEnergy+o.d+state.up.post,c:[1,2,4][o.d]};
 }
-function renderOrder(animate){
-  const o=state.order,card=$('#orderCard');
-  $('#orderTitle').textContent=T('📦 Sipariş: ','📦 Order from ')+YOU();
-  $('#reqs').innerHTML=o.reqs.map((r,i)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-r="'+i+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l,r.s)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('');
+const reqEl=(oi,ri)=>$('#ords').querySelector('.req[data-o="'+oi+'"][data-r="'+ri+'"]');
+function orderRowHTML(o,i){
   const rw=orderReward(o);
-  $('#orderReward').textContent=o.done?T('Gönderildi 🎁','Sent 🎁'):(o.rush?'⚡ ':'')+'+'+rw.h+' ❤ · +'+(BAL.orderEnergy+state.up.post)+' 🌻';
-  $('#orderSay').textContent=o.done?T('Çok teşekkür ederim! 💕','Thank you so much! 💕'):(o.rush?T('Acil kargo! Süre dolmadan yetiştir ⚡','Rush parcel! Deliver before time runs out ⚡'):'“'+SAYS[o.say%SAYS.length]()+'”');
-  card.classList.toggle('done',!!o.done);card.classList.toggle('rushing',!!o.rush&&!o.done);
-  if(animate){card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap')}
-  updateWant();tickRush();
+  return '<div class="orow d'+o.d+(o.done?' done':'')+'" data-o="'+i+'"><div class="odif">'+'★'.repeat(o.d+1)+'</div><div class="reqs">'+
+    o.reqs.map((r,j)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-o="'+i+'" data-r="'+j+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l,r.s)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('')+
+    '</div><div class="orew">'+(o.done?'✔':'+'+rw.h+'❤<br>+'+rw.e+'🌻<br>+'+rw.c+'🪙')+'</div></div>';
 }
-function tickRush(){
-  const o=state.order,box=$('#rush');
-  if(!o||!o.rush||o.done){box.classList.remove('on');return}
-  const left=o.rush-Date.now();
-  if(left<=0){
-    toast(T('Kargo gecikti 🥺 Yeni sipariş geldi','The parcel was late 🥺 A new order arrived'));
-    state.order=makeOrder(false);renderOrder(true);saveSoon();return;
-  }
-  box.classList.add('on');box.firstChild.style.width=Math.min(100,left/(state.lv&&state.lv.mech.rushMs||BAL.rushMs)*100)+'%';box.lastChild.textContent='⚡ '+Math.ceil(left/1000)+T(' sn',' s');
+function renderOrder(swapIdx){
+  ensureOrders();
+  $('#orderTitle').textContent=T('📦 Siparişler · ','📦 Orders · ')+YOU();
+  $('#orderReward').textContent=state.orders.filter(o=>o.done).length+'/3';
+  $('#ords').innerHTML=state.orders.map(orderRowHTML).join('');
+  if(typeof swapIdx==='number'){const e=$('#ords').children[swapIdx];if(e){e.classList.add('swap')}}
+  updateWant();
 }
+function tickRush(){}
 function updateWant(){
   const c=sel!=null?state.board[sel]:null;
-  [...$('#reqs').children].forEach((el,i)=>{const r=state.order.reqs[i];el.classList.toggle('want',!!(c&&r&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need&&!state.order.done))});
+  [...$('#ords').querySelectorAll('.req')].forEach(el=>{
+    const o=state.orders[+el.dataset.o],r=o&&o.reqs[+el.dataset.r];
+    el.classList.toggle('want',!!(c&&r&&!o.done&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need));
+  });
 }
 function fly(rect,toEl,c){
   const to=toEl.getBoundingClientRect(),g=document.createElement('div');
@@ -384,40 +379,45 @@ function fly(rect,toEl,c){
   const a=g.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+dx*.5+'px,'+(dy*.5-30)+'px) scale(1.1)',opacity:1,offset:.45},{transform:'translate('+dx+'px,'+dy+'px) scale(.3)',opacity:.2}],{duration:520,easing:'ease-in-out'});
   a.onfinish=()=>g.remove();setTimeout(()=>g.remove(),900);
 }
-function deliver(idx,ri){
-  const o=state.order,c=state.board[idx],req=o.reqs[ri];
-  if(!c||c.k||c.z||c.g||c.t==='x'||c.t==='r'||c.t==='m'||c.t==='w'||!req||o.done||!lvActive())return false;
-  const chip=reqEl(ri);
+function findReq(c,oi){
+  if(!c)return null;
+  const rng=oi==null?[0,1,2]:[oi];
+  for(const i of rng){const o=state.orders[i];if(!o||o.done)continue;const j=o.reqs.findIndex(r=>r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need);if(j>=0)return{oi:i,ri:j}}
+  return null;
+}
+function deliver(idx,oi,ri){
+  const o=state.orders[oi],c=state.board[idx],req=o&&o.reqs[ri];
+  if(!c||c.k||c.z||c.g||c.t==='x'||c.t==='r'||c.t==='m'||c.t==='w'||!req||o.done||!state.saga)return false;
+  const chip=reqEl(oi,ri);
   if(req.t!==c.t||req.l!==c.l||(req.s||'')!==(c.s||'')){sfx('err');toast(T('Şunu istiyor: ','Wants: ')+itemName(req.t,req.l,req.s));bounceEl(chip);return false}
   if(req.got>=req.need){sfx('err');toast(T('Bu istek zaten tamam ✔️','This one is already done ✔️'));bounceEl(chip);return false}
   const rect=cellEls[idx].getBoundingClientRect(),cc=elCenter(chip);
   fly(rect,chip,c);
   req.got++;state.board[idx]=null;sel=null;
-  const mult=o.rush?BAL.rushMult:1;
-  const hh=HV[c.t][c.l]*mult;
+  const hh=HV[c.t][c.l];
   state.hearts+=hh;state.stats.items++;ev('item');
-  setTimeout(()=>{
-    floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10);
-  },430);
+  setTimeout(()=>{floatText('+'+hh+' ❤',cc.x,cc.y+22);burst(cc.x,cc.y,6,10)},430);
   sfx('deliver');buzz(18);setMood('happy',2000);
   renderBoard();renderHUD();renderOrder();tutAdv('deliver');
   if(o.reqs.every(r=>r.got>=r.need)){
-    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');
-    if(o.rush){state.stats.rush++;ev('rush')}
-    const bh=BAL.orderHearts*mult;state.hearts+=bh;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+BAL.orderEnergy+state.up.post);
-    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+(BAL.orderEnergy+state.up.post)+'🌻');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);renderHUD();$('#orderCard').classList.add('done');$('#orderReward').textContent=T('Gönderildi 🎁','Sent 🎁');$('#rush').classList.remove('on')},600);
+    const rw=orderReward(Object.assign({},o,{reqs:o.reqs.map(r=>Object.assign({},r,{got:0}))}));
+    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');if(o.d===2){state.stats.rush++;ev('rush')}
+    const bh=BAL.orderHearts*(o.d+1);state.hearts+=bh;
+    const en=BAL.orderEnergy+o.d+state.up.post;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+en);
+    addCoins([1,2,4][o.d]);
+    albumTick();
+    setTimeout(()=>{toast(T('Sipariş tamam! 🎁 +','Order complete! 🎁 +')+bh+'❤ +'+en+'🌻 +'+[1,2,4][o.d]+'🪙');sfx('order');setMood('love',2600);burst(innerWidth/2,innerHeight*.3,10,16);renderHUD();renderOrder()},350);
     setTimeout(()=>{
-      if(state.lv&&state.lv.done)return;
-      state.order=makeOrder(false);renderOrder(true);if(state.order.rush){sfx('order');toast(T('⚡ Aceleli kargo! Süre işliyor','⚡ Rush parcel! The clock is ticking'))}
-      saveSoon();
-    },1000);
+      if(state.orders[oi]!==o)return;
+      state.orders[oi]=makeOrder(o.d);renderOrder(oi);saveSoon();
+    },1100);
   }
   afterAction();saveSoon();return true;
 }
 $('#orderCard').addEventListener('click',e=>{
   const r=e.target.closest('.req');if(!r)return;
   if(sel==null){toast(T('Önce tahtadan bir eşya seç 👆','Pick an item on the board first 👆'));return}
-  deliver(sel,+r.dataset.r);
+  deliver(sel,+r.dataset.o,+r.dataset.r);
 });
 
 /* ---------- sürükle & bırak ---------- */
@@ -462,11 +462,11 @@ function endDrag(e,cancel){
     const to=+cellE.dataset.i;
     if(to===d.i){renderBoard();return}
     act(d.i,to);
-  }else if(reqE){deliver(d.i,+reqE.dataset.r)}
+  }else if(reqE){deliver(d.i,+reqE.dataset.o,+reqE.dataset.r)}
   else if(ordE){
     const c=state.board[d.i];
-    const ri=state.order.reqs.findIndex(r=>c&&r.t===c.t&&r.l===c.l&&r.got<r.need);
-    if(ri>=0)deliver(d.i,ri);else{sfx('err');toast(T(YOU()+' bunu istemedi 🥺',YOU()+' didn’t ask for that 🥺'));bounceEl(ordE)}
+    const rowE=el.closest('.orow'),f=findReq(c,rowE?+rowE.dataset.o:null)||findReq(c,null);
+    if(f)deliver(d.i,f.oi,f.ri);else{sfx('err');toast(T(YOU()+' bunu istemedi 🥺',YOU()+' didn’t ask for that 🥺'));bounceEl(ordE)}
   }else renderBoard();
 }
 addEventListener('pointerup',e=>endDrag(e,false));
