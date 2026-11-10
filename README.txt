@@ -18,3 +18,14 @@ v14 — EL BOYAMASI / MASAL (Ghibli'den esinli özgün çizim stili)
 - Arka plan: uçuşan yaprak / taç yaprağı / kar tanesi / tohum çizimleri (emoji yok); giriş ekranında çayır tepeleri ve bulutlar
 - Animasyonlar yaylı jöle yerine yumuşak, rüzgârlı hareketler
 - Ayarlar > "Çizim stili": kapatılırsa eski parlak Şeker görünümüne döner
+
+
+v15 — MAĞAZA, TEMALAR, TEST REKLAMLARI
+- Dükkân artık "Mağaza": yeni Paketler sekmesi (altın, enerji, başlangıç paketi, reklamsız) — TEST satın alma, gerçek ödeme alınmaz
+- 5 görünüm teması mağazada: Suluboya Masal, Şeker, Kiraz Çiçeği, Eskiz Defteri, Gece Feneri (Ayarlar'daki çizim stili anahtarı kaldırıldı)
+- Reklamlar: Google Publisher Tag ile Google'ın resmî test birimleri — ödüllü reklam + oyun ekranının altında 320x50 banner.
+  GPT yüklenemezse (çevrimdışı, engelleyici) yerleşik "Test reklamı" devreye girer
+- Test modu (sınırsız enerji) kaldırıldı
+- Ayarlar: aç/kapa anahtarları hizalandı
+- Tahta temaları önizlemesindeki ">"> yazı hatası düzeltildi; tahta temaları artık her görünüm temasında çalışıyor
+- Service worker dış (reklam) isteklerini önbelleğe almıyor

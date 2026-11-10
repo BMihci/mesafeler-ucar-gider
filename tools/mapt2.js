@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const n=+process.argv[2]||45,dir=process.argv[3]||'A';
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844},deviceScaleFactor:2});
 const errs=[];p.on('pageerror',e=>errs.push(e.message));
-await p.goto('file:///home/claude/index.html');await p.waitForTimeout(800);
+await p.goto('file://'+require('path').join(__dirname,'..','index.html'));await p.waitForTimeout(800);
 const F=s=>p.click(s,{force:true,timeout:2000}).catch(()=>{});
 await F('#tStart');await p.waitForTimeout(900);await F('#mChar .chbtn[data-dir='+dir+']');await p.waitForTimeout(600);
 for(let i=0;i<14;i++){for(const s of ['#coachSkip','#cNext','#liStart','#noteOk']){const e=await p.$(s);if(e)await e.click({force:true,timeout:500}).catch(()=>{})}await p.waitForTimeout(250)}

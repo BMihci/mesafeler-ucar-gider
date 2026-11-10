@@ -334,7 +334,7 @@ function renderChips(){
   $('#langChips').innerHTML=[['tr','🇹🇷 Türkçe'],['en','🇬🇧 English']].map(([k,n])=>'<button class="chip'+(state.settings.lang===k?' on':'')+'" data-lng="'+k+'">'+n+'</button>').join('');
 }
 function syncSettings(){
-  $('#swSfx').checked=!!state.settings.sfx;$('#swMusic').checked=!!state.settings.music;$('#swUnl').checked=!!state.settings.unlimited;$('#swEco').checked=ecoOn();$('#swArt').checked=state.settings.art!=='candy';
+  $('#swSfx').checked=!!state.settings.sfx;$('#swMusic').checked=!!state.settings.music;$('#swEco').checked=ecoOn();
   $('#rgSfx').value=Math.round(state.settings.sfxVol*100);$('#rgMus').value=Math.round(state.settings.musVol*100);
   $('#inMe').value=state.settings.names.me;$('#inYou').value=state.settings.names.you;
   renderChips();
@@ -346,11 +346,15 @@ $('#btnSettings').addEventListener('click',()=>{sfx('tap');showModal('mSettings'
 $('#btnCloseS').addEventListener('click',()=>closeModal('mSettings'));
 $('#swSfx').addEventListener('change',e=>{state.settings.sfx=e.target.checked;ensureAudio();applyVolumes();if(e.target.checked)sfx('pop');saveSoon()});
 $('#swMusic').addEventListener('change',e=>{state.settings.music=e.target.checked;ensureAudio();if(e.target.checked)startMusic();else stopMusic();saveSoon()});
-function applyArt(){document.body.classList.toggle('gh',state.settings.art!=='candy');buildSprite()}
-$('#swArt').addEventListener('change',e=>{state.settings.art=e.target.checked?'gh':'candy';applyArt();try{applyTheme();renderAll()}catch(_){};saveSoon()});
+function applyArt(){
+  const a=(state&&state.cos&&ARTS[state.cos.art])?state.cos.art:'gh',b=document.body;
+  b.classList.toggle('gh',a!=='candy');
+  ['night','sakura','kraft'].forEach(x=>b.classList.toggle('art-'+x,a===x));
+  b.dataset.art=a;buildSprite();
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.content=ARTS[a].tc;
+}
 function applyEco(){document.body.classList.toggle('eco',ecoOn());try{resizeCv()}catch(e){}}
 $('#swEco').addEventListener('change',e=>{state.settings.eco=e.target.checked;applyEco();saveSoon()});
-$('#swUnl').addEventListener('change',e=>{state.settings.unlimited=e.target.checked;renderHUD();saveSoon()});
 $('#rgSfx').addEventListener('input',e=>{state.settings.sfxVol=e.target.value/100;applyVolumes();saveSoon()});
 $('#rgSfx').addEventListener('change',()=>sfx('pop'));
 $('#rgMus').addEventListener('input',e=>{state.settings.musVol=e.target.value/100;applyVolumes();saveSoon()});
@@ -443,7 +447,7 @@ function refreshTitle(){
   const t=$('#title');if(!t||!state)return;
   const n=curSlot(),info=slotInfo(n);
   $('#tStart').textContent=info?T('▶ Devam Et','▶ Continue'):T('▶ Başla','▶ Start');
-  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info&&info.lv?T('Seviye ','Level ')+info.lv+' · '+Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v3.0';
+  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info&&info.lv?T('Seviye ','Level ')+info.lv+' · '+Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v15';
   $('#tMusic').textContent=state.settings.music?'🎵':'🔇';
 }
 function renderTitleArt(){

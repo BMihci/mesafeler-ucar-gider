@@ -212,3 +212,116 @@ body.gh .tcatR{animation:ghFloat 5.5s ease-in-out infinite}
 body.gh .tfoot{color:#7C5A3E;font-style:italic}
 body.gh .slot{border:2px solid var(--ink);background:linear-gradient(180deg,#FFFDF2,#F9F0D8)}
 body.gh .slot.on{background:#FBEBDD;border-color:var(--pinkd)}
+
+/* =====================================================================
+   v15 — MAĞAZA TEMALARI (body.gh üzerine binen görünümler)
+   art-sakura: Kiraz Çiçeği · art-kraft: Eskiz Defteri · art-night: Gece Feneri
+   ===================================================================== */
+/* ---------- Kiraz Çiçeği ---------- */
+body.gh.art-sakura,body.gh.art-sakura[data-theme]{--ink:#5E4047;--ink2:#9A7480;--paper:#FFF8F5;--bg1:#F8D9E2;--bg2:#FDF1EC;--bg3:#F4C6D4;
+  --tray1:#EDB1BF;--tray2:#D98AA0;--trayE:#96506A;--cell:#FFF8F6;--cellS:#F2D2D9;--pink:#E88FA8;--pinkd:#B4526E;--pink2:#FBDAE3;--gold1:#FBE3EA;--gold2:#E5A0B4;--gold3:#B4526E}
+body.gh.art-sakura .awning{background:repeating-linear-gradient(90deg,#F2A9BD 0 24px,#FFF6F3 24px 48px)}
+body.gh.art-sakura .btn{background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.45) 0,transparent 100%),linear-gradient(180deg,#F5B3C4 0,#E88FA8 55%,#D4708C 100%);box-shadow:0 4px 0 #96405A,inset 0 0 0 2px rgba(255,255,255,.3),0 8px 12px rgba(94,64,71,.2)}
+body.gh.art-sakura .btn:active{box-shadow:0 1px 0 #96405A}
+body.gh.art-sakura .btn.soft{background:linear-gradient(180deg,#FFFDFB,#FBE6EA 60%,#F3CDD6);box-shadow:0 4px 0 #C9909F,inset 0 0 0 2px rgba(255,255,255,.7)}
+body.gh.art-sakura .ibtn{background:radial-gradient(ellipse at 50% 0,rgba(255,255,255,.7) 0 35%,transparent 36%),linear-gradient(180deg,#FBD3DC,#F0A6B8 70%,#E48CA2);box-shadow:0 3px 0 #B4526E,0 6px 8px rgba(94,64,71,.2)}
+body.gh.art-sakura .board{border-color:#96506A;box-shadow:0 6px 0 var(--trayE),0 0 0 2px rgba(94,64,71,.85),inset 0 3px 0 rgba(255,240,244,.5),inset 0 -8px 14px rgba(120,50,75,.2),0 18px 26px rgba(94,64,71,.28)}
+body.gh.art-sakura .panel,body.gh.art-sakura .mcard{background:linear-gradient(180deg,rgba(255,253,251,.97),rgba(253,236,239,.97))}
+body.gh.art-sakura .mcard{border-color:#B4526E;box-shadow:0 0 0 2px rgba(94,64,71,.5),0 5px 0 2px #96405A,inset 0 0 0 3px rgba(255,255,255,.6),0 24px 40px rgba(60,30,40,.4)}
+body.gh.art-sakura .hpill,body.gh.art-sakura .stat{background:linear-gradient(180deg,#FFFDFB,#FBE0E6)}
+body.gh.art-sakura .tabs button.on,body.gh.art-sakura .chip.on,body.gh.art-sakura .x{background:linear-gradient(180deg,#F5B3C4,#DE7F99);box-shadow:0 3px 0 #96405A}
+body.gh.art-sakura .feed{border-color:#D98AA0;box-shadow:0 0 0 2px var(--ink),0 5px 0 2px #96506A,inset 0 0 0 2px rgba(255,245,248,.7),0 12px 18px rgba(94,64,71,.28)}
+body.gh.art-sakura #title{background:linear-gradient(180deg,#F6C3D3 0%,#FBE3E6 42%,#FFF4EC 72%,#F9DCE0 100%)}
+body.gh.art-sakura .thills path:nth-child(1){fill:#F2BFCB}body.gh.art-sakura .thills path:nth-child(2){fill:#C9DDA8}
+body.gh.art-sakura .tl1.b{color:#FBD0DB}
+body.gh.art-sakura #scene svg{filter:saturate(.75) sepia(.1) hue-rotate(-12deg)}
+body.gh.art-sakura .toast{background:linear-gradient(180deg,#EFA1B6,#D4708C)}
+
+/* ---------- Eskiz Defteri ---------- */
+body.gh.art-kraft,body.gh.art-kraft[data-theme]{--ink:#43362A;--ink2:#7E6A52;--paper:#F5ECD8;--bg1:#E6D8BC;--bg2:#EFE5CE;--bg3:#D9C7A2;
+  --tray1:#CDB48A;--tray2:#B89B6C;--trayE:#6F5838;--cell:#F8F0DE;--cellS:#DBCAA4;--pink:#B98A5A;--pinkd:#7A5632;--pink2:#EAD7B5;--gold1:#F0E2BC;--gold2:#C2A46A;--gold3:#7E6436}
+body.gh.art-kraft{background:
+  repeating-linear-gradient(0deg,rgba(67,54,42,.07) 0 1px,transparent 1px 22px),
+  repeating-linear-gradient(90deg,rgba(67,54,42,.07) 0 1px,transparent 1px 22px),
+  linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed}
+body.gh.art-kraft .awning{background:repeating-linear-gradient(90deg,#B98A5A 0 24px,#F5ECD8 24px 48px)}
+body.gh.art-kraft .btn{background:linear-gradient(180deg,#CBA273 0,#B98A5A 55%,#9E7144 100%);box-shadow:0 4px 0 #5E4122,inset 0 0 0 2px rgba(255,255,255,.22)}
+body.gh.art-kraft .btn:active{box-shadow:0 1px 0 #5E4122}
+body.gh.art-kraft .btn.soft{background:linear-gradient(180deg,#FBF4E2,#EBDDBD 60%,#DCCAA0);box-shadow:0 4px 0 #9A8256,inset 0 0 0 2px rgba(255,255,255,.6)}
+body.gh.art-kraft .ibtn{background:linear-gradient(180deg,#EADBB8,#D0B98A 70%,#BFA672);box-shadow:0 3px 0 #7E6436}
+body.gh.art-kraft .panel,body.gh.art-kraft .mcard{background:linear-gradient(180deg,rgba(250,243,226,.98),rgba(238,226,198,.98));border-style:dashed}
+body.gh.art-kraft .mcard{border-color:#6F5838;box-shadow:0 0 0 2px rgba(67,54,42,.45),0 5px 0 2px #4E3C24,0 24px 40px rgba(40,30,18,.45)}
+body.gh.art-kraft .hpill,body.gh.art-kraft .stat{background:linear-gradient(180deg,#FBF4E2,#E9DAB6)}
+body.gh.art-kraft .board{border-color:#4E3C24;background:repeating-linear-gradient(45deg,rgba(67,54,42,.07) 0 2px,transparent 2px 9px),linear-gradient(160deg,var(--tray1),var(--tray2))}
+body.gh.art-kraft .cell{border:1.5px dashed rgba(67,54,42,.45)}
+body.gh.art-kraft .tabs button.on,body.gh.art-kraft .chip.on,body.gh.art-kraft .x{background:linear-gradient(180deg,#CBA273,#A67A4A);box-shadow:0 3px 0 #5E4122}
+body.gh.art-kraft .item{border-radius:26%;border-style:solid;box-shadow:inset 0 2px 2px rgba(255,255,255,.6),0 3px 0 var(--t3),0 5px 5px rgba(67,54,42,.18)}
+body.gh.art-kraft .t1{--t1:#F1E2D2;--t2:#D9B49C;--t3:#9C6E55}
+body.gh.art-kraft .t2{--t1:#E6E6CC;--t2:#B9BD92;--t3:#787C52}
+body.gh.art-kraft .t3{--t1:#F3E6C4;--t2:#D9BC84;--t3:#9A7A40}
+body.gh.art-kraft .t4{--t1:#E4DCDC;--t2:#B8A9AC;--t3:#7C6C70}
+body.gh.art-kraft .t5{--t1:#DCE4E0;--t2:#A4B8B4;--t3:#627C78}
+body.gh.art-kraft .t6,body.gh.art-kraft .kx{--t1:#F6ECBE;--t2:#DCC272;--t3:#9A8030}
+body.gh.art-kraft .feed{border-color:#9A7C50;background:#E4DCC6;box-shadow:0 0 0 2px var(--ink),0 5px 0 2px #5E4A2C}
+body.gh.art-kraft #title{background:repeating-linear-gradient(0deg,rgba(67,54,42,.07) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(67,54,42,.07) 0 1px,transparent 1px 22px),linear-gradient(180deg,#E6D8BC,#F1E7D0 60%,#DCCBA6)}
+body.gh.art-kraft .thills path:nth-child(1){fill:#D6C49C}body.gh.art-kraft .thills path:nth-child(2){fill:#BFAE84}
+body.gh.art-kraft .tsun{background:#F3E4B4;box-shadow:none;border-style:dashed}
+body.gh.art-kraft .tl1.b{color:#EAD7B5}
+body.gh.art-kraft #scene svg,body.gh.art-kraft .tscene::before{filter:grayscale(.75) sepia(.55) contrast(.95)}
+body.gh.art-kraft .toast{background:linear-gradient(180deg,#B39468,#8C6E44)}
+body.gh.art-kraft .fill{background:linear-gradient(180deg,#D3AF82,#B98A5A 55%,#9E7144)}
+body.gh.art-kraft #eFill{background:linear-gradient(180deg,#C9CB9C,#A3A870 55%,#7F8450)}
+
+/* ---------- Gece Feneri ---------- */
+body.gh.art-night,body.gh.art-night[data-theme]{--ink:#2C2A45;--ink2:#6B6890;--paper:#F1EEF4;--bg1:#18213F;--bg2:#2E3A66;--bg3:#514B78;
+  --tray1:#46548A;--tray2:#303A6A;--trayE:#141A38;--cell:#ECE9F5;--cellS:#B8B4D4;--pink:#E7B85C;--pinkd:#9A6C22;--pink2:#F6E4B6;--gold1:#FBE9B0;--gold2:#E0AE4A;--gold3:#8E6A22}
+body.gh.art-night{background:
+  radial-gradient(circle at 12% 9%,#fff 0 1.2px,transparent 1.8px),radial-gradient(circle at 31% 22%,#FFF3C4 0 1px,transparent 1.6px),
+  radial-gradient(circle at 54% 7%,#fff 0 1.4px,transparent 2px),radial-gradient(circle at 72% 17%,#fff 0 1px,transparent 1.6px),
+  radial-gradient(circle at 90% 30%,#FFF3C4 0 1.3px,transparent 1.9px),radial-gradient(circle at 20% 40%,#fff 0 .9px,transparent 1.5px),
+  radial-gradient(circle at 64% 36%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 44% 52%,#FFF3C4 0 .9px,transparent 1.5px),
+  radial-gradient(ellipse 46% 22% at 84% 8%,rgba(255,236,170,.32) 0,transparent 70%),
+  linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 58%,var(--bg3) 100%) fixed}
+body.gh.art-night::before{opacity:.25}
+body.gh.art-night .awning{background:repeating-linear-gradient(90deg,#3B4780 0 24px,#E7B85C 24px 48px)}
+body.gh.art-night .btn{color:#3A2A0C;text-shadow:0 1px 0 rgba(255,245,200,.6);background:radial-gradient(ellipse 80% 40% at 50% 6%,rgba(255,255,255,.5) 0,transparent 100%),linear-gradient(180deg,#F6D98C 0,#E7B85C 55%,#CC9838 100%);box-shadow:0 4px 0 #7A5516,inset 0 0 0 2px rgba(255,255,255,.3),0 0 14px rgba(240,200,100,.35)}
+body.gh.art-night .btn:active{box-shadow:0 1px 0 #7A5516}
+body.gh.art-night .btn.soft{color:var(--ink);background:linear-gradient(180deg,#FAF8FD,#E4E0F0 60%,#CFCAE4);box-shadow:0 4px 0 #7C78A4,inset 0 0 0 2px rgba(255,255,255,.7)}
+body.gh.art-night .ibtn{background:radial-gradient(ellipse at 50% 0,rgba(255,255,255,.55) 0 35%,transparent 36%),linear-gradient(180deg,#A6B1E4,#7480C4 70%,#5E69AE);box-shadow:0 3px 0 #2E3768,0 6px 8px rgba(0,0,0,.3)}
+body.gh.art-night .panel{background:linear-gradient(180deg,rgba(246,244,250,.96),rgba(224,220,238,.96));box-shadow:0 3px 0 rgba(10,12,30,.45),inset 0 0 0 3px rgba(255,255,255,.5),0 8px 18px rgba(0,0,0,.35)}
+body.gh.art-night .mcard{border-color:#2E3768;background:linear-gradient(180deg,rgba(248,246,252,.98),rgba(226,222,240,.98));box-shadow:0 0 0 2px rgba(231,184,92,.7),0 5px 0 2px #141A38,inset 0 0 0 3px rgba(255,255,255,.5),0 24px 40px rgba(0,0,0,.6)}
+body.gh.art-night .modal{background:radial-gradient(circle at 50% 30%,rgba(20,26,56,.5),rgba(6,8,20,.78))}
+body.gh.art-night .hpill,body.gh.art-night .stat{background:linear-gradient(180deg,#FAF8FD,#DAD5EC)}
+body.gh.art-night .board{border-color:#141A38;background:radial-gradient(ellipse 90% 26% at 50% 0,rgba(255,236,170,.22) 0,transparent 100%),linear-gradient(160deg,var(--tray1),var(--tray2));box-shadow:0 6px 0 var(--trayE),0 0 0 2px rgba(231,184,92,.75),inset 0 3px 0 rgba(200,210,255,.25),inset 0 -8px 14px rgba(0,0,20,.35),0 18px 30px rgba(0,0,0,.5)}
+body.gh.art-night .cell{border-color:rgba(200,206,240,.4)}
+body.gh.art-night .cell.sel{background:radial-gradient(circle at 50% 40%,#FFF8DC,#F6E4B6)}
+body.gh.art-night .tabs button.on,body.gh.art-night .chip.on,body.gh.art-night .x{color:#3A2A0C;background:linear-gradient(180deg,#F6D98C,#DDAA48);box-shadow:0 3px 0 #7A5516;text-shadow:none}
+body.gh.art-night .l1,body.gh.art-night .l2{color:#FBE9B0}
+body.gh.art-night .feed{border-color:#46548A;background:#2A3560;box-shadow:0 0 0 2px #141A38,0 5px 0 2px #0C1028,inset 0 0 0 2px rgba(231,184,92,.6),0 12px 20px rgba(0,0,0,.5)}
+body.gh.art-night .fill{background:linear-gradient(180deg,#F6D98C,#E7B85C 55%,#CC9838)}
+body.gh.art-night .nlabel,body.gh.art-night .nests .nlabel{color:#FBE9B0;text-shadow:0 1px 0 #141A38}
+body.gh.art-night .o-head{text-shadow:none}
+body.gh.art-night #scene svg{filter:brightness(.5) saturate(.7) hue-rotate(15deg)}
+body.gh.art-night #bg span{opacity:.5}
+body.gh.art-night #title{background:radial-gradient(circle at 14% 12%,#fff 0 1.2px,transparent 1.8px),radial-gradient(circle at 38% 6%,#FFF3C4 0 1px,transparent 1.6px),radial-gradient(circle at 60% 16%,#fff 0 1.3px,transparent 1.9px),radial-gradient(circle at 82% 9%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 26% 28%,#fff 0 .9px,transparent 1.5px),radial-gradient(circle at 92% 30%,#FFF3C4 0 1px,transparent 1.6px),linear-gradient(180deg,#141C3A 0%,#2B3662 45%,#57507E 100%)}
+body.gh.art-night .tsun{background:radial-gradient(circle at 38% 36%,#FFFDF0 0 50%,#F2E6B8 100%);border-color:rgba(255,245,200,.6);box-shadow:0 0 0 12px rgba(255,240,180,.14),0 0 46px 18px rgba(255,236,150,.3)}
+body.gh.art-night .tcloud{opacity:.28}
+body.gh.art-night .thills path:nth-child(1){fill:#3B4A78}body.gh.art-night .thills path:nth-child(2){fill:#2A3560}
+body.gh.art-night .tscene::before{filter:brightness(.45) saturate(.6)}
+body.gh.art-night .tl0,body.gh.art-night .tfoot{color:#D9D4EE}
+body.gh.art-night .tl1{color:#FBE9B0}body.gh.art-night .tl1.b{color:#F6D98C}
+body.gh.art-night .toast{background:linear-gradient(180deg,#6672B8,#3F4A8A)}
+body.gh.art-night .jbar{background:rgba(236,233,245,.95)!important}
+body.gh.art-night #eFill{background:linear-gradient(180deg,#F6D98C,#E7B85C 55%,#CC9838)}
+
+/* v15: tahta temaları her görünüm temasında geçerli */
+body.gh[data-board=candy][data-board]{--tray1:#FFC2D8;--tray2:#FF9CBF;--trayE:#D96C97;--cell:#FFF3F8;--cellS:#F7C9DA}
+body.gh[data-board=night][data-board]{--tray1:#6F77B8;--tray2:#4B5391;--trayE:#2D3361;--cell:#D9DDF5;--cellS:#A9B0DE}
+body.gh[data-board=mint][data-board]{--tray1:#A8E4CB;--tray2:#6FCBA6;--trayE:#3E9A77;--cell:#F0FFF8;--cellS:#C4EBDA}
+body.gh[data-board=marble][data-board]{--tray1:#E9E6EE;--tray2:#C9C4D4;--trayE:#8F889E;--cell:#FFFFFF;--cellS:#DAD6E2}
+body.gh[data-board=sakura][data-board]{--tray1:#FFD6E4;--tray2:#F5A3C2;--trayE:#C96A8F;--cell:#FFF5F9;--cellS:#F9D3E2}
+body.gh[data-board=forest][data-board]{--tray1:#9ED39A;--tray2:#5FA36A;--trayE:#3A6F47;--cell:#F0FBEA;--cellS:#CBE6C2}
+body.gh[data-board=galaxy][data-board]{--tray1:#6A58AE;--tray2:#3B2F73;--trayE:#22194A;--cell:#E6DEFA;--cellS:#B9ABE6}
+body.gh[data-board=gold][data-board]{--tray1:#F8DE8A;--tray2:#DDAE3E;--trayE:#A87B1E;--cell:#FFF8E0;--cellS:#F0DDA0}
+body.gh[data-board=sunset][data-board]{--tray1:#FFB38A;--tray2:#F5806A;--trayE:#C2514A;--cell:#FFF0E2;--cellS:#F7CDB0}
+body.gh[data-board] .board{border-color:var(--trayE)}

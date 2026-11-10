@@ -4,23 +4,28 @@
 const INK='#5A4636';
 /* v14: suluboya renk süzgeci — doygunluğu kıs, sıcak kâğıt tonuna çek */
 const __gsc={};
+const ART_FX={gh:{s:.72,l:.93,a:.06},sakura:{s:.66,l:.9,a:.09,tint:[246,184,200,.13],ink:'#6E4B50'},kraft:{s:.28,l:.9,a:.06,tint:[201,162,107,.34],ink:'#4A3B2E'},night:{s:.64,l:.88,a:.05,tint:[110,124,190,.14]}};
 function GS(s){
-  if(!document.body||!document.body.classList.contains('gh'))return s;
-  s=s.replace(/#4B2377|#6B4A45/gi,'#5A4636');
-  return s.replace(/#([0-9A-Fa-f]{6})\b/g,(m,h)=>{
-    const k=h.toUpperCase();if(__gsc[k])return __gsc[k];
-    if(k==='5A4636'||k==='FFFFFF'||k==='FFF6E0'){return __gsc[k]=m}
+  const art=document.body&&document.body.dataset.art,F=ART_FX[art];
+  if(!F)return s;
+  const C=__gsc[art]||(__gsc[art]={}),ink=F.ink||'#5A4636';
+  s=s.replace(/#4B2377|#6B4A45|#5A4636/gi,'#\u0001INK');
+  s=s.replace(/#([0-9A-Fa-f]{6})\b/g,(m,h)=>{
+    const k=h.toUpperCase();if(C[k])return C[k];
+    if(k==='FFFFFF'||k==='FFF6E0'){return C[k]=m}
     let r=parseInt(k.slice(0,2),16)/255,g=parseInt(k.slice(2,4),16)/255,b=parseInt(k.slice(4,6),16)/255;
     const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let H=0,S=0,L=(mx+mn)/2;
     if(mx!==mn){const d=mx-mn;S=L>.5?d/(2-mx-mn):d/(mx+mn);
       H=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;H/=6}
     if(H>.72&&H<.8)H=H*.6+.1;/* mor -> sıcak gül */
-    S=S*.72;L=L*.93+.06;
+    S=S*F.s;L=L*F.l+F.a;
     const f=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p};
     let R,G,B;if(S===0){R=G=B=L}else{const q=L<.5?L*(1+S):L+S-L*S,p=2*L-q;R=f(p,q,H+1/3);G=f(p,q,H);B=f(p,q,H-1/3)}
-    const x=v=>('0'+Math.round(v*255).toString(16)).slice(-2);
-    return __gsc[k]='#'+(x(R)+x(G)+x(B)).toUpperCase();
+    if(F.tint){const t=F.tint,w=t[3];R=R*(1-w)+t[0]/255*w;G=G*(1-w)+t[1]/255*w;B=B*(1-w)+t[2]/255*w}
+    const x=v=>('0'+Math.round(Math.max(0,Math.min(1,v))*255).toString(16)).slice(-2);
+    return C[k]='#'+(x(R)+x(G)+x(B)).toUpperCase();
   });
+  return s.split('#\u0001INK').join(ink);
 }
 const HP='M0 6C-12 -2 -7 -11 0 -5C7 -11 12 -2 0 6Z';
 const st=w=>'stroke="'+INK+'" stroke-width="'+(w||2.6)+'" stroke-linejoin="round" stroke-linecap="round"';

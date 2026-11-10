@@ -1,5 +1,5 @@
 /* =========================================================
-   EKONOMİ: canlar, altın, reklam (demo), jokerler, dükkan,
+   EKONOMİ: canlar, altın, reklam, jokerler, dükkan,
    mini oyun, haftalık meydan okuma, analitik
    ========================================================= */
 const ANALYTICS_URL=''; // İstersen buraya bir uç nokta yaz (POST JSON). Boşsa sadece yerel sayaçlar tutulur.
@@ -53,29 +53,122 @@ function renderStats(){
   const h=$('#shopHearts');if(h)h.textContent=state.hearts;
 }
 setInterval(()=>{
+  try{syncBanner()}catch(_){}
   if(!state||!started)return;
   const was=state.lives.n;tickLives();if(state.lives.n!==was){renderStats();saveSoon()}
   if($('#mLives').classList.contains('open'))paintLives();
 },1000);
 
-/* ---------- reklam (demo: sadece bekleme) ---------- */
-let adKind=null,adStart=0,adTimer=null,adDone=false;
+/* ---------- reklamlar ----------
+   Google Publisher Tag (GPT) ile Google'ın RESMÎ TEST reklam birimleri kullanılır.
+   Yayına çıkarken ADS.banner / ADS.rewarded yerine kendi Ad Manager birimlerini yaz.
+   GPT yüklenemezse (çevrimdışı, engelleyici, dosyadan açma) yerleşik test reklamı devreye girer. */
+const ADS={
+  on:true,
+  gpt:'https://securepubads.g.doubleclick.net/tag/js/gpt.js',
+  banner:'/6355419/Travel/Europe/France/Paris',  /* Google örnek (test) birimi */
+  bannerSize:[320,50],
+  rewarded:'/22639388115/rewarded_web_example',  /* Google ödüllü test birimi */
+  wait:5000
+};
+let gptState=0,bannerSlot=null,bannerInit=false,rw=null;const gptQ=[];
+function houseBanner(){
+  const el=$('#adSlot');if(!el)return;
+  el.innerHTML='<div class="adHouse"><b>Test</b><span>'+T('Test reklamı','Test ad')+'<small>'+T('320×50 banner alanı','320×50 banner slot')+'</small></span><i>'+T('Aç','Open')+'</i></div>';
+}
+function cleanupRw(){if(rw){try{googletag.destroySlots([rw.slot])}catch(_){}rw=null}}
+function loadGPT(cb){
+  if(gptState===2){cb(true);return}
+  if(gptState===-1||!ADS.on||!/^https?:/.test(location.protocol)||navigator.onLine===false){cb(false);return}
+  gptQ.push(cb);if(gptState===1)return;gptState=1;
+  const done=ok=>{if(gptState!==1)return;gptState=ok?2:-1;gptQ.splice(0).forEach(f=>{try{f(ok)}catch(_){}})};
+  window.googletag=window.googletag||{cmd:[]};
+  const s=document.createElement('script');s.async=true;s.src=ADS.gpt;s.crossOrigin='anonymous';
+  s.onload=()=>{try{googletag.cmd.push(()=>{
+    try{
+      const pa=googletag.pubads();
+      pa.addEventListener('slotRenderEnded',ev=>{
+        if(bannerSlot&&ev.slot===bannerSlot&&ev.isEmpty)houseBanner();
+        if(rw&&ev.slot===rw.slot&&ev.isEmpty)rw.fallback();
+      });
+      pa.addEventListener('rewardedSlotReady',ev=>{if(!rw||ev.slot!==rw.slot)return;rw.shown=true;rw.settle();ev.makeRewardedVisible()});
+      pa.addEventListener('rewardedSlotGranted',ev=>{if(rw&&ev.slot===rw.slot)rw.granted=true});
+      pa.addEventListener('rewardedSlotClosed',ev=>{
+        if(!rw||ev.slot!==rw.slot)return;
+        const g=rw.granted,k=rw.kind;cleanupRw();
+        if(g)grantAd(k);else toast(T('Ödül için reklamı sonuna kadar izle','Watch the whole ad to get the reward'));
+      });
+      googletag.enableServices();done(true);
+    }catch(_){done(false)}
+  })}catch(_){done(false)}};
+  s.onerror=()=>done(false);
+  setTimeout(()=>done(false),7000);
+  document.head.appendChild(s);
+}
+/* oyun ekranının altındaki banner */
+function syncBanner(){
+  const show=!!(ADS.on&&state&&started&&state.iap&&!state.iap.noads);
+  document.documentElement.classList.toggle('hasAd',show);
+  if(!show||bannerInit)return;
+  bannerInit=true;houseBanner();
+  loadGPT(ok=>{
+    if(!ok)return;
+    googletag.cmd.push(()=>{
+      try{
+        bannerSlot=googletag.defineSlot(ADS.banner,ADS.bannerSize,'adSlot');
+        if(!bannerSlot)return;
+        bannerSlot.addService(googletag.pubads());$('#adSlot').innerHTML='';googletag.display('adSlot');
+      }catch(_){houseBanner()}
+    });
+  });
+}
+/* ödüllü reklam */
+let adKind=null,adStart=0,adTimer=null,adDone=false,adLen=10000;
+function grantAd(k){
+  trk('ad_done',{k});
+  if(k==='life'){gainLife(1);toast(T('+1 🐥 can!','+1 🐥 life!'))}
+  else if(k==='moves'){state.energy+=BAL.buyEnergyAmt;sfx('energy');renderHUD();toast('+'+BAL.buyEnergyAmt+' 🌻');afterAction()}
+  else if(k==='coins'){state.adT=Date.now();addCoins(BAL.adCoins);sfx('coin');toast('+'+BAL.adCoins+' 🪙');if($('#mShop').classList.contains('open'))renderShop()}
+  saveSoon();
+}
 function openAd(kind){
-  adKind=kind;adDone=false;adStart=Date.now();
+  if(rw)return;
+  let settled=false;
+  const fallback=()=>{if(settled)return;settled=true;cleanupRw();openTestAd(kind)};
+  if(gptState===-1||!/^https?:/.test(location.protocol)||navigator.onLine===false){fallback();return}
+  toast(T('Reklam yükleniyor…','Loading ad…'));
+  loadGPT(ok=>{
+    if(!ok)return fallback();
+    googletag.cmd.push(()=>{
+      try{
+        const slot=googletag.defineOutOfPageSlot(ADS.rewarded,googletag.enums.OutOfPageFormat.REWARDED);
+        if(!slot)return fallback();
+        slot.addService(googletag.pubads());
+        rw={kind,slot,granted:false,shown:false,fallback,settle:()=>{settled=true}};
+        googletag.display(slot);
+        setTimeout(()=>{if(rw&&rw.slot===slot&&!rw.shown)fallback()},ADS.wait);
+      }catch(_){fallback()}
+    });
+  });
+}
+/* yerleşik test reklamı (GPT yoksa) */
+function openTestAd(kind){
+  adKind=kind;adDone=false;adStart=Date.now();adLen=Math.min(BAL.adMs,10000);
   showModal('mAd',()=>{
-    $('#adTitle').textContent=T('🎬 Reklam (demo)','🎬 Ad (demo)');
-    $('#adText').textContent=kind==='life'?T('Bir can için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for a life.')
-      :kind==='moves'?T('+'+BAL.buyEnergyAmt+' enerji için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for +'+BAL.buyEnergyAmt+' energy.')
-      :T('+'+BAL.adCoins+' 🪙 için '+BAL.adMs/1000+' sn bekle.','Wait '+BAL.adMs/1000+'s for +'+BAL.adCoins+' 🪙.');
+    $('#adTitle').innerHTML='🎬 '+T('Reklam','Ad')+' <span class="adtest">TEST</span>';
+    const s=adLen/1000;
+    $('#adText').textContent=kind==='life'?T('Bir can için '+s+' sn izle.','Watch '+s+'s for a life.')
+      :kind==='moves'?T('+'+BAL.buyEnergyAmt+' enerji için '+s+' sn izle.','Watch '+s+'s for +'+BAL.buyEnergyAmt+' energy.')
+      :T('+'+BAL.adCoins+' 🪙 için '+s+' sn izle.','Watch '+s+'s for +'+BAL.adCoins+' 🪙.');
     $('#adCancel').textContent=T('Vazgeç','Cancel');
     $('#adClaim').disabled=true;paintAd();
     clearInterval(adTimer);adTimer=setInterval(paintAd,200);
   });
 }
 function paintAd(){
-  const el=Date.now()-adStart,f=Math.min(1,el/BAL.adMs);
+  const el=Date.now()-adStart,f=Math.min(1,el/adLen);
   $('#adFill').style.width=(f*100)+'%';
-  const left=Math.max(0,Math.ceil((BAL.adMs-el)/1000));
+  const left=Math.max(0,Math.ceil((adLen-el)/1000));
   $('#adTime').textContent=left>0?left:'✔';
   if(f>=1&&!adDone){adDone=true;clearInterval(adTimer);const b=$('#adClaim');b.disabled=false;b.textContent=T('Ödülü Al 🎁','Claim 🎁');sfx('win')}
   else if(!adDone)$('#adClaim').textContent=T('Bekleniyor…','Waiting…');
@@ -83,11 +176,7 @@ function paintAd(){
 $('#adClaim').addEventListener('click',()=>{
   if(!adDone)return;
   const k=adKind;adKind=null;closeModal('mAd');clearInterval(adTimer);
-  trk('ad_done',{k});
-  if(k==='life'){gainLife(1);toast(T('+1 🐥 can!','+1 🐥 life!'))}
-  else if(k==='moves'){state.energy+=BAL.buyEnergyAmt;sfx('energy');renderHUD();toast('+'+BAL.buyEnergyAmt+' 🌻');afterAction()}
-  else if(k==='coins'){state.adT=Date.now();addCoins(BAL.adCoins);sfx('coin');toast('+'+BAL.adCoins+' 🪙');if($('#mShop').classList.contains('open'))renderShop()}
-  saveSoon();
+  grantAd(k);
 });
 $('#adCancel').addEventListener('click',()=>{clearInterval(adTimer);adKind=null;closeModal('mAd')});
 
@@ -156,7 +245,7 @@ function useJoker(j){
   if(!jokerUnlocked(j)){sfx('err');toast(T('Bu joker seviye '+JOKERS[j].intro+'’de açılır','Unlocks at level '+JOKERS[j].intro));return}
   if(jMode===j){setJMode(null);return}
   if(state.jk[j]<=0){
-    sfx('err');toast(T('Jokerin kalmadı — dükkandan alabilirsin ('+JOKERS[j].cost+' 🪙)','Out of jokers — buy one in the shop ('+JOKERS[j].cost+' 🪙)'));return;
+    sfx('err');toast(T('Jokerin kalmadı — mağazadan alabilirsin ('+JOKERS[j].cost+' 🪙)','Out of jokers — buy one in the store ('+JOKERS[j].cost+' 🪙)'));return;
   }
   sfx('tap');
   if(j==='magnet'){setJMode(null);useMagnet();return}
@@ -236,7 +325,7 @@ function regionCatGrid(){
 }
 
 /* ---------- dükkan ---------- */
-let shopTab='joker';
+let shopTab='pack';
 const UP_META={
   blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('+'+BAL.energyPerBlanket+' maks. enerji','+'+BAL.energyPerBlanket+' max energy')},
   post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('Her siparişte +1 ekstra enerji','+1 extra energy per order')},
@@ -244,9 +333,51 @@ const UP_META={
 };
 Object.assign(HAT_NAMES,{cap:['Şapka','Cap'],sailor:['Denizci','Sailor'],chef:['Aşçı Kepi','Chef Hat']});
 const ACC_NAMES={none:['Aksesuarsız','None'],glasses:['Gözlük','Glasses'],phones:['Kulaklık','Headphones'],star:['Yıldız Tokası','Star Clip'],pin:['Rozet','Pin'],bow:['Papyon','Bow Tie'],halo:['Hare','Halo'],sparkle:['Parıltı','Sparkles']};
-const BOARD_NAMES={wood:['Şeker Mor','Candy Purple'],candy:['Şeker','Candy'],night:['Gece','Night'],mint:['Nane','Mint'],marble:['Mermer','Marble'],sunset:['Gün Batımı','Sunset'],sakura:['Sakura','Sakura'],forest:['Orman','Forest'],galaxy:['Galaksi','Galaxy'],gold:['Altın','Gold']};
+const BOARD_NAMES={wood:['Temanın Kendi Tahtası','Theme Default'],candy:['Şeker','Candy'],night:['Gece','Night'],mint:['Nane','Mint'],marble:['Mermer','Marble'],sunset:['Gün Batımı','Sunset'],sakura:['Sakura','Sakura'],forest:['Orman','Forest'],galaxy:['Galaksi','Galaxy'],gold:['Altın','Gold']};
 const BOARD_COL={wood:['#9C6BFF','#C9A9FF'],candy:['#FFC2D8','#FFF3F8'],night:['#6F77B8','#D9DDF5'],mint:['#A8E4CB','#F0FFF8'],marble:['#E9E6EE','#FFFFFF'],sunset:['#FFB38A','#FFF0E2'],sakura:['#F5A3C2','#FFF5F9'],forest:['#5FA36A','#F0FBEA'],galaxy:['#3B2F73','#E6DEFA'],gold:['#DDAE3E','#FFF8E0']};
-const SHOP_TABS=[['joker','🔨'],['wear','🎀'],['board','🎨'],['nest','🏡'],['up','⬆️'],['free','🎬']];
+const SHOP_TABS=[['pack','💎'],['theme','🖌️'],['joker','🔨'],['wear','🎀'],['board','🎨'],['nest','🏡'],['up','⬆️']];
+/* v15: mağaza paketleri — ödeme altyapısı bağlanana kadar TEST satın alma */
+const PACKS={
+  starter:{ico:'🎁',p:['₺39,99','$1.99'],n:['Başlangıç Paketi','Starter Pack'],d:['500 altın · 40 enerji · her jokerden 1 · tek seferlik','500 coins · 40 energy · 1 of each joker · one time'],once:true,give:{coins:500,energy:40,jk:1}},
+  c1:{ico:'🪙',p:['₺29,99','$0.99'],n:['Bir Avuç Altın','Handful of Coins'],d:['250 altın','250 coins'],give:{coins:250}},
+  c2:{ico:'💰',p:['₺69,99','$2.99'],n:['Altın Kesesi','Coin Pouch'],d:['700 altın','700 coins'],give:{coins:700}},
+  c3:{ico:'🧰',p:['₺129,99','$5.99'],n:['Altın Sandığı','Coin Chest'],d:['1600 altın','1600 coins'],give:{coins:1600}},
+  en:{ico:'🌻',p:['₺19,99','$0.99'],n:['Enerji Paketi','Energy Pack'],d:['+100 enerji, hemen','+100 energy, right away'],give:{energy:100}},
+  noads:{ico:'🚫',p:['₺99,99','$3.99'],n:['Reklamsız','No Ads'],d:['Alt banner kalkar; ödüllü reklamlar isteğe bağlı kalır','Removes the bottom banner; rewarded ads stay optional'],once:true,give:{noads:true}}
+};
+let buyKey=null;
+function openBuy(k){
+  const P=PACKS[k];if(!P)return;buyKey=k;
+  showModal('mBuy',()=>{
+    $('#buyTitle').textContent=T(P.n[0],P.n[1]);$('#buyArt').textContent=P.ico;
+    $('#buyText').textContent=T(P.d[0],P.d[1]);$('#buyOk').textContent=T('Satın al · '+P.p[0],'Buy · '+P.p[1]);
+  });
+}
+function packOwned(k){return k==='noads'?state.iap.noads:k==='starter'?state.iap.starter:false}
+$('#buyOk').addEventListener('click',()=>{
+  const k=buyKey,P=PACKS[k];buyKey=null;closeModal('mBuy');if(!P||packOwned(k))return;
+  const g=P.give;
+  if(g.coins)addCoins(g.coins);
+  if(g.energy){state.energy+=g.energy;renderHUD()}
+  if(g.jk){for(const j in JOKERS)state.jk[j]+=g.jk;renderJokers()}
+  if(g.noads)state.iap.noads=true;
+  if(k==='starter')state.iap.starter=true;
+  state.iap.n++;sfx('win');toast(T(P.n[0]+' alındı ✔',P.n[1]+' purchased ✔'));trk('iap_test',{k});
+  if(typeof syncBanner==='function')syncBanner();
+  if($('#mShop').classList.contains('open'))renderShop();saveSoon();
+});
+$('#buyCancel').addEventListener('click',()=>{buyKey=null;closeModal('mBuy')});
+function artPreview(k){
+  const v=ARTS[k].pv;
+  return '<div class="artpv" style="background:linear-gradient(180deg,'+v[0]+','+v[1]+')"><div class="artpv-b" style="background:'+v[2]+'">'+('<i style="background:'+v[3]+'"></i>').repeat(4)+'</div><div class="artpv-k" style="background:'+v[4]+'"></div></div>';
+}
+function useArt(k){
+  if(!ARTS[k])return;
+  if(!state.cos.arts.includes(k)){if(!needCoins(ARTS[k].cost))return;spendCoins(ARTS[k].cost);state.cos.arts.push(k)}
+  state.cos.art=k;sfx('levelup');applyArt();
+  try{applyTheme();renderAll();renderArt();renderJokers();applyNest()}catch(_){}
+  renderShop();saveSoon();
+}
 const SLOT_N={t:['Üst','Top'],l:['Sol','Left'],r:['Sağ','Right']};
 function applyNest(){
   if(!state||!state.nest)return;
@@ -274,7 +405,25 @@ function lockedCost(c){return c}
 function renderShop(){
   $('#shopTabs').innerHTML=SHOP_TABS.map(([k,i])=>'<button data-tab="'+k+'" class="'+(k===shopTab?'on':'')+'">'+i+'</button>').join('');
   let h='';
-  if(shopTab==='joker'){
+  if(!SHOP_TABS.some(t=>t[0]===shopTab))shopTab='pack';
+  if(shopTab==='pack'){
+    const cd=BAL.adCoinCd-(Date.now()-state.adT),ready=cd<=0;
+    h+='<div class="sec">'+T('Bedava','Free')+'</div>';
+    h+='<div class="lrow"><div class="li">🎬</div><div class="lt">+'+BAL.adCoins+' 🪙<small>'+(ready?T('Kısa bir reklam izle','Watch a short ad'):T('Tekrar için ','Again in ')+fmtLeft(cd))+'</small></div><button class="btn sm'+(ready?'':' dis')+'" data-act="adcoins">'+T('İzle','Watch')+'</button></div>';
+    h+='<div class="sec">'+T('Paketler','Packs')+'</div>';
+    for(const k in PACKS){
+      const P=PACKS[k],own=packOwned(k);
+      h+='<div class="lrow'+(k==='starter'&&!own?' hot':'')+'"><div class="li">'+P.ico+'</div><div class="lt">'+T(P.n[0],P.n[1])+'<small>'+T(P.d[0],P.d[1])+'</small></div>'+(own?'<span class="chip on">✔</span>':'<button class="btn sm" data-act="pack:'+k+'">'+T(P.p[0],P.p[1])+'</button>')+'</div>';
+    }
+    h+='<div class="mcap" style="margin-top:8px">'+T('Satın almalar şu an test modunda: gerçek ödeme alınmaz. Altın ayrıca seviye bitirerek, mini oyunla ve haftalık meydan okumayla kazanılır.','Purchases are in test mode: no real payment is taken. You also earn coins by clearing levels, the mini-game and the weekly challenge.')+'</div>';
+  }else if(shopTab==='theme'){
+    h+='<div class="sec">'+T('Görünüm Temaları','Look & Feel Themes')+'</div><div class="shopgrid">';
+    for(const k in ARTS){
+      const A=ARTS[k],own=state.cos.arts.includes(k),on=state.cos.art===k;
+      h+='<div class="sitem'+(on?' on':'')+'"><div class="sart wide">'+artPreview(k)+'</div>'+T(A.n[0],A.n[1])+'<small>'+T(A.d[0],A.d[1])+'</small>'+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="art:'+k+'">'+(own?T('Kullan','Use'):A.cost+' 🪙')+'</button>')+'</div>';
+    }
+    h+='</div><div class="mcap" style="margin-top:8px">'+T('Tema tüm oyunun görünümünü değiştirir: arayüz, tahta, ikonlar ve arka plan.','A theme restyles the whole game: interface, board, icons and backdrop.')+'</div>';
+  }else if(shopTab==='joker'){
     h+='<div class="sec">'+T('Jokerler','Jokers')+'</div><div class="shopgrid">';
     for(const j in JOKERS){
       const J=JOKERS[j],un=jokerUnlocked(j);
@@ -296,8 +445,8 @@ function renderShop(){
   }else if(shopTab==='board'){
     h+='<div class="sec">'+T('Tahta Temaları','Board Skins')+'</div><div class="shopgrid">';
     for(const k in BOARDS){
-      const own=state.cos.boards.includes(k),on=state.cos.board===k,c=BOARD_COL[k];
-      h+='<div class="sitem'+(on?' on':'')+'"><div class="sart"><div class="swatch" style="background:'+c[0]+'">'+'<i style="--c2:'+c[1]+'"></i>'.repeat(9)+'</div></div>'+T(BOARD_NAMES[k][0],BOARD_NAMES[k][1])+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="board:'+k+'">'+(own?T('Kullan','Use'):BOARDS[k]+' 🪙')+'</button>')+'</div>';
+      const own=state.cos.boards.includes(k),on=state.cos.board===k,c=k==='wood'?[ARTS[state.cos.art].pv[2],ARTS[state.cos.art].pv[3]]:BOARD_COL[k];
+      h+='<div class="sitem'+(on?' on':'')+'"><div class="sart"><div class="swatch" style="background:'+c[0]+'">'+('<i style="--c2:'+c[1]+'"></i>').repeat(9)+'</div></div>'+T(BOARD_NAMES[k][0],BOARD_NAMES[k][1])+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="board:'+k+'">'+(own?T('Kullan','Use'):BOARDS[k]+' 🪙')+'</button>')+'</div>';
     }
     h+='</div>';
   }else if(shopTab==='nest'){
@@ -324,11 +473,6 @@ function renderShop(){
     }
     h+='<div class="sec">'+T('Enerji','Energy')+'</div>';
     h+='<div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('enerji','energy')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' 🪙</button></div>';
-  }else{
-    const cd=BAL.adCoinCd-(Date.now()-state.adT),ready=cd<=0;
-    h+='<div class="sec">'+T('Bedava Altın','Free Coins')+'</div>';
-    h+='<div class="lrow"><div class="li">🎬</div><div class="lt">+'+BAL.adCoins+' 🪙<small>'+(ready?T('Reklam (demo): '+BAL.adMs/1000+' sn bekle','Ad (demo): wait '+BAL.adMs/1000+'s'):T('Tekrar için ','Again in ')+fmtLeft(cd))+'</small></div><button class="btn sm'+(ready?'':' dis')+'" data-act="adcoins">'+T('İzle','Watch')+'</button></div>';
-    h+='<div class="mcap" style="margin-top:8px">'+T('Altın: seviye bitirerek, bölüm patronlarını yenerek, mini oyunla ve haftalık meydan okumayla kazanılır.','Earn coins by clearing levels, beating chapter bosses, the mini-game and the weekly challenge.')+'</div>';
   }
   $('#shopBody').innerHTML=h;renderStats();
 }
@@ -341,7 +485,6 @@ function buyUp(k){
   tickEnergy();renderHUD();renderShop();saveSoon();
 }
 function buyEnergy(){
-  if(state.settings.unlimited)return;
   if(!needCoins(BAL.buyEnergyCost))return;
   spendCoins(BAL.buyEnergyCost);state.energy+=BAL.buyEnergyAmt;
   sfx('energy');renderHUD();if($('#mShop').classList.contains('open'))renderShop();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
@@ -368,7 +511,7 @@ $('#shopBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.classList.contains('dis'))return;
   const [a,x]=b.dataset.act.split(':');
   if(a==='joker')buyJoker(x);else if(a==='up')buyUp(x);else if(a==='energy')buyEnergy();else if(a==='life')buyLife();
-  else if(a==='skin')useSkin(x);else if(a==='decor')useDecor(x);else if(a==='hat')useHat(x);else if(a==='acc')useAcc(x);else if(a==='board')useBoard(x);
+  else if(a==='skin')useSkin(x);else if(a==='decor')useDecor(x);else if(a==='hat')useHat(x);else if(a==='acc')useAcc(x);else if(a==='board')useBoard(x);else if(a==='art')useArt(x);else if(a==='pack')openBuy(x);
   else if(a==='adcoins'){closeModal('mShop');setTimeout(()=>openAd('coins'),280)}
   else if(a==='adlife'){closeModal('mShop');setTimeout(()=>openAd('life'),280)}
 });

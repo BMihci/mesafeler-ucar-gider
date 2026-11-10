@@ -270,7 +270,7 @@ function waveRoll(){
 /* ---------- takılma kontrolü ---------- */
 function isStuck(){
   if(!state.lv||state.lv.done)return false;
-  const B=state.board,unl=state.settings.unlimited;
+  const B=state.board,unl=false;
   if(B.some(c=>c&&c.t==='x'))return false;
   if((unl||state.energy>0)&&emptyCells().length)return false;
   for(let i=0;i<CELLS;i++)for(let j=i+1;j<CELLS;j++)if(canMerge(B[i],B[j]))return false;
@@ -282,7 +282,7 @@ function isStuck(){
 }
 function showFail(){
   if(!lvActive()||mCur)return;
-  const noMoves=state.energy<=0&&!state.settings.unlimited;
+  const noMoves=state.energy<=0&&!false;
   trk('level_stuck',{n:state.lv.n,noMoves});
   showModal('mLvFail',()=>{
     $('#lfTitle').textContent=noMoves?T('Enerjin bitti! 🌻','Out of energy! 🌻'):T('Tahta tıkandı! 🧺','The board is jammed! 🧺');
@@ -310,7 +310,7 @@ function levelComplete(){
   const L=state.lv;if(!L||L.done)return;
   L.done=true;
   const par=L.par||0,used=L.spawned;
-  const stars=state.settings.unlimited||used<=Math.ceil(par*1.12)+1?3:used<=Math.ceil(par*1.32)+2?2:1;
+  const stars=false||used<=Math.ceil(par*1.12)+1?3:used<=Math.ceil(par*1.32)+2?2:1;
   const weekly=!!L.weekly;
   const prev=state.saga.stars[L.n]||0,first=prev===0&&!weekly;
   if(!weekly)state.saga.stars[L.n]=Math.max(prev,stars);
@@ -430,7 +430,7 @@ function mapSVG(g){
   s+='<path id="mpDone" d="'+d+'" fill="none" stroke="#FF3FA0" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+(f*total+.01).toFixed(1)+' '+(total+60).toFixed(0)+'"/>';
   /* 80 seviye noktası: tamamlananlar pembe */
   for(let c=1;c<80;c++){if(c%10===0)continue;const q=ptAt(lenAtT(c/10)),on=c<=comp;
-    s+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="'+(on?3:2.4)+'" fill="'+(on?'#FF3FA0':'#fff')+'" stroke="#4B2377" stroke-width="'+(on?1.6:1.3)+'"/>'}
+    s+='<circle class="mp-dot'+(on?' on':'')+'" cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="'+(on?3:2.4)+'" fill="'+(on?'#FF3FA0':'#fff')+'" stroke="#4B2377" stroke-width="'+(on?1.6:1.3)+'"/>'}
   order.forEach((gi,i)=>{
     const q=P[i],reached=comp>=i*10,L=TR_LBL[gi];
     s+='<g class="mp-city'+(reached?' on':'')+'"><circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+(reached?8:6.5)+'" fill="'+(reached?'#FF3FA0':'#fff')+'" stroke="#4B2377" stroke-width="3"/>'+(reached?'<circle cx="'+(q[0]-2.5)+'" cy="'+(q[1]-2.5)+'" r="2.4" fill="#fff" opacity=".8"/>':'')+'<text x="'+(+q[0]+L[0])+'" y="'+(+q[1]+L[1])+'" text-anchor="'+L[2]+'">'+rc(i)+'</text></g>';

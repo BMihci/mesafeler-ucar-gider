@@ -33,8 +33,9 @@ Bird Adana'da, Birdie İstanbul'da. Aynı eşyaları birleştirerek siparişleri
 - **Kediler** — kedi sepeti, kedili özel seviyeler ve tahtada dolaşan yardımcılar
 - **Defter** — 7 günlük hediye serisi, günlük görevler, koleksiyon albümü, mektuplar
 - **Hediye kodu** — partnerine kısa bir kodla (`PK-XXXXX-XXXXX`) hediye gönder
-- **Dükkân ve yuva dekorasyonu** — oyun içi altınla yuva ve tahta görünümleri
-- **El boyaması masal görünümü** — suluboya tonları, kâğıt ve ahşap arayüz; Ayarlar'dan parlak "Şeker" görünümüne dönülebilir
+- **Mağaza** — jokerler, şapkalar, tahta ve yuva görünümleri, kalıcı yükseltmeler, altın/enerji paketleri (şimdilik test satın alma)
+- **5 görünüm teması** — Suluboya Masal, Şeker, Kiraz Çiçeği, Eskiz Defteri, Gece Feneri; tema tüm arayüzü, ikonları ve arka planı değiştirir
+- **Reklam altyapısı** — ödüllü reklam ve alt banner, Google'ın test reklam birimleriyle
 - **Tamamı çizim** — ikonlar, kuşlar, kediler ve harita kod içinde SVG olarak çizildi; harici görsel dosyası yok
 - **Çevrimdışı çalışır (PWA)** — ana ekrana eklenebilir; ilerleme cihazda saklanır, 3 kayıt yuvası
 - **Pil tasarrufu modu** — telefonda animasyon ve efektleri hafifletir
@@ -48,7 +49,7 @@ Framework ya da bağımlılık yok: tek bir `index.html` (HTML + CSS + JavaScrip
 | `index.html`, `sw.js`, `manifest.webmanifest`, ikonlar | Yayınlanan oyun — depo kökü doğrudan statik site olarak sunulabilir |
 | `src/` | Kaynak parçalar (stil, gövde, çekirdek, çizimler, oyun, saga, ekonomi, sistemler) |
 | `build.sh` | `src/` parçalarını birleştirip `index.html` üretir ve sözdizimini denetler |
-| `tools/` | Playwright ile yazılmış oyun botu ve denetim betikleri |
+| `tools/` | Playwright ile yazılmış oyun botu ve denetim betikleri (`audit.js`, `v15check.js`, `shots.js`) |
 | `README.txt` | Sürüm notları |
 
 ```bash
@@ -59,7 +60,7 @@ Yerelde denemek için `index.html` dosyasını tarayıcıda açmak yeterli; PWA 
 
 ## Sürümler
 
-Güncel sürüm **v14**, `main` dalında. Eski sürümler ayrı dallarda duruyor: `surum/v2`, `surum/v3`, `surum/v8`, `surum/v9`, `surum/v10`, `surum/v14`.
+Güncel sürüm **v15**, `main` dalında. Eski sürümler ayrı dallarda duruyor: `surum/v2`, `surum/v3`, `surum/v8`, `surum/v9`, `surum/v10`, `surum/v14`.
 
 ## Durum
 

@@ -158,7 +158,7 @@ function tickKit(){
   if(d>0){state.kit.n=Math.min(BAL.kitMax,state.kit.n+d);state.kit.t+=d*ms;if(state.kit.n>=BAL.kitMax)state.kit.t=now}
 }
 function renderEnergy(){
-  const unl=state.settings.unlimited,max=energyMax();
+  const unl=false,max=energyMax();
   $('#eNum').textContent=unl?'∞':state.energy;$('#eMax').textContent='/'+max;
   $('#eFill').style.width=(unl?100:clamp(state.energy/max*100,0,100))+'%';
   let note;
@@ -180,7 +180,7 @@ function renderHUD(){
   if(lastHearts>=0&&state.hearts!==lastHearts){const p=$('#heartPill');p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}
   lastHearts=state.hearts;
   renderEnergy();renderKit();
-  $('#buyEnergy').disabled=!!state.settings.unlimited;
+  $('#buyEnergy').disabled=false;
   $('#buyEnergy').innerHTML='+'+BAL.buyEnergyAmt+' 🌻<small>'+BAL.buyEnergyCost+' 🪙</small>';renderLvCard();renderStats();
   updateBookDot();
 }
@@ -188,7 +188,7 @@ function renderHUD(){
 /* ---------- üretim ---------- */
 function spawn(k){
   ensureAudio();k=k||'post';
-  const unl=state.settings.unlimited,nest=document.querySelector('.nest[data-k="'+k+'"]')||$('#nest');
+  const unl=false,nest=document.querySelector('.nest[data-k="'+k+'"]')||$('#nest');
   if(!lvActive()){sfx('err');toast(T('Önce haritadan bir seviye seç 🗺️','Pick a level on the map first 🗺️'));bounceEl(nest);return}
   if(!unl&&state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da altınla enerji al','Out of energy! Deliver orders, wait, or buy energy with coins'));bounceEl(nest);afterAction();return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}

@@ -8,7 +8,7 @@
     <div class="hpill" id="heartPill">❤ <b id="hearts">0</b></div>
     <button class="ibtn" id="btnBook" aria-label="Defter">📖<i class="dot" id="bookDot"></i></button>
     <button class="ibtn" id="btnGift" aria-label="Hediye">🎁</button>
-    <button class="ibtn" id="btnShop" aria-label="Dükkan">🛍️</button>
+    <button class="ibtn" id="btnShop" aria-label="Mağaza">🛍️</button>
     <button class="ibtn" id="btnSettings" aria-label="Ayarlar">⚙️</button>
   </header>
 
@@ -99,6 +99,7 @@
   </div>
 </div>
 
+<div id="adBanner" aria-label="Reklam"><div id="adSlot"></div></div>
 <div class="roam" id="roam"></div>
 <div class="toast" id="toast"></div>
 <canvas id="fx"></canvas>
@@ -135,6 +136,15 @@
 </div>
 
 <!-- Reklam (demo) -->
+<div class="modal" id="mBuy">
+  <div class="mcard">
+    <h2 class="li-h" id="buyTitle"></h2>
+    <div class="buyart" id="buyArt"></div>
+    <p class="mcap" id="buyText"></p>
+    <div class="testtag" data-en="TEST PURCHASE — no real payment is taken">TEST SATIN ALMA — gerçek ödeme alınmaz</div>
+    <div class="mbtns"><button class="btn" id="buyOk"></button><button class="btn soft" id="buyCancel" data-en="Cancel">Vazgeç</button></div>
+  </div>
+</div>
 <div class="modal" id="mAd">
   <div class="mcard">
     <h2 class="li-h" id="adTitle">🎬</h2>
@@ -231,9 +241,7 @@
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
-      <div class="mrow"><div><span data-en="🎨 Art style: storybook watercolor">🎨 Çizim stili: masal / suluboya</span><small data-en="Hand-painted storybook look. Turn off for the glossy candy look">El boyaması masal görünümü. Kapatırsan parlak şeker görünümüne döner</small></div><label class="sw"><input type="checkbox" id="swArt"><span></span></label></div>
       <div class="mrow"><div><span data-en="🔋 Battery saver">🔋 Pil tasarrufu</span><small data-en="Fewer animations, lighter music — keeps the phone cool">Daha az animasyon, hafif müzik — telefon ısınmasın</small></div><label class="sw"><input type="checkbox" id="swEco"><span></span></label></div>
-      <div class="mrow"><div><span data-en="♾️ Unlimited Energy">♾️ Sınırsız Enerji</span><small data-en="Test mode">Test modu</small></div><label class="sw"><input type="checkbox" id="swUnl"><span></span></label></div>
     </div>
     <div class="mbtns">
       <button class="btn sm" id="btnSave2" data-en="💾 Save Game">💾 Oyunu Kaydet</button>
@@ -274,7 +282,7 @@
 <!-- Dükkan -->
 <div class="modal" id="mShop">
   <div class="mcard wide">
-    <div class="mhead"><h2 data-en="🛍️ Shop">🛍️ Dükkan</h2><button class="x" data-close="mShop">✕</button></div>
+    <div class="mhead"><h2 data-en="🛍️ Store">🛍️ Mağaza</h2><button class="x" data-close="mShop">✕</button></div>
     <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> </div>
     <div class="tabs" id="shopTabs"></div>
     <div class="mbody" id="shopBody"></div>

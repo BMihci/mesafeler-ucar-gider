@@ -1,6 +1,6 @@
 # Mesafeler Uçar Gider — Devir Notu
 
-*Son güncelleme: 10 Kasım 2026 · Güncel sürüm: v14*
+*Son güncelleme: 10 Kasım 2026 · Güncel sürüm: v15*
 
 Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığı yerden devam edebilmek için yazıldı. Yeni konuşmaya bu dosyayı ver ve depoyu açmasını iste.
 
@@ -22,7 +22,7 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 | `src/` | Kaynak parçalar (aşağıda) |
 | `build.sh` | `src/` parçalarını birleştirir, JS sözdizimini `node --check` ile denetler; `SYNTAX_OK` yazmalı |
 | `tools/` | Playwright test/denetim betikleri (içlerindeki dosya yolları eski geliştirme ortamına göre; yeni ortamda yolları düzeltmek gerekir) |
-| `docs/` | README ekran görüntüleri |
+| `docs/` | README ekran görüntüleri, pazar araştırması ve tavsiyeler |
 | `README.md` | GitHub tanıtım sayfası |
 | `README.txt` | Sürüm notları |
 
@@ -49,7 +49,9 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 - Kayıt `localStorage`'da; `fix()` eski kayıtları onarır. 3 kayıt yuvası var.
 - **Modallar:** `showModal(id)` / `closeModal(id)`. Panel modalları (`mBook`, `mShop`, `mSettings`, `mGift`) açıkken başka modal üstüne açılır. Testte `.open` sınıfını elle silme; gerçek tıklama kullan.
 - **Hediye kodu:** `PK-XXXXX-XXXXX` (base36 + sağlama). Ayrı 🎁 butonu ve `mGift` modalı.
-- **Çizim stili:** `state.settings.art` = `'gh'` (varsayılan) ya da `'candy'`. `applyArt()` `body.gh` sınıfını ve ikon sprite'ını yeniler. `GS()` yalnızca `body.gh` varken renkleri dönüştürür.
+- **Görünüm temaları:** `ARTS` (p3_core.js) — `gh`, `candy`, `sakura`, `kraft`, `night`. Seçim `state.cos.art`, sahip olunanlar `state.cos.arts`. `applyArt()` `body.gh` + `body.art-*` sınıflarını, `data-art` özniteliğini ve ikon sprite'ını yeniler. `GS()` renkleri `ART_FX` ayarlarına göre dönüştürür. Tema CSS'i `gh.css` sonunda.
+- **Mağaza paketleri:** `PACKS` (p5d_economy.js), `openBuy()` → `mBuy` penceresi. Şimdilik test satın alma; gerçek ödeme bağlanınca `#buyOk` işleyicisi ödeme sonucuna bağlanmalı. Durum: `state.iap`.
+- **Reklamlar:** `ADS` (p5d_economy.js). Google Publisher Tag ile Google'ın test birimleri. `openAd(kind)` ödüllü reklamı ister, gelmezse `openTestAd()` yerleşik test reklamını açar; ödül `grantAd()`. Banner: `syncBanner()`, `:root.hasAd` ve `--adH`. Yayında `ADS.banner` / `ADS.rewarded` kendi birimlerinle değiştirilmeli.
 - **Pil tasarrufu:** `ecoOn()`; dokunmatik cihazda varsayılan açık. `body.eco` CSS'i efektleri kapatır.
 - **Harita:** 9 duraklı yol; ilerleme `#mpDone` çizgisi ve `.mp-city.on` ile gösterilir.
 
@@ -59,17 +61,18 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 - **v11:** tester geri bildirimleri — sipariş sayısına dayalı seviyeler, zorluk eğrisi, gerçek Türkiye haritası, pil tasarrufu, mobil tek ekran düzeni.
 - **v12:** modal üst üste açılma hatası, ayrı hediye butonu, kısa hediye kodu.
 - **v13:** harita ilerleme düzeltmesi, tüm emojiler yerine SVG çizimler, denetim botu.
+- **v15:** Mağaza (paketler — test satın alma), 5 görünüm teması, Google test reklamları (GPT: ödüllü + alt banner), test modu kaldırıldı, ayarlar hizası, tahta teması yazı hatası.
 - **v14:** Ghibli'den esinli el boyaması tema (CSS katmanı + renk süzgeci), yaprak/taç yaprağı arka plan, yumuşak animasyonlar, "Çizim stili" ayarı.
 
 ## 5. Açık işler ve bilinen sorunlar
 
-1. **Çizimler sıfırdan yeniden çizilmedi.** v14'te kuş, kedi, yuva ve eşya çizimlerinin formu aynı kaldı; yalnızca renk ve arayüz değişti. Gerçek bir yeniden çizim ayrı bir iş.
-2. **28–41. seviyeler elle oynanmadı.** Denetim botu kedi kapılı bu bölümü geçemiyor (bot stratejisi sınırı). Arkasında gerçek bir denge sorunu olabilir.
-3. **Gerçek telefonda ısınma ve akıcılık ölçülmedi.**
-4. **v14'te Dükkân, Ayarlar ve diğer modallar ekran görüntüsüyle kontrol edilmedi.**
-5. **`tools/audit.js` harita kontrolü** eski pembe rengi (`#FF3FA0`) arıyor; v14'te yanlış uyarı veriyor ("level dots done 0"). Kontrol renge değil sınıfa bakacak şekilde düzeltilmeli.
-6. **README.md** eski sürümler için hâlâ doğru (dallar), ama GitHub "About" kutusuna açıklama ve demo adresi elle eklenmeli.
-7. Demo bağlantısının açıldığı geliştirme ortamından doğrulanamadı; tarayıcıdan kontrol edilmeli.
+1. **Çizimler sıfırdan yeniden çizilmedi.** Temalar renk süzgeci ve arayüz katmanıyla çalışıyor; kuş, kedi, eşya çizimlerinin formu her temada aynı.
+2. **Gerçek Google reklamı bu ortamdan denenemedi.** Reklam akışı sahte (mock) GPT ile doğrulandı (`tools/adcheck.js`); gerçek test reklamının geldiği canlı sitede tarayıcıdan kontrol edilmeli.
+3. **Kısa ekranlarda kaydırma.** 700 pikselden kısa görünümde (telefon tarayıcısında adres çubuğu açıkken sık görülür) oyun tek ekrana sığmıyor; banner bunu 54 piksel artırıyor.
+4. **Satın almalar test modunda.** Gerçek ödeme yok; paket fiyatları yer tutucu.
+5. **Kullanıcı onayı (çerez/izin) penceresi yok.** Gerçek reklamla yayına çıkmadan önce gerekli.
+6. **Gerçek telefonda ısınma ve akıcılık ölçülmedi.**
+7. Geliştirme tavsiyeleri: `docs/PAZAR-ARASTIRMASI.md`.
 
 ## 6. Yeni sürüm çıkarma adımları
 

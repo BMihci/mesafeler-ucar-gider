@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
 const errs=[];p.on('pageerror',e=>errs.push('PE '+e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
-await p.goto('file:///home/claude/index.html');await p.waitForTimeout(800);
+await p.goto('file://'+require('path').join(__dirname,'..','index.html'));await p.waitForTimeout(800);
 const F=s=>p.click(s,{force:true,timeout:2000}).catch(e=>errs.push('noclick '+s));
 const open=()=>p.evaluate(()=>[...document.querySelectorAll('.modal.open')].map(m=>m.id));
 await F('#tStart');await p.waitForTimeout(900);await F('#mChar .chbtn[data-dir=A]');await p.waitForTimeout(600);

@@ -7,7 +7,7 @@ const issues=[];const add=t=>{if(!issues.includes(t))issues.push(t)};
 p.on('pageerror',e=>add('PAGEERROR '+e.message));
 p.on('console',m=>{if(m.type()==='error')add('CONSOLE '+m.text().slice(0,160))});
 await p.addInitScript(()=>{const st=window.setTimeout;window.setTimeout=(f,d,...a)=>st(f,(d||0)>30?Math.max(30,d/6):d,...a)});
-await p.goto('file:///home/claude/index.html');await p.waitForTimeout(900);
+await p.goto('file://'+require('path').join(__dirname,'..','index.html'));await p.waitForTimeout(900);
 const ev=(f,a)=>p.evaluate(f,a);
 const center=async sel=>{let el;try{el=await p.$(sel)}catch(e){return null}if(!el)return null;let bb;try{bb=await el.boundingBox()}catch(e){return null}return bb?{x:bb.x+bb.width/2,y:bb.y+bb.height/2}:null};
 const cellC=i=>center('#board .cell:nth-child('+(i+1)+')');

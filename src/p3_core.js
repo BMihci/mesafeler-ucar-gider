@@ -50,6 +50,14 @@ const NEST_DECOR={
 };
 const JOKERS={hammer:{intro:6,cost:40,ico:'🔨'},magnet:{intro:14,cost:55,ico:'🧲'},star:{intro:24,cost:70,ico:'✨'}};
 const THEMES={pink:0,autumn:60,snow:60};
+/* v15: mağazadaki görünüm temaları (çizim stili) */
+const ARTS={
+  gh:{cost:0,n:['Suluboya Masal','Storybook Watercolor'],d:['El boyaması, sıcak kâğıt ve ahşap','Hand-painted, warm paper and wood'],tc:'#CDE6E2',pv:['#CDE6E2','#F5F0D8','#C9A06A','#FCF3DC','#E08F82']},
+  candy:{cost:0,n:['Şeker','Candy'],d:['Parlak, canlı ve jöle gibi','Glossy, vivid and jelly-like'],tc:'#FFE3EA',pv:['#BFE3F5','#FFE3EA','#9C6BFF','#F3E9FF','#FF5DA2']},
+  sakura:{cost:300,n:['Kiraz Çiçeği','Cherry Blossom'],d:['Pembe bahar, uçuşan taç yaprakları','Pink spring with drifting petals'],tc:'#F9DDE4',pv:['#F9DDE4','#FDF1EC','#E9A9B8','#FFF7F5','#E88FA8']},
+  kraft:{cost:350,n:['Eskiz Defteri','Sketchbook'],d:['Kraft kâğıt, kurşun kalem tonları','Kraft paper and pencil tones'],tc:'#E9DCC3',pv:['#E9DCC3','#EFE5D0','#CDB48A','#F7EFDC','#B98A5A']},
+  night:{cost:400,n:['Gece Feneri','Night Lantern'],d:['Yıldızlı gökyüzü, fener ışığı','Starry sky and lantern glow'],tc:'#1F2A4D',pv:['#1F2A4D','#55507A','#3D4A7A','#E9E6F2','#E0AE4A']}
+};
 const ROUTE_TR=['İstanbul','Bolu','Ankara','Kapadokya','Toroslar','Çukurova','Tarsus','Adana'];
 const ROUTE_EN=['Istanbul','Bolu','Ankara','Cappadocia','Taurus Mts','Cukurova','Tarsus','Adana'];
 const REGION_TRACK=['bosph','forest','steppe','cappa','snow','coffee','sea','adana'];
@@ -82,7 +90,7 @@ const regenMs=()=>Math.round(BAL.regenMs*(1-BAL.regenPerPost*state.up.post)*(1-B
 const kitMs=()=>Math.round(BAL.kitMs*(1-BAL.kitPerCat*state.maxC));
 
 /* ---------- durum ---------- */
-function defaultSettings(){return{sfx:true,music:true,sfxVol:.8,musVol:.7,track:'auto',unlimited:false,eco:null,art:'gh',lang:'tr',names:{me:'Bird',you:'Birdie'}}}
+function defaultSettings(){return{sfx:true,music:true,sfxVol:.8,musVol:.7,track:'auto',eco:null,lang:'tr',names:{me:'Bird',you:'Birdie'}}}
 function defState(settings){
   const board=Array(CELLS).fill(null);
   [6,7,11,13,17].forEach(i=>board[i]={t:'a',l:1,k:false});
@@ -92,7 +100,8 @@ function defState(settings){
     orders:null,orderN:0,nest:{skin:'twig',skins:['twig'],decor:{l:'',r:'',t:''},owned:[]},albumClaimed:{},
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
     up:{blanket:0,post:0,nest:0},
-    cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood']},
+    cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood'],art:'gh',arts:['gh','candy']},
+    iap:{noads:false,starter:false,n:0},
     daily:{last:'',streak:0},quests:{date:'',list:[]},ach:{},
     stats:{orders:0,items:0,merges:0,spawns:0,boxes:0,rush:0,catMerges:0,pets:0,gifts:0,kittens:0},
     gifts:{used:[],sent:[]},
@@ -160,6 +169,12 @@ function fix(s){
   s.adT=Number(s.adT)||0;s.lvs=(s.lvs&&typeof s.lvs==='object')?s.lvs:{};
   if(!(s.cos.acc in ACCS))s.cos.acc='none';if(!Array.isArray(s.cos.accs))s.cos.accs=['none'];
   if(!(s.cos.board in BOARDS))s.cos.board='wood';if(!Array.isArray(s.cos.boards))s.cos.boards=['wood'];
+  if(!Array.isArray(s.cos.arts))s.cos.arts=['gh','candy'];
+  if(s.settings&&s.settings.art==='candy'&&!s.cos._am)s.cos.art='candy';
+  s.cos._am=1;if(s.settings){delete s.settings.art;delete s.settings.unlimited}
+  if(!(s.cos.art in ARTS))s.cos.art='gh';
+  ['gh','candy'].forEach(k=>{if(!s.cos.arts.includes(k))s.cos.arts.push(k)});
+  s.iap=Object.assign({noads:false,starter:false,n:0},(s.iap&&typeof s.iap==='object')?s.iap:{});
   s.saga=sanSaga(s.saga);s.lv=sanLv(s.lv);
   return s;
 }
@@ -186,7 +201,7 @@ function migrateV1(){
     d.board=o.board.map(c=>c&&c.l>=1&&c.l<=6?{t:'a',l:c.l|0,k:!!c.k}:null);
     d.km=Number(o.km)||KM_TOTAL;d.hearts=Number(o.hearts)||0;d.energy=Math.min(Number(o.energy)||0,BAL.energyBase);
     d.maxA=clamp(o.maxLevel|0,1,6);d.stats.orders=(o.stats&&o.stats.orders)|0;d.stats.items=(o.stats&&o.stats.items)|0;
-    if(o.settings){d.settings.sfx=o.settings.sfx!==false;d.settings.music=o.settings.music!==false;d.settings.unlimited=!!o.settings.unlimited}
+    if(o.settings){d.settings.sfx=o.settings.sfx!==false;d.settings.music=o.settings.music!==false}
     d.story.intro=true;d.tut.done=true;d.story.beat=stageOf(d.km)>=5?4:stageOf(d.km);
     return fix(d);
   }catch(e){return null}
