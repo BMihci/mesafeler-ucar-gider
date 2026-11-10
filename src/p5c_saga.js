@@ -22,9 +22,39 @@ const MECH=[
   {k:'wave',ico:'🌊',n:['Dalga','Waves'],d:['Dalgalar zaman zaman bir sırayı yana kaydırır. Eşyaların yer değiştirir!','Waves sometimes slide a whole row sideways. Your items shift around!']},
   {k:'final',ico:'👑',n:['Büyük Final','Grand Finale'],d:['Bütün engeller bir arada! Taş, rüzgâr, buz, dalga ve aceleli kargo… Sevgiline az kaldı!','Every obstacle together! Rocks, wind, ice, waves and rush parcels… so close to your love!']}
 ];
-const LVNEED=[1, 4, 4, 5, 3, 3, 5, 5, 5, 8, 8, 9, 5, 7, 7, 5, 13, 8, 5, 10, 6, 15, 13, 10, 11, 10, 12, 13, 12, 22, 9, 20, 21, 12, 14, 14, 13, 18, 11, 11, 12, 28, 12, 21, 17, 16, 14, 14, 14, 17, 15, 34, 15, 24, 19, 17, 17, 17, 32, 25, 18, 44, 19, 31, 24, 22, 20, 37, 21, 27, 22, 49, 22, 24, 28, 28, 24, 24, 24, 30];
-const OP=[[2,2],[2,3],[2,3],[2,4],[3,4],[3,5],[3,5],[3,6]];
+const LVNEED_OLD=[1, 4, 4, 7, 3, 4, 5, 5, 5, 8, 12, 9, 5, 7, 7, 5, 13, 8, 5, 10, 6, 15, 13, 11, 11, 10, 13, 13, 12, 22, 9, 21, 21, 12, 14, 14, 13, 18, 11, 11, 12, 29, 12, 21, 17, 16, 14, 14, 14, 17, 15, 34, 15, 26, 19, 17, 17, 19, 32, 29, 18, 44, 19, 31, 24, 22, 20, 37, 21, 27, 22, 51, 22, 41, 28, 28, 24, 31, 24, 30];
+const LVNEED_PREV=[1, 4, 7, 10, 6, 8, 5, 9, 8, 24, 5, 10, 11, 9, 9, 12, 9, 9, 13, 22, 6, 15, 18, 13, 9, 15, 30, 13, 20, 32, 0, 18, 30, 22, 13, 22, 34, 17, 28, 32, 2, 23, 22, 13, 15, 17, 24, 10, 17, 41, 7, 29, 24, 19, 19, 21, 12, 16, 32, 29, 25, 35, 30, 26, 22, 26, 27, 18, 37, 50, 22, 40, 19, 41, 25, 24, 14, 12, 20, 47];
+const LVNEED=[1, 4, 3, 10, 3, 8, 3, 9, 7, 15, 4, 6, 10, 9, 4, 11, 7, 9, 13, 22, 3, 9, 9, 9, 5, 12, 20, 9, 16, 26, 6, 12, 21, 13, 7, 14, 19, 13, 19, 16, 7, 15, 19, 14, 8, 12, 17, 12, 16, 20, 10, 18, 17, 15, 9, 12, 12, 11, 17, 25, 14, 25, 14, 27, 11, 14, 18, 13, 19, 20, 16, 24, 13, 29, 15, 20, 10, 14, 15, 19];
+const OP=[[2,2],[2,3],[2,3],[2,3],[3,4],[3,4],[3,4],[3,5]];
 const lvActive=()=>!!(state&&state.lv&&!state.lv.done&&state.saga);
+
+/* ---------- seviye temaları (her temanın kendi eşya zincirleri var) ---------- */
+const LTHEMES={
+  gift:{n:['Hediyeler','Gifts'],sets:['post','flower','sweet']},
+  dock:{n:['Liman','Harbour'],sets:['sea','travel','post']},
+  bakery:{n:['Pastane','Bakery'],sets:['sweet','coffee','flower']},
+  cafe:{n:['Kafe','Café'],sets:['coffee','sweet','post']},
+  camp:{n:['Doğa & Kamp','Nature & Camp'],sets:['camp','bird','flower']},
+  travel:{n:['Yolculuk','Journey'],sets:['travel','post','fruit']},
+  winter:{n:['Kış Masalı','Winter Tale'],sets:['winter','coffee','camp']},
+  market:{n:['Pazar','Market'],sets:['fruit','flower','sweet']},
+  seaside:{n:['Sahil Günü','Seaside Day'],sets:['beach','sea','fruit']},
+  kebap:{n:['Adana Sofrası','Adana Table'],sets:['kitchen','fruit','sweet']},
+  cats:{n:['Kedi Dünyası','Cat World'],sets:['cat','catfood','cattoy'],cat:true}
+};
+const REGION_THEMES=[['gift','dock','bakery'],['camp','market','gift'],['cafe','gift','travel'],['travel','market','cafe'],['winter','camp','cafe'],['market','bakery','gift'],['seaside','dock','market'],['kebap','bakery','gift']];
+const CAT_IDX=[4,7];
+function themeFor(n){
+  const ch=chOf(n),idx=(n-1)%10;
+  if(n<=2)return{id:'gift',sets:['post']};
+  const ns=n<=6?2:3;
+  if(CAT_IDX.includes(idx)&&n>=5){const t=LTHEMES.cats;return{id:'cats',sets:t.sets.slice(0,ns)}}
+  const nonCat=[0,1,2,3,5,6,8,9],k=nonCat.indexOf(idx);
+  const pool=REGION_THEMES[routeIdx(ch)];
+  const id=pool[(k+ch)%pool.length],all=LTHEMES[id].sets;
+  const rot=(n*2)%3,sets=[0,1,2].map(i=>all[(i+rot)%3]).slice(0,ns);
+  return{id,sets};
+}
 
 /* ---------- seviye üretici ---------- */
 function genLevel(n){
@@ -32,29 +62,34 @@ function genLevel(n){
   const m={};
   [m.oLo,m.oHi]=OP[ch];
   m.multi=ch>=2?+(0.12+0.3*d).toFixed(2):0;
-  m.rocks=ch>=1?clamp(Math.round(1+d*7+(ch===1?1.5:0)+(boss?1:0)),2,8):0;
+  m.rocks=ch>=1?clamp(Math.round(1+d*5.5+(ch===1?1.5:0)+(boss?1:0)),2,7):0;
   m.rockHp=ch>=4?2:1;
   m.wind=ch>=2?clamp(9-Math.round(d*5),4,9):0;
   m.balloons=ch>=3?1+(idx>=4?1:0)+(ch>=5?1:0):0;
   m.balloonDrop=ch>=3?0.12:0;
   m.ice=ch>=4?clamp(Math.round(2+(d-.5)*6+(ch===4&&idx===0?1:0)),2,5):0;
   m.rush=ch>=5?1:0;m.rushMs=Math.round(95000-d*38000);
+  m.fog=(n>=25&&idx>=3)?clamp(1+Math.floor(d*3),1,4):0;
+  m.moss=(n>=45&&idx>=4)?clamp(9-Math.round(d*3),6,9):0;
   m.wave=ch>=6?clamp(11-Math.round((d-.75)*16),7,11):0;
+  const th=themeFor(n),ns=th.sets.length;
   const a0=n===1?5:(n<=4?4:clamp(Math.round(3.4-d*1.2),2,3));
   const iceItems=m.ice;
-  const P=Math.round(3+52*Math.pow(d,1.2)),Etot=P*(boss?1.2:1)+a0+iceItems*1.5;
+  const P=Math.round(3+26*Math.pow(d,1.2)),Etot=P*(boss?1.1:1)+a0+iceItems*1.5;
   let oEU=0,oc=0;for(let l=m.oLo;l<=m.oHi;l++){oEU+=Math.pow(2,l-1);oc++}oEU=oEU/oc*(1+m.multi*.8);
-  const fMkA=E=>({k:'mkA',l:clamp(Math.round(Math.log2(Math.max(2,E)))+1,2,6),need:1});
-  const fMg=E=>({k:'merge',l:0,need:Math.max(3,Math.round(E*.95))});
+  const maxMk=n<=8?3:n<=25?4:5;
+  const msets=th.sets.filter(k=>k!=='cat'),ms=msets[Math.floor(r()*msets.length)]||'post';
+  const fMkA=E=>{const o={k:'mkA',l:clamp(Math.round(Math.log2(Math.max(2,E)))+1,2,maxMk),need:1};if(ms!=='post')o.s=ms;return o};
+  const fMg=E=>({k:'merge',l:0,need:Math.max(3,Math.round(E*.75))});
   const fOr=E=>({k:'order',l:0,need:Math.max(1,Math.round(E/oEU))});
-  const fCa=()=>({k:'mkC',l:clamp(2+Math.floor(d*3),2,4),need:1});
+  const fCa=()=>({k:'mkC',l:clamp(2+Math.floor(d*3.4)+(n>=12?1:0),2,4),need:1});
   const Rk=N=>({k:'rock',l:0,need:clamp(N,1,Math.max(1,m.rocks))});
   const Th=N=>({k:'thaw',l:0,need:clamp(N,1,Math.max(1,m.ice))});
   const Wd=N=>({k:'wild',l:0,need:clamp(N,1,Math.max(1,m.balloons))});
   const spec=[()=>fMg(Etot*.5),()=>Rk(2+Math.floor(d*3)),()=>fMg(Etot*.6),()=>Wd(2),()=>Th(2+Math.floor(d*1.5)),()=>fOr(Etot*.4),()=>fMkA(Etot*.6),()=>Rk(2)][ch];
   let goals;
   switch(idx){
-    case 0:goals=n===1?[{k:'order',l:0,need:2}]:[[fOr(Etot*.3)],[Rk(2)],[fMg(Etot*.4)],[Wd(2)],[Th(2)],[fOr(Etot*.3)],[fMkA(Etot*.5)],[fMkA(Etot*.45),fOr(Etot*.3)]][ch];break;
+    case 0:goals=n===1?[{k:'order',l:0,need:2}]:[[fOr(Etot*.3)],[Rk(2)],[fMg(Etot*.4)],[Wd(2),fMg(Etot*.5)],[Th(2),fMg(Etot*.5)],[fOr(Etot*.45),fMg(Etot*.4)],[fMkA(Etot*.5)],[fMkA(Etot*.45),fOr(Etot*.3)]][ch];break;
     case 1:goals=[fMg(Etot)];break;
     case 2:goals=[fMkA(Etot)];break;
     case 3:goals=[fOr(Etot)];break;
@@ -72,15 +107,16 @@ function genLevel(n){
   if(par==null){
     let eu=0;
     goals.forEach(g=>{if(g.k==='merge')eu+=g.need*.9+1;else if(g.k==='mkA')eu+=Math.pow(2,g.l-1);else if(g.k==='order')eu+=g.need*3;else if(g.k==='rock')eu+=g.need*2;else if(g.k==='thaw')eu+=g.need*1.2});
-    par=Math.max(0,Math.round(eu-a0-iceItems*1.5));
+    par=Math.max(0,Math.round((eu-a0-iceItems*1.5)*(1+.22*(ns-1))));
   }
-  const slack=1.6-0.4*d;
-  let moves=Math.ceil(par*slack)+(n<=10?3:2);
-  if(boss)moves=Math.ceil(moves*1.05)+1;
+  const slack=2.7-0.7*d;
+  let moves=Math.ceil(par*slack)+(n<=10?6:4);
+  if(boss)moves=Math.ceil(moves*1.08)+2;
   if(goals.some(g=>g.k==='rock'||g.k==='thaw'))moves+=3;
-  moves=clamp(moves,n===1?10:7,260);
+  if(goals.some(g=>g.k==='mkA'))moves=Math.ceil(moves*1.2)+2;
+  moves=clamp(moves,n===1?10:12,260);
   let kits=0;goals.forEach(g=>{if(g.k==='mkC')kits+=Math.pow(2,g.l-1)});
-  return{n,ch,idx,boss,goals,moves,par,mech:m,a0,kits:kits?Math.min(9,kits+1):1,rnd:r};
+  return{n,ch,idx,boss,goals,moves,par,mech:m,sets:th.sets,theme:th.id,a0,kits:kits?Math.min(9,kits+1):1,rnd:r};
 }
 
 function buildBoard(g){
@@ -88,30 +124,42 @@ function buildBoard(g){
   for(let i=0;i<CELLS;i++)free.push(i);
   for(let i=free.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[free[i],free[j]]=[free[j],free[i]]}
   const take=()=>free.pop();
+  const sk=()=>{const k=g.sets[Math.floor(r()*g.sets.length)];return k},mk=(l,extra)=>{const k=sk();const o=k==='cat'?{t:'c',l:1,k:false}:(k==='post'||!SETS[k].it?{t:'a',l,k:false}:{t:'a',s:k,l,k:false});return Object.assign(o,extra||{})};
   if(g.n===1){[6,7,11,13,17].forEach(i=>{b[i]={t:'a',l:1,k:false};free.splice(free.indexOf(i),1)})}
-  else for(let i=0;i<g.a0;i++)b[take()]={t:'a',l:1,k:false};
+  else for(let i=0;i<g.a0;i++)b[take()]=mk(1);
   const m=g.mech;
   for(let i=0;i<m.rocks;i++)b[take()]={t:'r',l:m.rockHp,k:false};
-  for(let i=0;i<m.ice;i++)b[take()]={t:'a',l:r()<.35?2:1,k:false,z:1};
+  for(let i=0;i<m.ice;i++){const q=mk(r()<.35?2:1);if(q.t==='c')q.t='a',delete q.s;b[take()]=Object.assign(q,{z:1})}
   for(let i=0;i<m.balloons;i++)b[take()]={t:'w',l:1,k:false};
-  if(g.n>=3){const nk=g.ch>=2?2:1;for(let i=0;i<nk;i++)b[take()]={t:'a',l:(g.ch>=3&&r()<.5)?3:2,k:true}}
+  for(let i=0;i<m.fog;i++)b[take()]=mk(1,{g:1});
+  if(g.n>=3){const nk=g.ch>=2?2:1;for(let i=0;i<nk;i++){const q=mk((g.ch>=3&&r()<.5)?3:2,{k:true});b[take()]=q}}
   if(g.n%4===0)b[take()]={t:'x',l:1,k:false};
   return b;
 }
 
+function tryStart(n,opt){
+  tickLives();
+  if(state.lives.n<=0){openLives();return false}
+  startLevel(n,opt);return true;
+}
+let introGrants=[];
 function startLevel(n,opt){
   opt=opt||{};
   const g=genLevel(n),bonus=state.up.blanket*BAL.energyPerBlanket+state.maxC*BAL.energyPerCat;
-  state.lv={n,maxMoves:g.moves+bonus,spawned:0,usedMoves:0,done:false,goals:g.goals.map(x=>({k:x.k,l:x.l,need:x.need})),
-    c:{merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0},mech:g.mech,par:g.par,startHearts:state.hearts};
+  state.lv={n,sets:g.sets,theme:g.theme,maxMoves:g.moves+bonus,spawned:0,usedMoves:0,done:false,goals:g.goals.map(x=>x.s?{k:x.k,l:x.l,need:x.need,s:x.s}:{k:x.k,l:x.l,need:x.need}),weekly:!!opt.weekly,
+    c:{merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0,moss:0,fog:0},mech:g.mech,par:g.par,startHearts:state.hearts};
   state.board=buildBoard(g);
   state.energy=state.lv.maxMoves;state.energyT=Date.now();
   state.kit.n=g.kits;state.kit.t=Date.now();
   state.order=makeOrder(false);
   state.won=false;
+  jMode=null;document.body.classList.remove('jmode');
+  introGrants=(opt.retry||opt.silent)?[]:grantJokers(n);
+  const ls=state.lvs[n]||(state.lvs[n]={t:0,f:0});if(!opt.retry)ls.t++;
+  trk('level_start',{n,retry:!!opt.retry});
   sel=null;fxMap={};
   applyTheme();setCities();applyTrack();
-  renderBoard(true);renderHUD();renderOrder(true);renderLvCard();syncKm(false);renderFeedBird('idle');
+  renderBoard(true);renderHUD();renderOrder(true);renderLvCard();renderJokers();renderCollection();syncKm(false);renderFeedBird('idle');
   saveSoon();
   if(!opt.silent&&!opt.retry)showLevelIntro();
   else if(opt.retry)toast(T('Yeniden başlıyoruz! 💪','Starting over! 💪'));
@@ -119,17 +167,17 @@ function startLevel(n,opt){
 
 /* ---------- sayaçlar / hedefler ---------- */
 function lvEv(k,n){if(!lvActive())return;state.lv.c[k]=(state.lv.c[k]||0)+(n||1)}
-function noteMade(t,l){if(!lvActive())return;const c=state.lv.c;if(t==='a')c.mkA=Math.max(c.mkA,l);else if(t==='c')c.mkC=Math.max(c.mkC,l)}
+function noteMade(t,l,sk){if(!lvActive())return;const c=state.lv.c;if(t==='a'){c.mkA=Math.max(c.mkA,l);const k='m_'+(sk||'post');c[k]=Math.max(c[k]||0,l)}else if(t==='c')c.mkC=Math.max(c.mkC,l)}
 function goalHave(g){
   const c=state.lv.c;
-  if(g.k==='mkA')return c.mkA>=g.l?1:0;
+  if(g.k==='mkA')return (c['m_'+(g.s||'post')]||0)>=g.l?1:0;
   if(g.k==='mkC')return c.mkC>=g.l?1:0;
   return Math.min(g.need,c[g.k]||0);
 }
 const goalsMet=()=>!!state.lv&&state.lv.goals.every(g=>goalHave(g)>=g.need);
 function goalFrac(){const L=state.lv;if(!L)return 0;let s=0;L.goals.forEach(g=>s+=goalHave(g)/g.need);return s/L.goals.length}
 function goalIcon(g){
-  if(g.k==='mkA')return '<div class="mini t'+g.l+'">'+itemIcon('a',g.l)+'</div>';
+  if(g.k==='mkA')return '<div class="mini t'+g.l+'">'+itemIcon('a',g.l,g.s)+'</div>';
   if(g.k==='mkC')return itemIcon('c',g.l);
   return ({merge:'🔀',order:'📦',rock:'🪨',thaw:'🧊',wild:'🎈'})[g.k]||'⭐';
 }
@@ -137,7 +185,7 @@ function goalText(g){
   switch(g.k){
     case 'merge':return T(g.need+' birleştirme yap','Make '+g.need+' merges');
     case 'order':return T(g.need+' sipariş tamamla','Complete '+g.need+' order'+(g.need>1?'s':''));
-    case 'mkA':return T(itemName('a',g.l)+' yap','Make a '+itemName('a',g.l));
+    case 'mkA':return T(itemName('a',g.l,g.s)+' yap','Make a '+itemName('a',g.l,g.s));
     case 'mkC':return T(catName(g.l)+' ile tanış','Meet '+catName(g.l));
     case 'rock':return T(g.need+' taşı kır','Break '+g.need+' rock'+(g.need>1?'s':''));
     case 'thaw':return T(g.need+' buzu çöz','Thaw '+g.need+' ice block'+(g.need>1?'s':''));
@@ -160,11 +208,12 @@ let metT=0,stuckT=0;
 function afterAction(){
   if(!lvActive())return;
   renderLvCard();syncKm(true);
-  if(goalsMet()&&!metT){metT=setTimeout(()=>{metT=0;if(lvActive()&&goalsMet())levelComplete()},750)}
-  clearTimeout(stuckT);stuckT=setTimeout(()=>{if(lvActive()&&!goalsMet()&&!mCur&&isStuck())showFail()},1100);
+  if(goalsMet()&&!metT){metT=setTimeout(()=>{metT=0;if(lvActive()&&goalsMet())levelComplete()},380)}
+  clearTimeout(stuckT);stuckT=setTimeout(()=>{if(lvActive()&&!goalsMet()&&!mCur&&isStuck())showFail()},900);
 }
 function syncKm(anim){
   if(!state.saga)return;
+  if(state.saga.done){state.km=0;updateKm(!!anim);return}
   const done=Math.min(80,state.saga.n-1);
   let frac=0;if(state.lv&&!state.lv.done&&state.lv.n===state.saga.n)frac=goalFrac();
   state.km=Math.max(0,Math.round(KM_TOTAL*(1-(done+frac)/80)*10)/10);
@@ -180,7 +229,9 @@ function thawAround(list){
   hit.forEach(j=>{
     const c=state.board[j];if(!c)return;
     const p=cellCenter(j);
-    if(c.t==='r'){
+    if(c.t==='m'){state.board[j]=null;lvEv('moss');burst(p.x,p.y,5,10);floatText('🌿 ✨',p.x,p.y);sfx('unlock')}
+    else if(c.g){c.g=0;lvEv('fog');fxMap[j]='unlock';burst(p.x,p.y,4,8);floatText('🌫️ ✨',p.x,p.y);sfx('unlock')}
+    else if(c.t==='r'){
       c.l--;
       if(c.l<=0){state.board[j]=null;lvEv('rock');burst(p.x,p.y,6,12);floatText('🪨 💥',p.x,p.y);sfx('unlock')}
       else{fxMap[j]='move';sfx('move');burst(p.x,p.y,3,6)}
@@ -193,6 +244,14 @@ function mechTick(){
   const L=state.lv;if(!L)return;const m=L.mech;
   if(m.wind&&L.spawned%m.wind===0)windBlow();
   if(m.wave&&L.spawned%m.wave===0)waveRoll();
+  if(m.moss&&L.spawned%m.moss===0)growMoss();
+}
+function growMoss(){
+  const em=emptyCells();if(em.length<4)return;
+  const adj=em.filter(i=>nbrs(i).some(j=>state.board[j]&&state.board[j].t==='m'));
+  const i=adj.length?rnd(adj):rnd(em);
+  state.board[i]={t:'m',l:1,k:false};fxMap[i]='spawn';
+  toast(T('🌿 Yosun yayılıyor!','🌿 Moss is spreading!'));
 }
 function windBlow(){
   const mov=[];state.board.forEach((c,i)=>{if(c&&!c.k&&!isFixed(c))mov.push(i)});
@@ -220,7 +279,7 @@ function isStuck(){
   for(let i=0;i<CELLS;i++)for(let j=i+1;j<CELLS;j++)if(canMerge(B[i],B[j]))return false;
   if(B.some(c=>c&&c.t==='w')&&B.some(isUp))return false;
   const o=state.order;
-  if(o&&!o.done&&B.some(c=>c&&!c.k&&!c.z&&c.t==='a'&&o.reqs.some(r=>r.t===c.t&&r.l===c.l&&r.got<r.need)))return false;
+  if(o&&!o.done&&B.some(c=>c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&o.reqs.some(r=>r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need)))return false;
   if(state.kit.n>0&&emptyCells().length&&state.lv.goals.some(g=>g.k==='mkC'&&goalHave(g)<g.need))return false;
   if(B.some(c=>c&&c.k)&&state.hearts>=BAL.unlockCost)return false;
   return true;
@@ -228,24 +287,27 @@ function isStuck(){
 function showFail(){
   if(!lvActive()||mCur)return;
   const noMoves=state.energy<=0&&!state.settings.unlimited;
-  const canBuy=noMoves&&state.hearts>=BAL.buyEnergyCost;
+  const ls=state.lvs[state.lv.n]||(state.lvs[state.lv.n]={t:0,f:0});ls.f++;
+  trk('level_fail',{n:state.lv.n,noMoves});
   showModal('mLvFail',()=>{
     $('#lfTitle').textContent=noMoves?T('Hamlen bitti!','Out of moves!'):T('Tahta tıkandı!','The board is jammed!');
     $('#lfText').textContent=noMoves
-      ?T('Hedeflere ulaşamadan hamlen bitti. '+BAL.buyEnergyAmt+' hamle için '+BAL.buyEnergyCost+' ❤ verip devam edebilir ya da baştan başlayabilirsin.','You ran out of moves before reaching the goals. Spend '+BAL.buyEnergyCost+' ❤ for '+BAL.buyEnergyAmt+' more moves, or start over.')
-      :T('Hiçbir birleştirme yapılamıyor ve yer kalmadı. Bu seviyeyi baştan deneyelim!','No merges left and no space. Let’s try this level again!');
-    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.disabled=!canBuy;b.innerHTML=T('+'+BAL.buyEnergyAmt+' hamle · '+BAL.buyEnergyCost+' ❤','+'+BAL.buyEnergyAmt+' moves · '+BAL.buyEnergyCost+' ❤');
-    $('#lfRetry').textContent=T('↻ Baştan','↻ Retry');
+      ?T('Altınla '+BAL.buyEnergyAmt+' hamle alıp devam edersen can kaybetmezsin. Pes edersen 1 can gider.','Buy '+BAL.buyEnergyAmt+' moves with coins and you keep your life. Give up and you lose 1 life.')
+      :T('Hiçbir birleştirme yapılamıyor ve yer kalmadı. Baştan denersen 1 can gider.','No merges left and no space. Trying again costs 1 life.');
+    const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' hamle · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' moves · '+BAL.buyEnergyCost+' 🪙');
+    const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' hamle','🎬 Watch ad · +'+BAL.buyEnergyAmt+' moves');
+    $('#lfRetry').textContent=T('↻ Baştan (−1 🐥)','↻ Retry (−1 🐥)');
   });
   sfx('err');
 }
 $('#lfMoves').addEventListener('click',()=>{
-  if(state.hearts<BAL.buyEnergyCost)return;
-  state.hearts-=BAL.buyEnergyCost;state.energy+=BAL.buyEnergyAmt;sfx('energy');
+  if(state.coins<BAL.buyEnergyCost){sfx('err');toast(T('Yeterli 🪙 yok. Mağazadan ya da reklamla kazanabilirsin','Not enough 🪙. Earn some or watch an ad'));return}
+  spendCoins(BAL.buyEnergyCost);state.energy+=BAL.buyEnergyAmt;sfx('energy');
   closeModal('mLvFail');renderHUD();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
 });
-$('#lfRetry').addEventListener('click',()=>{closeModal('mLvFail');startLevel(state.lv.n,{retry:true})});
-$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(openMap,300)});
+$('#lfAd').addEventListener('click',()=>{closeModal('mLvFail');setTimeout(()=>openAd('moves'),280)});
+$('#lfRetry').addEventListener('click',()=>{const n=state.lv.n,w=state.lv.weekly;closeModal('mLvFail');loseLife();setTimeout(()=>tryStart(n,{retry:true,weekly:w}),280)});
+$('#lfMap').addEventListener('click',()=>{closeModal('mLvFail');loseLife();setTimeout(openMap,300)});
 
 /* ---------- seviye tamam ---------- */
 function levelComplete(){
@@ -253,52 +315,74 @@ function levelComplete(){
   L.done=true;
   const par=L.par||0,used=L.spawned;
   const stars=state.settings.unlimited||used<=Math.ceil(par*1.12)+1?3:used<=Math.ceil(par*1.32)+2?2:1;
-  const prev=state.saga.stars[L.n]||0,first=prev===0;
-  state.saga.stars[L.n]=Math.max(prev,stars);
-  const boss=L.n%10===0;
-  let reward=4+Math.round(L.n/4)+stars*2+(boss?30:0);if(!first)reward=Math.ceil(reward/3);
-  state.hearts+=reward;
-  const advanced=state.saga.n===L.n&&L.n<80;
+  const weekly=!!L.weekly;
+  const prev=state.saga.stars[L.n]||0,first=prev===0&&!weekly;
+  if(!weekly)state.saga.stars[L.n]=Math.max(prev,stars);
+  const boss=L.n%10===0&&!weekly;
+  let coins=6+Math.round(L.n*.35)+stars*2+(boss?25:0);if(!first)coins=Math.ceil(coins/3);
+  let hearts=first?3+stars+(boss?10:0):1;
+  let wb=0;
+  if(weekly&&state.weekly.w===weekId()&&!state.weekly.done){state.weekly.done=true;wb=120;hearts+=5}
+  coins+=wb;addCoins(coins);state.hearts+=hearts;
+  const advanced=!weekly&&state.saga.n===L.n&&L.n<80;
   if(advanced)state.saga.n=L.n+1;
-  syncKm(true);renderHUD();renderLvCard();
+  const newCat=(boss&&first)?routeIdx(chOf(L.n)):-1;
+  if(boss&&first)state.mini.tokens++;
+  trk('level_complete',{n:L.n,stars,used,par});
+  syncKm(true);renderHUD();renderLvCard();renderJokers();
   sfx('win');confetti(boss?90:40);setMood('love',2600);
   checkAch();saveSoon();
-  if(L.n===80){state.saga.done=true;win();return}
-  const beatK=(boss&&[10,30,50,70].includes(L.n)&&!state.letters.includes(String((L.n+10)/20)))?(L.n+10)/20:0;
+  if(L.n===80&&!weekly){state.saga.done=true;win();return}
+  const k=boss?L.n/10:0;
+  const beatK=(k&&k<=7&&!state.letters.includes(String(k)))?k:0;
   showModal('mLvDone',()=>{
+    $('#ldScene').innerHTML='<div class="d1">'+birdSVG(meBird(),'love')+'</div>'+(newCat>=0?'<div class="d3">'+catSVG(REGION_CATS[newCat].o,'happy')+'</div>':'')+'<div class="d2">'+birdSVG(partnerBird(),'love')+'</div>';
     $('#ldStars').innerHTML=[1,2,3].map(i=>'<i class="'+(i<=stars?'':'off')+'" style="animation-delay:'+(i*.18)+'s">⭐</i>').join('');
-    $('#ldTitle').textContent=boss?T('Bölüm Tamam! 👑','Chapter Complete! 👑'):T('Seviye Tamam!','Level Complete!');
-    $('#ldText').textContent=T('Seviye ','Level ')+L.n+' · +'+reward+' ❤'+(first?'':T(' (tekrar)',' (replay)'))+'\n'+T('Kalan mesafe: ','Distance left: ')+Math.round(state.km)+' km'+(boss?'\n'+T(rc(Math.min(7,chOf(L.n)+1))+' yolunda ilerliyorsun!','On your way to '+rc(Math.min(7,chOf(L.n)+1))+'!'):'');
-    $('#ldNext').innerHTML=T('Sonraki ▶','Next ▶');
-    $('#ldNext').style.display=L.n<80?'':'none';
+    $('#ldTitle').textContent=weekly?T('Meydan Okuma Tamam! ⭐','Challenge Complete! ⭐'):boss?T('Bölüm Tamam! 👑','Chapter Complete! 👑'):T('Seviye Tamam!','Level Complete!');
+    let t=T('Seviye ','Level ')+L.n+' · +'+coins+' 🪙 · +'+hearts+' ❤'+(first||weekly?'':T(' (tekrar)',' (replay)'));
+    if(wb)t+='\n'+T('Haftalık bonus: +'+wb+' 🪙','Weekly bonus: +'+wb+' 🪙');
+    if(!weekly)t+='\n'+T('Kalan mesafe: ','Distance left: ')+Math.round(state.km)+' km';
+    if(newCat>=0)t+='\n🐾 '+T('Yeni bölge kedisi: ','New regional cat: ')+T(REGION_CATS[newCat].n[0],REGION_CATS[newCat].n[1])+'!\n💌 '+T('Mini oyun hakkı kazandın!','You earned a mini-game token!');
+    $('#ldText').textContent=t;
+    $('#ldNext').innerHTML=weekly?T('Harita ▶','Map ▶'):T('Sonraki ▶','Next ▶');
+    $('#ldNext').dataset.beat=beatK||'';$('#ldNext').dataset.weekly=weekly?'1':'';
     $('#ldAgain').textContent=T('↻ Tekrar','↻ Replay');
-    $('#ldNext').dataset.beat=beatK||'';
   });
 }
 $('#ldNext').addEventListener('click',e=>{
-  const k=+e.currentTarget.dataset.beat,n=state.saga.n;
+  const k=+e.currentTarget.dataset.beat,n=state.saga.n,wk=e.currentTarget.dataset.weekly;
   closeModal('mLvDone');
-  const go=()=>startLevel(Math.min(80,n));
+  if(wk){setTimeout(openMap,300);return}
+  const go=()=>tryStart(Math.min(80,n));
   if(k)setTimeout(()=>playBeat(k,go),300);else setTimeout(go,260);
 });
 $('#ldMap').addEventListener('click',()=>{closeModal('mLvDone');setTimeout(openMap,300)});
-$('#ldAgain').addEventListener('click',()=>{const n=state.lv.n;closeModal('mLvDone');setTimeout(()=>startLevel(n),260)});
+$('#ldAgain').addEventListener('click',()=>{const n=state.lv.n,w=state.lv.weekly;closeModal('mLvDone');setTimeout(()=>tryStart(n,{weekly:w}),260)});
 
 /* ---------- seviye girişi ---------- */
 function mechLine(L){
   const ch=chOf(L.n),m=L.mech,a=[];
   if(m.rocks)a.push('🪨');if(m.wind)a.push('🌬️');if(m.balloons||m.balloonDrop)a.push('🎈');if(m.ice)a.push('🧊');if(m.rush)a.push('⚡');if(m.wave)a.push('🌊');
+  if(m.fog)a.push('🌫️');if(m.moss)a.push('🌿');
   const first=(L.n-1)%10===0;
+  if(L.n===25)return '🌫️ '+T('YENİ: Sis','NEW: Fog')+'\n'+T('Sisli eşyalar gizli kalır. Yanında birleştirme yapınca sis dağılır.','Foggy items stay hidden. Merge next to them to clear the fog.');
+  if(L.n===45)return '🌿 '+T('YENİ: Yosun','NEW: Moss')+'\n'+T('Yosun birkaç hamlede bir yayılır. Yanında birleştirme yaparak temizle!','Moss spreads every few moves. Clear it by merging next to it!');
   if(first)return MECH[ch].ico+' '+T('YENİ: ','NEW: ')+T(MECH[ch].n[0],MECH[ch].n[1])+'\n'+T(MECH[ch].d[0],MECH[ch].d[1]);
   return a.length?T('Aktif engeller: ','Active hazards: ')+a.join(' '):'';
+}
+function themeBadge(L){
+  const th=LTHEMES[L.theme]||LTHEMES.gift;
+  const ic=(L.sets||['post']).map(k=>k==='cat'?'<span class="ti">'+catSVG(CATS[3]).replace('<svg ','<svg class="ico cat" ')+'</span>':'<span class="ti">'+itemIcon('a',3,k)+'</span>').join('');
+  return '<div class="li-theme"><span>🎨 '+T(th.n[0],th.n[1])+'</span>'+ic+'</div>';
 }
 function showLevelIntro(){
   const L=state.lv,ch=chOf(L.n);
   showModal('mLvIntro',()=>{
     $('#liChap').textContent=T(REGION_TITLE[routeIdx(ch)][0],REGION_TITLE[routeIdx(ch)][1]).toUpperCase()+' · '+T('BÖLÜM ','CHAPTER ')+(ch+1);
     $('#liTitle').textContent=T('Seviye ','Level ')+L.n+(L.n%10===0?' 👑':'');
-    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+L.maxMoves+' '+T('hamle','moves')+'</div>';
-    $('#liMech').textContent=mechLine(L);
+    $('#liGoals').innerHTML=L.goals.map(g=>'<div class="gl"><div class="gi">'+goalIcon(g)+'</div><div><b>'+goalText(g)+'</b></div></div>').join('')+'<div class="li-mv">🌻 '+L.maxMoves+' '+T('hamle','moves')+' · '+T('tahmini ~','est. ~')+Math.max(3,L.par)+'</div>'+themeBadge(L);
+    const gl=introGrants.map(j=>JOKER_TXT[j]()).join('\n');
+    $('#liMech').textContent=(mechLine(L)+(gl?(mechLine(L)?'\n\n':'')+gl:''));
     $('#liStart').textContent=T('▶ Başla','▶ Start');
   });
 }
@@ -306,15 +390,19 @@ $('#liStart').addEventListener('click',()=>{sfx('tap');closeModal('mLvIntro');me
 $('#liMap').addEventListener('click',()=>{closeModal('mLvIntro');setTimeout(openMap,300)});
 
 /* ---------- harita ---------- */
+let mapPrevN=null;
 function openMap(){showModal('mMap',renderMap)}
 function renderMap(){
   if(!state.saga){$('#mapBody').innerHTML='';return}
   const g=state.saga;
   let stars=0;for(const k in g.stars)stars+=g.stars[k];
-  let h='<div class="mcap" style="margin:0 0 2px">'+T('Kalan mesafe: ','Distance left: ')+'<b>'+Math.round(state.km)+' km</b> · '+(g.n-(g.done?0:1))+'/80 · ⭐ '+stars+'/240</div><div class="mapprog"><i style="width:'+((Math.min(80,g.n-1))/80*100)+'%"></i></div>';
+  const curPct=Math.min(80,g.n-1)/80*100,fromPct=mapPrevN==null?curPct:mapPrevN;
+  const wn=weeklyN(),wdone=state.weekly.w===weekId()&&state.weekly.done;
+  let h='<div class="mcap" style="margin:0 0 2px">'+T('Kalan mesafe: ','Distance left: ')+'<b>'+Math.round(state.km)+' km</b> · '+(g.n-(g.done?0:1))+'/80 · ⭐ '+stars+'/240</div><div class="mapprog"><i id="mapFill" style="width:'+fromPct+'%"></i><b id="mapBird" style="left:'+fromPct+'%">🕊️</b></div>';
+  h+='<div class="mapact">'+(wn?'<button class="btn sm'+(wdone?' soft':'')+'" data-act="weekly">⭐ '+T('Haftalık Meydan Okuma','Weekly Challenge')+(wdone?' ✔':' · +120 🪙')+'</button>':'')+'<button class="btn sm soft" data-act="mini">💌 '+T('Mektup Yakala','Catch the Letters')+' · '+state.mini.tokens+'</button></div>';
   for(let ch=0;ch<8;ch++){
     const first=ch*10+1,locked=g.n<first,cur=!locked&&g.n<=first+9&&!g.done,ri=routeIdx(ch);
-    h+='<div class="mapch'+(cur?' cur':'')+(locked?' lock':'')+'"><div class="mh"><span class="mi">'+(locked?'🔒':REGION[ri].ico)+'</span><div>'+T(REGION_TITLE[ri][0],REGION_TITLE[ri][1])+'<small>'+MECH[ch].ico+' '+T(MECH[ch].n[0],MECH[ch].n[1])+' · '+T('Seviye ','Levels ')+first+'–'+(first+9)+'</small></div></div>';
+    h+='<div class="mapch'+(cur?' cur':'')+(locked?' mlock':'')+'"><div class="mh"><span class="mi">'+(locked?'🔒':REGION[ri].ico)+'</span><div>'+T(REGION_TITLE[ri][0],REGION_TITLE[ri][1])+'<small>'+MECH[ch].ico+' '+T(MECH[ch].n[0],MECH[ch].n[1])+' · '+T('Seviye ','Levels ')+first+'–'+(first+9)+'</small></div></div>';
     if(!locked){
       h+='<div class="lvgrid">';
       for(let i=0;i<10;i++){
@@ -326,12 +414,23 @@ function renderMap(){
     h+='</div>';
   }
   $('#mapBody').innerHTML=h;
-  const c=$('#mapBody .lvb.cur');if(c)setTimeout(()=>c.scrollIntoView({block:'center'}),60);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#mapFill'),b=$('#mapBird');if(f){f.style.width=curPct+'%';b.style.left=curPct+'%'}}));
+  mapPrevN=curPct;
+  const c=$('#mapBody .lvb.cur');
+  if(c)setTimeout(()=>{let sc=c.parentElement;while(sc&&sc!==document.body&&sc.scrollHeight<=sc.clientHeight+2)sc=sc.parentElement;
+    if(sc&&sc!==document.body){const r=c.getBoundingClientRect(),q=sc.getBoundingClientRect();sc.scrollTop+=r.top-q.top-q.height/2+r.height/2}},60);
 }
 $('#mapBody').addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]');
+  if(a){
+    sfx('tap');
+    if(a.dataset.act==='weekly'){closeModal('mMap');setTimeout(()=>{const n=weeklyN();state.weekly.w=weekId();if(state.weekly.w!==weekId())state.weekly.done=false;tryStart(n,{weekly:true})},280)}
+    else if(a.dataset.act==='mini'){closeModal('mMap');setTimeout(openMini,280)}
+    return;
+  }
   const b=e.target.closest('.lvb');if(!b||b.disabled)return;
   const n=+b.dataset.lv;sfx('tap');closeModal('mMap');
-  setTimeout(()=>startLevel(n),280);
+  setTimeout(()=>tryStart(n),280);
 });
 $('#btnMap').addEventListener('click',()=>{sfx('tap');openMap()});
 

@@ -88,26 +88,28 @@ $('#cNext').addEventListener('click',()=>{
 /* ---------- tahta ---------- */
 const boardEl=$('#board');
 for(let i=0;i<CELLS;i++){const d=document.createElement('div');d.className='cell';d.dataset.i=i;boardEl.appendChild(d);cellEls.push(d)}
-let sel=null,fxMap={},spotSet=new Set(),spotEls=[];
+let sel=null,fxMap={},spotSet=new Set(),spotEls=[],jMode=null;
 function itemHTML(c,cls){
+  if(c.t==='m')return '<div class="item moss '+(cls||'')+'">'+itemIcon('m',1)+'</div>';
   if(c.t==='r')return '<div class="item rock h'+c.l+' '+(cls||'')+'">'+itemIcon('r',c.l)+'</div>';
   if(c.t==='w')return '<div class="item balloon '+(cls||'')+'">'+itemIcon('w',1)+'</div>';
   if(c.t==='x')return '<div class="item kx '+(cls||'')+'">'+itemIcon('x',1)+'</div>';
-  return '<div class="item t'+c.l+' '+(cls||'')+'">'+(c.t==='c'?'<b class="paw">🐾</b>':'')+itemIcon(c.t,c.l)+'<i class="lv">'+(c.l===MAXL[c.t]?'★':c.l)+'</i></div>';
+  return '<div class="item t'+c.l+' '+(cls||'')+'">'+(c.t==='c'?'<b class="paw">🐾</b>':'')+itemIcon(c.t,c.l,c.s)+'<i class="lv">'+(c.l===MAXL[c.t]?'★':c.l)+'</i></div>';
 }
-const canMerge=(a,b)=>!!(a&&b&&!a.k&&!b.k&&!a.z&&!b.z&&a.t===b.t&&(a.t==='a'||a.t==='c')&&a.l===b.l&&a.l<MAXL[a.t]);
-const isUp=c=>!!(c&&!c.k&&!c.z&&(c.t==='a'||c.t==='c')&&c.l<MAXL[c.t]);
-const isFixed=c=>!!(c&&(c.t==='r'||c.z));
+const canMerge=(a,b)=>!!(a&&b&&!a.k&&!b.k&&!a.z&&!b.z&&!a.g&&!b.g&&a.t===b.t&&(a.s||'')===(b.s||'')&&(a.t==='a'||a.t==='c')&&a.l===b.l&&a.l<MAXL[a.t]);
+const isUp=c=>!!(c&&!c.k&&!c.z&&!c.g&&(c.t==='a'||c.t==='c')&&c.l<MAXL[c.t]);
+const isFixed=c=>!!(c&&(c.t==='r'||c.t==='m'||c.z||c.g));
+const fixedMsg=c=>c.t==='r'?T('Taş yerinden oynamaz! Yanında bir birleştirme yap 🪨','Rocks won’t budge! Merge next to it 🪨'):c.t==='m'?T('Yosun! Yanında birleştirme yapınca temizlenir 🌿','Moss! Merge next to it to clear it 🌿'):c.z?T('Buz çözülmeli! Yanında bir birleştirme yap 🧊','Thaw it first! Merge next to it 🧊'):T('Sis var! Yanında birleştirme yapınca dağılır 🌫️','Fog! Merge next to it to clear it 🌫️');
 function renderBoard(force){
   const sc=sel!=null?state.board[sel]:null;
   for(let i=0;i<CELLS;i++){
     const c=state.board[i],el=cellEls[i];
     const isSel=i===sel,hint=!!(sc&&c&&i!==sel&&(canMerge(sc,c)||(sc.t==='w'&&isUp(c))));
-    const sig=(c?c.t+c.l+(c.k?'k':'')+(c.z?'z':''):'-')+'|'+isSel+'|'+hint;
+    const sig=(c?c.t+(c.s||'')+c.l+(c.k?'k':'')+(c.z?'z':'')+(c.g?'g':''):'-')+'|'+isSel+'|'+hint;
     if(!force&&el._s===sig)continue;el._s=sig;
-    el.className='cell'+(c?'':' empty')+(c&&c.k?' locked':'')+(c&&c.z?' frozen':'')+(c&&c.t==='r'?' rockc':'')+(isSel?' sel':'')+(hint?' hint':'')+(spotSet.has(i)?' spot':'');
+    el.className='cell'+(c?'':' empty')+(c&&c.k?' locked':'')+(c&&c.z?' frozen':'')+(c&&c.t==='r'?' rockc':'')+(c&&c.t==='m'?' mossc':'')+(isSel?' sel':'')+(hint?' hint':'')+(spotSet.has(i)?' spot':'');
     const f=fxMap[i];
-    el.innerHTML=c?itemHTML(c,f?'a-'+f:'')+(c.z?'<div class="ice"></div>':'')+(c.k?'<div class="lock"><span>🔒</span><small>'+BAL.unlockCost+'❤</small></div>':''):'';
+    el.innerHTML=c?itemHTML(c,f?'a-'+f:'')+(c.z?'<div class="ice"></div>':'')+(c.g?'<div class="fog"></div>':'')+(c.k?'<div class="lock"><span>🔒</span><small>'+BAL.unlockCost+'❤</small></div>':''):'';
   }
   fxMap={};
 }
@@ -157,7 +159,7 @@ function renderHUD(){
   lastHearts=state.hearts;
   renderEnergy();renderKit();
   $('#buyEnergy').disabled=!!state.settings.unlimited;
-  $('#buyEnergy').innerHTML='+'+BAL.buyEnergyAmt+' 🌻<small>'+BAL.buyEnergyCost+' ❤</small>';renderLvCard();
+  $('#buyEnergy').innerHTML='+'+BAL.buyEnergyAmt+' 🌻<small>'+BAL.buyEnergyCost+' 🪙</small>';renderLvCard();renderStats();
   updateBookDot();
 }
 
@@ -170,7 +172,7 @@ function spawn(){
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}
   if(!unl)state.energy--;
   const l=Math.random()<BAL.nestL2*state.up.nest?2:1;
-  place({t:'a',l,k:false},'spawn');
+  place(newItem(l),'spawn');
   state.stats.spawns++;ev('spawn');state.lv.spawned++;state.lv.usedMoves++;
   sfx('pop');buzz(8);mechTick();renderBoard();renderHUD();tutAdv('spawn');afterAction();saveSoon();
 }
@@ -190,7 +192,7 @@ function openBox(i){
   const p=cellCenter(i),r=Math.random();let txt;
   if(r<.4){const h=rint(4,12);state.hearts+=h;txt='+'+h+' ❤'}
   else if(r<.7){const e=rint(3,6);state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+e);txt='+'+e+' 🌻'}
-  else if(r<.92){const n=rint(2,3);let k=0;for(let q=0;q<n;q++){if(place({t:'a',l:1,k:false},'spawn')>=0)k++}txt='+'+k+' ✉️'}
+  else if(r<.92){const n=rint(2,3);let k=0;for(let q=0;q<n;q++){if(place(newItem(1),'spawn')>=0)k++}txt='+'+k+' ✉️'}
   else{state.kit.n=Math.min(BAL.kitMax+3,state.kit.n+1);txt='+1 🐱'}
   floatText(txt,p.x,p.y);burst(p.x,p.y,6,14);sfx('box');state.stats.boxes++;ev('box');
   renderBoard();renderHUD();afterAction();saveSoon();
@@ -202,8 +204,13 @@ function showCatCard(l,b){
     text:T(C_DESC[l][0],C_DESC[l][1])+'\n\n'+T(`Her yeni kedi: +1 🌻 maks. enerji ve daha hızlı kedi sepeti.\nToplam kedi bonusu: +${state.maxC} 🌻   ·   +${b} ❤`,`Each new cat: +1 🌻 max energy and a faster cat basket.\nTotal cat bonus: +${state.maxC} 🌻   ·   +${b} ❤`),
     ok:T('Miyav! 🐱','Meow! 🐱')});
 }
-function discover(t,l){
-  if(t==='a'&&l>state.maxA){
+function discover(t,l,sk){
+  if(t==='a'&&sk&&sk!=='post'&&SETS[sk]&&SETS[sk].it){
+    if(l>(state.dsc[sk]||0)){
+      state.dsc[sk]=l;const b=l;state.hearts+=b;renderCollection();
+      toast(T('Yeni eşya: ','New item: ')+itemName('a',l,sk)+'! +'+b+'❤');sfx('levelup');
+    }
+  }else if(t==='a'&&l>state.maxA){
     state.maxA=l;const b=l*2;state.hearts+=b;renderCollection();
     toast(T('Yeni eşya: ','New item: ')+itemName('a',l)+'! +'+b+'❤');sfx('levelup');checkAch();
   }else if(t==='c'&&l>state.maxC){
@@ -212,9 +219,9 @@ function discover(t,l){
 }
 function merge(from,to){
   const a=state.board[from],nl=a.l+1,t=a.t;
-  state.board[to]={t,l:nl,k:false};state.board[from]=null;fxMap[to]='merge';sel=null;
+  const ss=a.s;state.board[to]=ss?{t,l:nl,k:false,s:ss}:{t,l:nl,k:false};state.board[from]=null;fxMap[to]='merge';sel=null;
   state.stats.merges++;ev('merge');if(t==='c'){state.stats.catMerges++;ev('catmerge')}
-  lvEv('merge');noteMade(t,nl);thawAround([from,to]);
+  lvEv('merge');noteMade(t,nl,ss);thawAround([from,to]);
   if(nl>=4)ev('lvl4');
   sfx('merge',nl);if(t==='c')sfx('meow',1+nl*.06);buzz(14);
   renderBoard();
@@ -227,15 +234,15 @@ function merge(from,to){
   if(nl>=3&&state.lv&&state.lv.mech.balloonDrop&&Math.random()<state.lv.mech.balloonDrop){
     const bi=place({t:'w',l:1,k:false},'spawn');if(bi>=0){toast(T('Bir balon jokeri geldi! 🎈','A balloon joker floated in! 🎈'));renderBoard()}
   }
-  discover(t,nl);renderHUD();updateWant();tutAdv('merge');afterAction();saveSoon();
+  discover(t,nl,ss);renderHUD();updateWant();tutAdv('merge');afterAction();saveSoon();
 }
 function useBalloon(from,to){
   const b=state.board[from],c=state.board[to];if(!b||b.t!=='w'||!isUp(c))return false;
   state.board[from]=null;c.l++;fxMap[to]='merge';sel=null;
-  lvEv('wild');noteMade(c.t,c.l);if(c.l>=4)ev('lvl4');
+  lvEv('wild');noteMade(c.t,c.l,c.s);if(c.l>=4)ev('lvl4');
   sfx('merge',c.l);sfx('levelup');buzz(14);renderBoard();
   const p=cellCenter(to);burst(p.x,p.y,6,12);floatText('🎈 +1',p.x,p.y);
-  discover(c.t,c.l);renderHUD();updateWant();afterAction();saveSoon();return true;
+  discover(c.t,c.l,c.s);renderHUD();updateWant();afterAction();saveSoon();return true;
 }
 function move(from,to){
   state.board[to]=state.board[from];state.board[from]=null;fxMap[to]='move';sel=null;
@@ -248,7 +255,7 @@ function swap(a,b){
 function act(from,to){
   const a=state.board[from],t=state.board[to];
   if(!a||a.k||isFixed(a))return;
-  if(t&&isFixed(t)){sfx('err');toast(t.t==='r'?T('Taş yerinden oynamaz! Yanında bir birleştirme yap 🪨','Rocks won’t budge! Merge next to it 🪨'):T('Buz çözülmeli! Yanında bir birleştirme yap 🧊','Thaw it first! Merge next to it 🧊'));bounceEl(cellEls[to]);renderBoard();return}
+  if(t&&isFixed(t)){sfx('err');toast(fixedMsg(t));bounceEl(cellEls[to]);renderBoard();return}
   if(a.t==='w'&&isUp(t)){useBalloon(from,to);return}
   if(!t)move(from,to);
   else if(t.k){sfx('err');toast(T('Önce 🔒 kilidi aç','Unlock the 🔒 first'));bounceEl(cellEls[to]);renderBoard()}
@@ -263,15 +270,20 @@ function unlock(i){
   discover(c.t,c.l);renderHUD();saveSoon();
 }
 function tapCell(i){
+  if(jMode){jokerTarget(i);return}
   const c=state.board[i];
   if(c&&c.k){unlock(i);return}
   if(c&&c.t==='x'){openBox(i);return}
   if(c&&isFixed(c)){
-    if(sel!=null){const s0=state.board[sel];if(s0){sfx('err');toast(c.t==='r'?T('Bu taş dolu! Yanında birleştir 🪨','Rock in the way! Merge next to it 🪨'):T('Buzu çözmek için yanında birleştir 🧊','Merge next to the ice to thaw it 🧊'));bounceEl(cellEls[i]);return}}
-    sfx('err');toast(c.t==='r'?T('Taşı kırmak için yanında birleştirme yap 🪨','Merge next to a rock to break it 🪨'):T('Buzu çözmek için yanında birleştirme yap 🧊','Merge next to the ice to thaw it 🧊'));bounceEl(cellEls[i]);return
+    sfx('err');toast(fixedMsg(c));bounceEl(cellEls[i]);return
   }
   if(sel==null){if(c){sel=i;sfx('select');renderBoard();updateWant()}return}
-  if(sel===i){sel=null;renderBoard();updateWant();return}
+  if(sel===i){
+    // çift dokunuş: en yakın eşleşmeyle hemen birleştir
+    const a=state.board[i];let bj=-1,bd=99;
+    if(a)for(let j=0;j<CELLS;j++){if(j!==i&&canMerge(a,state.board[j])){const d=Math.abs((i/5|0)-(j/5|0))+Math.abs(i%5-j%5);if(d<bd){bd=d;bj=j}}}
+    if(bj>=0){merge(i,bj);return}
+    sel=null;renderBoard();updateWant();return}
   const s=state.board[sel];
   if(!c){move(sel,i);return}
   if(s.t==='w'&&isUp(c)){useBalloon(sel,i);return}
@@ -281,20 +293,59 @@ function tapCell(i){
 
 /* ---------- siparişler ---------- */
 const SAYS=[()=>T('Bana şunları gönderir misin? 🥺','Could you send me these? 🥺'),()=>T('Seni çok özledim, bunları bekliyorum 💌','I miss you so much, waiting for these 💌'),()=>T('Küçük bir kargo çıkar mı bana? 🎁','Got a little parcel for me? 🎁'),()=>T('Bu hafta bunlara bayılırım! 💕','I’d love these this week! 💕'),()=>T('Paketini sabırsızlıkla bekliyorum 📦','Can’t wait for your parcel 📦')];
+function lvSets(){return (state.lv&&state.lv.sets&&state.lv.sets.length)?state.lv.sets:['post']}
+/* hedefe ihtiyaç duyulan zincirler: açık sipariş + hedef eşya */
+function wantedSets(){
+  const w=[];
+  const o=state.order;
+  if(o&&!o.done)o.reqs.forEach(r=>{if(r.got<r.need){const k=r.t==='c'?'cat':(r.s||'post');if(!w.includes(k))w.push(k)}});
+  const L=state.lv;
+  if(L&&!L.done)L.goals.forEach(g=>{
+    if(g.k==='mkA'&&goalHave(g)<g.need){const k=g.s||'post';if(!w.includes(k))w.push(k)}
+    if(g.k==='mkC'&&goalHave(g)<g.need&&lvSets().includes('cat')&&!w.includes('cat'))w.push('cat');
+  });
+  return w.filter(k=>lvSets().includes(k));
+}
+function goalSetKey(){
+  const L=state.lv;if(!L||L.done)return null;
+  const g=L.goals.find(g=>(g.k==='mkA'||g.k==='mkC')&&goalHave(g)<g.need);
+  if(!g)return null;
+  const k=g.k==='mkC'?'cat':(g.s||'post');return lvSets().includes(k)?k:null;
+}
+function pickSet(){
+  const sets=lvSets();if(sets.length===1)return sets[0];
+  const gk=goalSetKey(),r=Math.random();
+  if(gk&&r<.6)return gk;
+  const w=wantedSets();
+  if(w.length&&r<.8)return rnd(w);
+  return rnd(sets);
+}
+function newItem(l){
+  const k=pickSet();
+  if(k==='cat')return{t:'c',l:1,k:false};
+  return (k==='post'||!SETS[k]||!SETS[k].it)?{t:'a',l,k:false}:{t:'a',s:k,l,k:false};
+}
 function makeOrder(rush){
   const m=state.lv?state.lv.mech:null,lo=m?m.oLo:2,hi=m?m.oHi:3;
   const count=(m&&m.multi&&Math.random()<m.multi)?2:1,reqs=[],used=new Set();
-  for(let n=0,tr=0;n<count&&tr<30;tr++){
-    const l=rint(lo,hi),key='a'+l;if(used.has(key))continue;used.add(key);
+  const sets=lvSets();
+  for(let n=0,tr=0;n<count&&tr<40;tr++){
+    const k=rnd(sets);
+    if(k==='cat'){
+      const l=rint(2,Math.min(4,Math.max(2,hi)));const key='c'+l;if(used.has(key))continue;used.add(key);
+      reqs.push({t:'c',l,need:1,got:0});n++;continue;
+    }
+    const l=rint(lo,hi),key=k+l;if(used.has(key))continue;used.add(key);
     const need=(l===1)?rint(2,3):((l===2&&Math.random()<.3)?2:1);
-    reqs.push({t:'a',l,need,got:0});n++;
+    const q={t:'a',l,need,got:0};if(k!=='post'&&SETS[k]&&SETS[k].it)q.s=k;
+    reqs.push(q);n++;
   }
   if(!reqs.length)reqs.push({t:'a',l:2,need:1,got:0});
   const isRush=!!(rush||(m&&m.rush));
   return{reqs,done:false,say:Math.floor(Math.random()*SAYS.length),rush:isRush?Date.now()+(m&&m.rushMs?m.rushMs:BAL.rushMs):0};
 }
 const reqEl=i=>$('#reqs').children[i];
-const reqIcon=r=>'<div class="mini t'+r.l+'">'+itemIcon(r.t,r.l)+'</div>';
+const reqIcon=r=>'<div class="mini t'+r.l+'">'+itemIcon(r.t,r.l,r.s)+'</div>';
 function orderReward(o){
   let h=0;o.reqs.forEach(r=>{const left=r.need-r.got;h+=HV[r.t][r.l]*left});
   const m=o.rush?BAL.rushMult:1;return{km:0,h:h*m};
@@ -302,7 +353,7 @@ function orderReward(o){
 function renderOrder(animate){
   const o=state.order,card=$('#orderCard');
   $('#orderTitle').textContent=T('📦 Sipariş: ','📦 Order from ')+YOU();
-  $('#reqs').innerHTML=o.reqs.map((r,i)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-r="'+i+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('');
+  $('#reqs').innerHTML=o.reqs.map((r,i)=>'<div class="req'+(r.got>=r.need?' ok':'')+'" data-r="'+i+'">'+reqIcon(r)+'<div class="rt"><b>'+itemName(r.t,r.l,r.s)+'</b><span>'+r.got+'/'+r.need+'</span></div></div>').join('');
   const rw=orderReward(o);
   $('#orderReward').textContent=o.done?T('Gönderildi 🎁','Sent 🎁'):(o.rush?'⚡ ':'')+'+'+rw.h+' ❤ · +'+(BAL.orderEnergy+state.up.post)+' 🌻';
   $('#orderSay').textContent=o.done?T('Çok teşekkür ederim! 💕','Thank you so much! 💕'):(o.rush?T('Acil kargo! Süre dolmadan yetiştir ⚡','Rush parcel! Deliver before time runs out ⚡'):'“'+SAYS[o.say%SAYS.length]()+'”');
@@ -322,7 +373,7 @@ function tickRush(){
 }
 function updateWant(){
   const c=sel!=null?state.board[sel]:null;
-  [...$('#reqs').children].forEach((el,i)=>{const r=state.order.reqs[i];el.classList.toggle('want',!!(c&&r&&r.t===c.t&&r.l===c.l&&r.got<r.need&&!state.order.done))});
+  [...$('#reqs').children].forEach((el,i)=>{const r=state.order.reqs[i];el.classList.toggle('want',!!(c&&r&&r.t===c.t&&r.l===c.l&&(r.s||'')===(c.s||'')&&r.got<r.need&&!state.order.done))});
 }
 function fly(rect,toEl,c){
   const to=toEl.getBoundingClientRect(),g=document.createElement('div');
@@ -335,9 +386,9 @@ function fly(rect,toEl,c){
 }
 function deliver(idx,ri){
   const o=state.order,c=state.board[idx],req=o.reqs[ri];
-  if(!c||c.k||c.z||c.t==='x'||c.t==='r'||c.t==='w'||!req||o.done||!lvActive())return false;
+  if(!c||c.k||c.z||c.g||c.t==='x'||c.t==='r'||c.t==='m'||c.t==='w'||!req||o.done||!lvActive())return false;
   const chip=reqEl(ri);
-  if(req.t!==c.t||req.l!==c.l){sfx('err');toast(T('Şunu istiyor: ','Wants: ')+itemName(req.t,req.l));bounceEl(chip);return false}
+  if(req.t!==c.t||req.l!==c.l||(req.s||'')!==(c.s||'')){sfx('err');toast(T('Şunu istiyor: ','Wants: ')+itemName(req.t,req.l,req.s));bounceEl(chip);return false}
   if(req.got>=req.need){sfx('err');toast(T('Bu istek zaten tamam ✔️','This one is already done ✔️'));bounceEl(chip);return false}
   const rect=cellEls[idx].getBoundingClientRect(),cc=elCenter(chip);
   fly(rect,chip,c);
@@ -359,7 +410,7 @@ function deliver(idx,ri){
       if(state.lv&&state.lv.done)return;
       state.order=makeOrder(false);renderOrder(true);if(state.order.rush){sfx('order');toast(T('⚡ Aceleli kargo! Süre işliyor','⚡ Rush parcel! The clock is ticking'))}
       saveSoon();
-    },1900);
+    },1000);
   }
   afterAction();saveSoon();return true;
 }
@@ -377,7 +428,7 @@ boardEl.addEventListener('pointerdown',e=>{
   if(mCur||(e.pointerType==='mouse'&&e.button!==0))return;
   const cell=e.target.closest('.cell');if(!cell||drag)return;
   const i=+cell.dataset.i,c=state.board[i];
-  drag={i,sx:e.clientX,sy:e.clientY,moved:false,ghost:null,can:!!(c&&!c.k&&!isFixed(c)),rect:cell.getBoundingClientRect()};
+  drag={i,sx:e.clientX,sy:e.clientY,moved:false,ghost:null,can:!!(c&&!c.k&&!isFixed(c)&&!jMode),rect:cell.getBoundingClientRect()};
 });
 addEventListener('pointermove',e=>{
   if(!drag)return;
@@ -464,18 +515,25 @@ function setCities(){
 }
 
 /* ---------- koleksiyon şeridi ---------- */
+let collSel=null;
+function collSets(){return lvSets().filter(x=>x!=='cat'&&SETS[x]&&(x==='post'||SETS[x].it))}
+function collKey(){const c=collSets();if(collSel&&c.includes(collSel))return collSel;return c[0]||'post'}
+function collMax(k){return k==='post'?state.maxA:(state.dsc[k]||0)}
 function renderCollection(){
-  let h='';
+  const k=collKey(),mx=collMax(k),cs=collSets();
+  let h=cs.length>1?'<div class="cchips">'+cs.map(x=>'<button class="cchip'+(x===k?' on':'')+'" data-k="'+x+'" aria-label="'+T(SETS[x].n[0],SETS[x].n[1])+'">'+itemIcon('a',3,x)+'</button>').join('')+'</div>':'';
+  h+='<div class="crow">';
   for(let l=1;l<=6;l++){
-    const on=l<=state.maxA;
-    h+='<button class="ct t'+l+(on?' on':'')+'" data-l="'+l+'">'+(on?wrapIco(ICON_A[l]):'<span style="font-size:22px;line-height:30px">❔</span>')+'<small>'+l+'</small></button>';
+    const on=l<=mx;
+    h+='<button class="ct t'+l+(on?' on':'')+'" data-l="'+l+'">'+(on?itemIcon('a',l,k):'<span style="font-size:22px;line-height:30px">❔</span>')+'<small>'+l+'</small></button>';
     if(l<6)h+='<span class="arr">›</span>';
   }
-  $('#coll').innerHTML=h;
+  $('#coll').innerHTML=h+'</div>';
 }
 $('#coll').addEventListener('click',e=>{
+  const c=e.target.closest('.cchip');if(c){collSel=c.dataset.k;sfx('tap');renderCollection();toast(T(SETS[collSel].n[0],SETS[collSel].n[1]));return}
   const b=e.target.closest('.ct');if(!b)return;
-  const l=+b.dataset.l;toast(l<=state.maxA?T('Seviye ','Level ')+l+': '+itemName('a',l):T('Henüz keşfedilmedi ❔','Not discovered yet ❔'));
+  const l=+b.dataset.l,k=collKey();toast(l<=collMax(k)?T('Seviye ','Level ')+l+': '+itemName('a',l,k):T('Henüz keşfedilmedi ❔','Not discovered yet ❔'));
 });
 
 /* ---------- kediler: sevme, dolaşan kedi ---------- */
@@ -488,8 +546,9 @@ function petCat(x,y){
 ['#bcat','#bcat2'].forEach(s=>$(s).addEventListener('click',e=>{const c=elCenter(e.currentTarget);bounceEl(e.currentTarget);petCat(c.x,c.y)}));
 let roamT=0;
 function walkCat(){
-  const lvl=rint(1,Math.max(1,state.maxC)),el=document.createElement('div');
-  el.className='roamCat';el.innerHTML='<div class="walk">'+catSVG(CATS[lvl],'happy')+'</div>';
+  const lvl=rint(1,Math.max(1,state.maxC)),el=document.createElement('div'),rcs=unlockedRegionCats();
+  const art=(rcs.length&&Math.random()<.45)?catSVG(REGION_CATS[rnd(rcs)].o,'happy'):catSVG(CATS[lvl],'happy');
+  el.className='roamCat';el.innerHTML='<div class="walk">'+art+'</div>';
   $('#roam').appendChild(el);
   const W=innerWidth,dir=Math.random()<.5?1:-1,dur=rint(9000,13000);
   const from=dir>0?-70:W+10,to=dir>0?W+10:-70;

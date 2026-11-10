@@ -13,19 +13,22 @@ const BAL={
   unlockCost:5,orderEnergy:1,orderHearts:2,
   rushMs:100000,rushEvery:4,rushMult:2,
   boxChance:.10,boxMinLevel:3,
-  buyEnergyCost:10,buyEnergyAmt:5,
+  buyEnergyCost:30,buyEnergyAmt:5,lifeMax:3,lifeMs:86400000,adMs:30000,lifeCost:90,adCoinCd:900000,adCoins:25,
   stageAt:[800,600,400,200],
-  beatHearts:[0,15,20,25,30],beatEnergy:5,
+  beatHearts:[0,15,20,25,30,35,40,50],beatEnergy:5,
   nestL2:.12
 };
 const KMV={a:[0,5,12,30,70,150,320],c:[0,4,10,24,56,120,260]};
 const HV={a:[0,1,3,6,12,25,50],c:[0,2,5,9,16,30,60]};
-const UPS={blanket:{max:3,cost:[25,60,120]},post:{max:3,cost:[30,70,140]},nest:{max:3,cost:[40,90,180]}};
-const HATS={beanie:0,none:0,flower:25,bow:30,catears:40,crown:80};
+const UPS={blanket:{max:3,cost:[150,350,700]},post:{max:3,cost:[180,400,800]},nest:{max:3,cost:[220,480,900]}};
+const HATS={beanie:0,none:0,flower:100,bow:120,catears:160,crown:400,cap:140,sailor:180,chef:220};
+const ACCS={none:0,glasses:110,phones:150,star:130,pin:90,bow:260,halo:420,sparkle:600};
+const BOARDS={wood:0,candy:300,night:350,mint:300,marble:450,sunset:400,sakura:600,forest:500,galaxy:750,gold:950};
+const JOKERS={hammer:{intro:6,cost:40,ico:'🔨'},magnet:{intro:14,cost:55,ico:'🧲'},star:{intro:24,cost:70,ico:'✨'}};
 const THEMES={pink:0,autumn:60,snow:60};
 const ROUTE_TR=['İstanbul','Bolu','Ankara','Kapadokya','Toroslar','Çukurova','Tarsus','Adana'];
 const ROUTE_EN=['Istanbul','Bolu','Ankara','Cappadocia','Taurus Mts','Cukurova','Tarsus','Adana'];
-const CH_TRACK=['coffee','pati','coffee','pati','snow','pati','coffee','reunion'];
+const REGION_TRACK=['bosph','forest','steppe','cappa','snow','coffee','sea','adana'];
 
 /* ---------- yardımcılar ---------- */
 const $=s=>document.querySelector(s);
@@ -58,12 +61,12 @@ function defState(settings){
   const board=Array(CELLS).fill(null);
   [6,7,11,13,17].forEach(i=>board[i]={t:'a',l:1,k:false});
   board[4]={t:'a',l:2,k:true};board[20]={t:'a',l:2,k:true};board[24]={t:'a',l:3,k:true};board[0]={t:'c',l:1,k:true};
-  return{v:3,saga:null,lv:null,board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
+  return{v:4,saga:null,lv:null,coins:0,lives:{n:3,t:Date.now()},jk:{hammer:0,magnet:0,star:0},jg:{},dsc:{},mini:{tokens:0,day:''},weekly:{w:0,done:false},adT:0,lvs:{},board,km:KM_TOTAL,hearts:0,energy:BAL.energyBase,energyT:Date.now(),kit:{n:2,t:Date.now()},
     maxA:1,maxC:0,
     order:{reqs:[{t:'a',l:2,need:1,got:0}],done:false,say:0,rush:0},orderN:0,
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
     up:{blanket:0,post:0,nest:0},
-    cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink']},
+    cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood']},
     daily:{last:'',streak:0},quests:{date:'',list:[]},ach:{},
     stats:{orders:0,items:0,merges:0,spawns:0,boxes:0,rush:0,catMerges:0,pets:0,gifts:0,kittens:0},
     gifts:{used:[],sent:[]},
@@ -86,15 +89,16 @@ function fix(s){
     if(t==='x')return{t:'x',l:1,k:false};
     if(t==='w')return{t:'w',l:1,k:false};
     if(t==='r')return{t:'r',l:clamp(c.l|0,1,3),k:false};
+    if(t==='m')return{t:'m',l:1,k:false};
     if(!MAXL[t])return null;const l=c.l|0;if(l<1||l>MAXL[t])return null;
-    const o={t,l,k:!!c.k};if(c.z)o.z=1;return o;
+    const o={t,l,k:!!c.k};if(t==='a'&&c.s&&SETS[c.s]&&c.s!=='post'&&SETS[c.s].it)o.s=c.s;if(c.z)o.z=1;if(c.g)o.g=1;return o;
   });
   const num=(k,lo,hi)=>{s[k]=Number.isFinite(s[k])?clamp(s[k],lo,hi):d[k]};
   num('km',0,KM_TOTAL);num('hearts',0,1e7);num('energy',0,300);num('energyT',0,9e15);num('maxA',1,6);num('maxC',0,6);num('orderN',0,1e6);num('trip',1,999);
   s.kit=Object.assign(d.kit,s.kit||{});s.kit.n=clamp(s.kit.n|0,0,9);if(!Number.isFinite(s.kit.t))s.kit.t=Date.now();
   const o=s.order;
   s.order=(o&&Array.isArray(o.reqs)&&o.reqs.length&&o.reqs.every(r=>r&&(r.t==='a'||r.t==='c')&&r.l>=1&&r.l<=6&&r.need>=1))
-    ?{reqs:o.reqs.map(r=>({t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)})),done:!!o.done,say:o.say|0,rush:Number(o.rush)||0}:null;
+    ?{reqs:o.reqs.map(r=>{const q={t:r.t,l:r.l|0,need:r.need|0,got:Math.min(r.got|0,r.need|0)};if(r.t==='a'&&r.s&&SETS[r.s]&&r.s!=='post'&&SETS[r.s].it)q.s=r.s;return q}),done:!!o.done,say:o.say|0,rush:Number(o.rush)||0}:null;
   s.story=Object.assign(d.story,s.story||{});s.story.beat=clamp(s.story.beat|0,0,4);
   s.letters=Array.isArray(s.letters)?s.letters.filter(x=>typeof x==='string').slice(0,40):[];
   s.notes=Array.isArray(s.notes)?s.notes.slice(0,30):[];
@@ -113,7 +117,17 @@ function fix(s){
   s.settings.names=Object.assign({me:'Bird',you:'Birdie'},s.settings.names||{});
   s.settings.lang=s.settings.lang==='en'?'en':'tr';
   s.tut=Object.assign(d.tut,s.tut||{});
-  s.won=!!s.won;s.v=3;
+  s.won=!!s.won;s.v=4;
+  s.coins=Number.isFinite(s.coins)?clamp(Math.floor(s.coins),0,1e8):0;
+  s.lives=Object.assign({n:BAL.lifeMax,t:Date.now()},s.lives||{});s.lives.n=clamp(s.lives.n|0,0,BAL.lifeMax);if(!Number.isFinite(s.lives.t))s.lives.t=Date.now();
+  s.jk=Object.assign({hammer:0,magnet:0,star:0},s.jk||{});for(const k in JOKERS)s.jk[k]=clamp(s.jk[k]|0,0,99);
+  s.jg=(s.jg&&typeof s.jg==='object')?s.jg:{};
+  s.mini=Object.assign({tokens:0,day:''},s.mini||{});s.mini.tokens=clamp(s.mini.tokens|0,0,99);
+  s.weekly=Object.assign({w:0,done:false},s.weekly||{});
+  s.dsc=(s.dsc&&typeof s.dsc==='object')?s.dsc:{};for(const k in s.dsc){if(!SETS[k]||k==='post'||k==='cat')delete s.dsc[k];else s.dsc[k]=clamp(s.dsc[k]|0,0,6)}
+  s.adT=Number(s.adT)||0;s.lvs=(s.lvs&&typeof s.lvs==='object')?s.lvs:{};
+  if(!(s.cos.acc in ACCS))s.cos.acc='none';if(!Array.isArray(s.cos.accs))s.cos.accs=['none'];
+  if(!(s.cos.board in BOARDS))s.cos.board='wood';if(!Array.isArray(s.cos.boards))s.cos.boards=['wood'];
   s.saga=sanSaga(s.saga);s.lv=sanLv(s.lv);
   return s;
 }
@@ -127,9 +141,9 @@ function sanLv(l){
   if(!l||typeof l!=='object'||!Array.isArray(l.goals))return null;
   try{
     const o={n:clamp(l.n|0,1,80),maxMoves:clamp(l.maxMoves|0,1,400),spawned:clamp(l.spawned|0,0,9999),done:!!l.done,
-      goals:l.goals.filter(g=>g&&typeof g.k==='string').map(g=>({k:g.k,need:clamp(g.need|0,1,999),l:clamp(g.l|0,0,6)})).slice(0,4),
-      c:Object.assign({merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0},l.c||{}),
-      mech:Object.assign({},l.mech||{}),par:clamp(l.par|0,0,999),startHearts:l.startHearts|0,usedMoves:l.usedMoves|0};
+      goals:l.goals.filter(g=>g&&typeof g.k==='string').map(g=>{const q={k:g.k,need:clamp(g.need|0,1,999),l:clamp(g.l|0,0,6)};if(typeof g.s==='string'&&SETS[g.s])q.s=g.s;return q}).slice(0,4),
+      c:Object.assign({merge:0,order:0,rock:0,thaw:0,wild:0,mkA:0,mkC:0,moss:0,fog:0},l.c||{}),weekly:!!l.weekly,
+      sets:Array.isArray(l.sets)?l.sets.filter(x=>typeof x==='string'&&SETS[x]).slice(0,4):['post'],theme:typeof l.theme==='string'?l.theme.slice(0,16):'gift',mech:Object.assign({},l.mech||{}),par:clamp(l.par|0,0,999),startHearts:l.startHearts|0,usedMoves:l.usedMoves|0};
     return o.goals.length?o:null;
   }catch(e){return null}
 }
@@ -265,11 +279,57 @@ const TRACKS={
       melNote(this,s,b,t,sd,c,{dens:.5,inst:iEP,vol:.06,len:4});
     }}
 };
-const TRACK_ORDER=['auto','coffee','pati','snow','reunion'];
+TRACKS.bosph={bpm:84,name:{tr:'🌉 Boğaz Esintisi',en:'🌉 Bosphorus Breeze'},
+  ch:[[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,67]],bs:[48,45,41,43],sc:[72,74,76,79,81,84,86],m:79,
+  play(s,b,t,sd){const c=this.ch[b],r=this.bs[b];
+    if(s===0||s===8)iBass(r,t,sd*6,.2);
+    if(s===0||s===8)kick(t,.38);if(s===4||s===12)snare(t,.07);
+    if(s%2===0)iPluck(c[[0,1,2,3,2,1,3,2][(s/2)%8]%c.length]+12,t,sd*2.4,.04);
+    if(s%4===2)hat(t,.04);
+    melNote(this,s,b,t,sd,c,{dens:.4,inst:iBell,vol:.05,len:4});}};
+TRACKS.forest={bpm:62,name:{tr:'🌲 Çam Ormanı',en:'🌲 Pine Forest'},
+  ch:[[57,60,64],[53,57,60],[60,64,67],[55,59,62]],bs:[45,41,48,43],sc:[69,71,72,74,76,79,81],m:74,
+  play(s,b,t,sd){const c=this.ch[b];
+    if(s===0){iPad(c,t,sd*15,.028);iBass(this.bs[b],t,sd*12,.16)}
+    if(s%4===0)iPluck(c[(s/4)%c.length]+12,t,sd*4,.035);
+    if(s===8)kick(t,.12);
+    melNote(this,s,b,t,sd,c,{dens:.28,inst:iPluck,vol:.05,len:5});}};
+TRACKS.steppe={bpm:70,name:{tr:'🌾 Bozkır Rüzgârı',en:'🌾 Steppe Wind'},
+  ch:[[62,65,69],[60,64,67],[58,62,65],[60,64,67]],bs:[38,36,34,36],sc:[69,72,74,76,77,81,84],m:76,
+  play(s,b,t,sd){const c=this.ch[b];
+    if(s===0){iPad(c,t,sd*15,.03);iBass(this.bs[b],t,sd*14,.2);kick(t,.25)}
+    if(s===8)kick(t,.15);if(s===12)snare(t,.05);
+    if(s%4===0)iBell(c[(s/4)%c.length]+12,t,sd*6,.04);
+    melNote(this,s,b,t,sd,c,{dens:.32,inst:iEP,vol:.05,len:6});}};
+TRACKS.cappa={bpm:90,name:{tr:'🎈 Balon Yolculuğu',en:'🎈 Balloon Ride'},
+  ch:[[62,66,69,73],[59,62,66,71],[55,59,62,67],[57,61,64,69]],bs:[50,47,43,45],sc:[74,76,78,81,83,86,88],m:81,
+  play(s,b,t,sd){const c=this.ch[b],r=this.bs[b];
+    if(s===0||s===8)iBass(r,t,sd*5,.2);if(s===0||s===8)kick(t,.34);if(s===4||s===12)snare(t,.06);
+    if(s%2===0)iBell(c[[0,1,2,3,2,1,3,1][(s/2)%8]%c.length]+12,t,sd*3,.04);
+    if(s%4===2)hat(t,.04);
+    melNote(this,s,b,t,sd,c,{dens:.5,inst:iPluck,vol:.05,len:2.4});}};
+TRACKS.sea={bpm:78,name:{tr:'🌊 Akdeniz Dalgası',en:'🌊 Mediterranean Wave'},
+  ch:[[60,64,67],[65,69,72],[67,71,74],[57,60,64]],bs:[48,41,43,45],sc:[72,74,76,79,81,84],m:76,
+  play(s,b,t,sd){const c=this.ch[b],r=this.bs[b];
+    const sw=(s%4===2)?sd*.2:0;
+    if(s===0)iBass(r,t,sd*10,.2);if(s===0||s===10)kick(t,.3);
+    if(s%2===0)iEP(c[[0,1,2,1,2,1,0,1][(s/2)%8]%c.length]+12,t+sw,sd*3,.04);
+    if(s===0||s===8)iPad(c,t,sd*8,.02);
+    if(s%4===2)hat(t+sw,.035);
+    melNote(this,s,b,t+sw,sd,c,{dens:.38,inst:iEP,vol:.05,len:4});}};
+TRACKS.adana={bpm:104,name:{tr:'🍢 Adana Sıcağı',en:'🍢 Adana Heat'},
+  ch:[[52,56,59],[53,57,60],[52,56,59],[57,60,64]],bs:[40,41,40,45],sc:[64,65,68,69,71,72,76,77,80,81],m:68,
+  play(s,b,t,sd){const c=this.ch[b],r=this.bs[b];
+    if(s===0||s===6||s===8)iBass(r,t,sd*3,.22);
+    if(s===0||s===8||s===10)kick(t,.4);if(s===4||s===12)snare(t,.1);
+    if(s%2===0)hat(t,s%4===0?.05:.03);
+    if(s%2===0&&Math.random()<.6)iPluck(c[[0,1,2,1][(s/2)%4]%c.length]+12,t,sd*1.6,.04);
+    melNote(this,s,b,t,sd,c,{dens:.62,inst:iPluck,vol:.06,len:1.8});}};
+const TRACK_ORDER=['auto','bosph','forest','steppe','cappa','snow','coffee','sea','adana','pati','reunion'];
 function desiredTrack(){
-  if(state.won&&state.km<=0)return 'reunion';
+  if(state.won)return 'reunion';
   const k=state.settings.track;
-  return(k==='auto'||!TRACKS[k])?CH_TRACK[curChap()]:k;
+  return(k==='auto'||!TRACKS[k])?REGION_TRACK[dirB()?7-curChap():curChap()]:k;
 }
 function startMusic(){
   if(!AC||musicTimer||!state.settings.music)return;
@@ -328,6 +388,7 @@ function sfx(n,l){
     case 'heart':tone(880,t,.12,'sine',.12);tone(1320,t+.07,.18,'sine',.1);break;
     case 'levelup':[523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>tone(f,t+i*.07,.4,'triangle',.18));break;
     case 'win':[523.25,659.25,783.99,1046.5,783.99,1046.5,1318.5,1568].forEach((f,i)=>tone(f,t+i*.2,.6,'triangle',.2));break;
+    case 'coin':tone(1175,t,.08,'square',.07);tone(1568,t+.07,.2,'square',.07);break;
     case 'energy':[659.25,880].forEach((f,i)=>tone(f,t+i*.09,.25,'sine',.17));break;
     case 'meow':meow(t,l||1);break;
   }

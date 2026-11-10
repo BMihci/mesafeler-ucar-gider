@@ -12,17 +12,31 @@ const HAT={
   flower:'<g '+st(2)+'><circle cx="40" cy="34" r="6.5" fill="#FFB3C7"/><circle cx="60" cy="27" r="7" fill="#fff"/><circle cx="80" cy="34" r="6.5" fill="#FFB3C7"/></g><path d="M48 31l4 4M72 31l-4 4" stroke="#6CC59A" stroke-width="3.4" stroke-linecap="round"/><circle cx="40" cy="34" r="2.2" fill="#FFE08A"/><circle cx="60" cy="27" r="2.4" fill="#FFE08A"/><circle cx="80" cy="34" r="2.2" fill="#FFE08A"/>',
   bow:'<g transform="translate(84 32) rotate(14)" '+st(2.2)+'><path d="M0 0L-15 -9V9Z" fill="#6EB5F2"/><path d="M0 0L15 -9V9Z" fill="#6EB5F2"/><circle r="4.5" fill="#3F8FD6"/></g>',
   catears:'<g '+st(2.4)+'><path d="M34 36L32 12L50 26Z" fill="#FF8FB0"/><path d="M86 36L88 12L70 26Z" fill="#FF8FB0"/><path d="M33 38Q60 20 87 38" fill="none" stroke-width="3.4"/></g><path d="M36 30l-1-10 8 7zM84 30l1-10-8 7z" fill="#FFD3DF"/>',
+  cap:'<g '+st(2.4)+'><path d="M38 38Q40 14 62 14Q84 16 84 38Z" fill="#FF8FB0"/><path d="M62 36H100Q104 38 100 42H62Z" fill="#E2638A"/></g><circle cx="61" cy="14" r="2.6" fill="#fff"/>',
+  sailor:'<g '+st(2.4)+'><path d="M36 38Q38 16 60 16Q82 16 84 38Z" fill="#fff"/><path d="M32 38H88" stroke-width="5"/></g><path d="M38 31H82" stroke="#3F8FD6" stroke-width="4"/>',
+  chef:'<g '+st(2.4)+'><circle cx="46" cy="20" r="11" fill="#fff"/><circle cx="60" cy="13" r="12" fill="#fff"/><circle cx="74" cy="20" r="11" fill="#fff"/><rect x="40" y="26" width="40" height="12" rx="3" fill="#fff"/></g>',
   crown:'<g '+st(2.4)+'><path d="M42 36L44 17L52 27L60 13L68 27L76 17L78 36Z" fill="#FFD76A"/></g><circle cx="60" cy="24" r="2.4" fill="#FF5D8F"/><circle cx="46" cy="30" r="1.8" fill="#6EB5F2"/><circle cx="74" cy="30" r="1.8" fill="#6EB5F2"/>'
 };
 /* Birdie: mavi saçlı beyaz kuş · Bird: kahverengi kuş */
+const ACCSVG={
+  none:'',
+  glasses:'<g fill="rgba(200,230,255,.35)" '+st(2.6)+'><circle cx="45" cy="57" r="11"/><circle cx="75" cy="57" r="11"/></g><path d="M56 56Q60 52 64 56" fill="none" '+st(2.6)+'/>',
+  phones:'<path d="M26 60Q24 16 60 16Q96 16 94 60" fill="none" stroke="#6B4A45" stroke-width="5" stroke-linecap="round"/><g '+st(2.4)+'><rect x="17" y="54" width="14" height="22" rx="6" fill="#FF8FB0"/><rect x="89" y="54" width="14" height="22" rx="6" fill="#FF8FB0"/></g>',
+  star:'<path d="M40 92Q60 104 80 92" fill="none" stroke="#E2638A" stroke-width="3.4" stroke-linecap="round"/><path d="M60 94l3.2 6.4 7 1-5 4.9 1.2 7-6.4-3.3-6.4 3.3 1.2-7-5-4.9 7-1z" fill="#FFD76A" '+st(1.8)+'/>',
+  pin:'<g transform="translate(96 86)" '+st(1.8)+'><circle cx="0" cy="-6" r="5" fill="#FFB3C7"/><circle cx="6" cy="0" r="5" fill="#FFB3C7"/><circle cx="0" cy="6" r="5" fill="#FFB3C7"/><circle cx="-6" cy="0" r="5" fill="#FFB3C7"/><circle r="3.4" fill="#FFE08A"/></g>'
+,bow:'<g transform="translate(60 99)" '+st(2)+'><path d="M0 0L-17 -9V9Z" fill="#FF6F91"/><path d="M0 0L17 -9V9Z" fill="#FF6F91"/><circle r="4.4" fill="#E2638A"/></g>',
+  halo:'<ellipse cx="60" cy="9" rx="24" ry="7" fill="none" stroke="#FFD76A" stroke-width="5.5"/><ellipse cx="60" cy="9" rx="24" ry="7" fill="none" stroke="#6B4A45" stroke-width="1.4" opacity=".5"/>',
+  sparkle:'<g fill="#FFD76A" '+st(1.6)+'><path d="M14 30l2.4 5.2 5.4 2.4-5.4 2.4L14 45l-2.4-5-5.4-2.4 5.4-2.4z"/><path d="M106 22l2 4.4 4.4 2-4.4 2-2 4.4-2-4.4-4.4-2 4.4-2z"/><path d="M100 70l1.6 3.6 3.6 1.6-3.6 1.6-1.6 3.6-1.6-3.6-3.6-1.6 3.6-1.6z"/></g>'
+};
+const accOn=()=>ACCSVG[(state&&state.cos&&state.cos.acc)||'none']||'';
 const HAIR='<g '+st(2.4)+'><path d="M22 54Q18 22 60 20Q102 22 98 54Q92 38 76 36Q66 46 56 36Q38 40 22 54Z" fill="#5BA8F0"/><path d="M22 54Q12 72 22 92Q31 80 31 62Z" fill="#5BA8F0"/><path d="M98 54Q108 72 98 92Q89 80 89 62Z" fill="#5BA8F0"/></g><path d="M36 31Q46 25 58 27" stroke="#B8DBFA" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M92 28l2.4 4.8 5.3.8-3.8 3.7.9 5.3-4.8-2.5-4.8 2.5.9-5.3-3.8-3.7 5.3-.8z" fill="#FFE08A" '+st(1.6)+'/>';
 const SCARF='<path d="M34 90Q60 106 86 90L84 99Q60 114 36 99Z" fill="#E2638A" '+st(2.2)+'/><path d="M78 96l6 14 7-4-4-12z" fill="#E2638A" '+st(2)+'/>';
 const BIRDIE={body:'#FFFFFF',wing:'#DDEAF8',belly:'#F3F8FF',acc:HAIR};
 const BIRDB={body:'#A8744F',wing:'#8B5A3A',belly:'#E8C9A0',acc:SCARF};
 const playerIsBirdie=()=>!(state&&state.saga&&state.saga.dir==='B');
 const meBird=()=>playerIsBirdie()
-  ?{body:BIRDIE.body,wing:BIRDIE.wing,belly:BIRDIE.belly,acc:HAIR+(HAT[state.cos.hat]||'')}
-  :{body:BIRDB.body,wing:BIRDB.wing,belly:BIRDB.belly,acc:SCARF+(HAT[state.cos.hat]||'')};
+  ?{body:BIRDIE.body,wing:BIRDIE.wing,belly:BIRDIE.belly,acc:HAIR+(HAT[state.cos.hat]||'')+accOn()}
+  :{body:BIRDB.body,wing:BIRDB.wing,belly:BIRDB.belly,acc:SCARF+(HAT[state.cos.hat]||'')+accOn()};
 const partnerBird=()=>playerIsBirdie()?BIRDB:BIRDIE;
 
 function birdSVG(o,mood){
@@ -64,6 +78,27 @@ const CAT_ACC={
   mail:'<path d="M38 70L88 100" stroke="#B97A4E" stroke-width="5" stroke-linecap="round"/><rect x="82" y="88" width="25" height="20" rx="5" fill="#E2B27A" '+st(2.4)+'/><path d="M84 92l10.5 8 10.5-8" fill="none" '+st(2)+'/><path d="M31 37Q60 3 89 37Q60 29 31 37Z" fill="#6EA8E8" '+st(2.6)+'/><path d="M33 37Q60 46 87 37" fill="#4F86C6" '+st(2.4)+'/><circle cx="60" cy="21" r="4.6" fill="#FFD76A" '+st(1.8)+'/>',
   lucky:'<path d="M40 76Q60 90 80 76" stroke="#E2638A" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="60" cy="87" r="5.5" fill="#FFD76A" '+st(2)+'/><g '+st(2.6)+'><ellipse cx="21" cy="70" rx="9" ry="15" fill="#FFD76A" transform="rotate(-16 21 70)"/></g><ellipse cx="19" cy="62" rx="3.6" ry="3" fill="#FFB8C6"/><g '+st(2.2)+'><ellipse cx="60" cy="99" rx="9" ry="10" fill="#FFE08A"/></g><path d="M60 93v12M56 97h8" '+st(1.6)+'/><path d="M96 22l2.4 5 5 2.4-5 2.4-2.4 5-2.4-5-5-2.4 5-2.4z" fill="#fff" stroke="#E7A92A" stroke-width="1.5"/>'
 };
+Object.assign(CAT_ACC,{
+  galata:'<g '+st(2)+'><rect x="48" y="2" width="24" height="22" fill="#F2D2B8"/><path d="M45 4L60 -12L75 4Z" fill="#E58E8E"/></g>',
+  pinehat:'<g '+st(2)+' fill="#6CC59A"><path d="M60 -6L46 14H74Z"/><path d="M60 4L42 24H78Z"/></g>',
+  wheat:'<g stroke="#C9973F" stroke-width="3" fill="none" stroke-linecap="round"><path d="M48 24Q52 8 50 -2M60 22V-4M72 24Q68 8 70 -2"/></g><g fill="#E6C27A"><ellipse cx="50" cy="2" rx="3" ry="6"/><ellipse cx="60" cy="-2" rx="3" ry="6"/><ellipse cx="70" cy="2" rx="3" ry="6"/></g>',
+  balloonhat:'<g '+st(1.8)+'><ellipse cx="60" cy="-4" rx="14" ry="16" fill="#FF8FB0"/><path d="M54 10L56 22M66 10L64 22" /><rect x="54" y="22" width="12" height="6" rx="2" fill="#E8B98A"/></g>',
+  snowhat:'<g '+st(2.2)+'><path d="M40 24Q44 2 60 2Q76 2 80 24Z" fill="#8EC9F2"/><rect x="38" y="20" width="44" height="8" rx="4" fill="#fff"/><circle cx="60" cy="0" r="6" fill="#fff"/></g>',
+  cotton:'<g '+st(1.8)+' fill="#fff"><circle cx="50" cy="20" r="8"/><circle cx="62" cy="14" r="9"/><circle cx="72" cy="22" r="7"/></g>',
+  sailor:'<g '+st(2.2)+'><path d="M42 22Q46 4 60 4Q74 4 78 22Z" fill="#fff"/><rect x="40" y="18" width="40" height="7" rx="3" fill="#3F8FD6"/></g>',
+  kebab:'<g '+st(2)+'><circle cx="48" cy="16" r="9" fill="#fff"/><circle cx="60" cy="9" r="10" fill="#fff"/><circle cx="72" cy="16" r="9" fill="#fff"/><rect x="42" y="20" width="36" height="9" rx="3" fill="#fff"/></g>'
+});
+/* bölge kedileri: [rota bölge indeksi] */
+const REGION_CATS=[
+  {n:['Simit','Simit'],o:{fur:'#FFF0DC',belly:'#FFFFFF',ear:'#FFB8C6',eye:'#4A3434',acc:'galata'}},
+  {n:['Çam','Pine'],o:{fur:'#C9D6B8',dark:'#8FA479',belly:'#F2F7E8',stripes:true,eye:'#3D7A4A',acc:'pinehat'}},
+  {n:['Bozkır','Steppe'],o:{fur:'#EBD39B',dark:'#C9A25B',belly:'#FFF3D6',stripes:true,eye:'#7A4A2B',acc:'wheat'}},
+  {n:['Peri','Peri'],o:{fur:'#F5B79B',dark:'#D98A6A',belly:'#FFE6D8',eye:'#4A3434',acc:'balloonhat'}},
+  {n:['Pamuk Kar','Snowy'],o:{fur:'#EEF4FB',dark:'#B7C9DD',belly:'#FFFFFF',points:true,eye:'#3D86DA',acc:'snowhat'}},
+  {n:['Pamuk','Cotton'],o:{fur:'#FFFFFF',belly:'#FFF7EC',ear:'#FFC9D6',eye:'#4A3434',acc:'cotton'}},
+  {n:['Dalga','Wave'],o:{fur:'#9EDCE4',dark:'#5BB8C4',belly:'#E4F8FA',stripes:true,eye:'#2E6F8A',acc:'sailor'}},
+  {n:['Kebap','Kebab'],o:{fur:'#D9884A',dark:'#A85A25',belly:'#FFE3C2',stripes:true,eye:'#4A3434',acc:'kebab'}}
+];
 function catSVG(o,mood,accOv){
   mood=mood||'idle';
   const fur=o.fur,belly=o.belly||'#FFF6EA',dark=o.dark||fur,ear=o.ear||'#FFB8C6',eye=o.eye||'#4A3434';
@@ -126,11 +161,38 @@ const ICON_A=[null,
 const ICON_BOX='<g '+st(2.4)+'><rect x="10" y="28" width="44" height="28" rx="5" fill="#FFB3C7"/><rect x="7" y="19" width="50" height="13" rx="5" fill="#FF8FB0"/><rect x="28" y="19" width="8" height="37" fill="#FFE08A"/><path d="M32 19Q20 4 15 12T32 19Q44 4 49 12T32 19Z" fill="#FFE08A"/></g><path d="M12 7l1.5 3 3 1.5-3 1.5L12 16l-1.5-3L7.5 11.5l3-1.5z" fill="#fff" stroke="#F2B01E" stroke-width="1.2"/>';
 const ICON_ROCK=h=>'<g '+st(2.6)+'><path d="M8 50Q4 30 18 20Q28 8 44 14Q60 20 57 40Q58 56 44 56H16Q10 56 8 50Z" fill="'+(h>1?'#9A918A':'#BDB3AA')+'"/></g><path d="M22 24Q30 20 38 22" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/>'+(h>1?'<path d="M18 40l8-6 6 8 8-6" stroke="'+INK+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>':'<path d="M30 30l5 8-4 6" stroke="'+INK+'" stroke-opacity=".5" stroke-width="2.2" fill="none" stroke-linecap="round"/>');
 const ICON_BALLOON='<g '+st(2.4)+'><path d="M32 4C16 4 10 16 12 26C14 36 24 42 26 44H38C40 42 50 36 52 26C54 16 48 4 32 4Z" fill="#FF8FB0"/><path d="M32 4C24 12 24 36 28 44M32 4C40 12 40 36 36 44" fill="none"/><rect x="26" y="52" width="12" height="8" rx="2" fill="#E8B98A"/></g><path d="M27 44L28 52M37 44L36 52" '+st(2)+'/><path d="M20 10Q24 8 28 9" stroke="#fff" stroke-opacity=".7" stroke-width="3" fill="none" stroke-linecap="round"/>';
-function itemIcon(t,l){
+const ICON_MOSS='<g '+st(2.6)+'><path d="M8 48Q4 30 16 22Q22 8 36 14Q50 12 54 28Q62 40 52 50Q40 58 20 54Q10 54 8 48Z" fill="#7BC96B"/></g><path d="M22 30q6-6 10 0M36 40q6-6 10 0M20 44q5-5 9 0" stroke="#4A8F45" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="44" cy="26" r="3" fill="#FFB3C7"/>';
+/* ---- eşya zincirleri (setler) ---- */
+const EMO_FONT='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+const SETS={
+  post:{c:'#FFD3DF',n:['Postane','Post Office']},
+  flower:{c:'#FFE0EC',n:['Çiçekler','Flowers'],it:[['🌱','Filiz','Sprout'],['🌷','Lale','Tulip'],['🌼','Papatya','Daisy'],['🌹','Gül','Rose'],['💐','Buket','Bouquet'],['🌸','Kiraz Çiçeği','Cherry Blossom']]},
+  sweet:{c:'#FFE6C7',n:['Tatlılar','Sweets'],it:[['🍬','Şeker','Candy'],['🍪','Kurabiye','Cookie'],['🧁','Cupcake','Cupcake'],['🍰','Pasta Dilimi','Cake Slice'],['🎂','Doğum Günü Pastası','Birthday Cake'],['🎉','Kutlama','Party']]},
+  coffee:{c:'#F3DDC8',n:['Kahvaltı','Breakfast'],it:[['🥛','Süt','Milk'],['☕','Kahve','Coffee'],['🥐','Kruvasan','Croissant'],['🥞','Pankek','Pancakes'],['🍳','Yumurta Tabağı','Egg Plate'],['🍽️','Kahvaltı Sofrası','Breakfast Table']]},
+  sea:{c:'#D3EEFF',n:['Deniz Canlıları','Sea Life'],it:[['🐚','Deniz Kabuğu','Seashell'],['🦀','Yengeç','Crab'],['🐠','Balık','Fish'],['🐬','Yunus','Dolphin'],['🐳','Balina','Whale'],['🏝️','Ada','Island']]},
+  beach:{c:'#FFF0B8',n:['Plaj','Beach'],it:[['🩴','Terlik','Flip-flop'],['🕶️','Güneş Gözlüğü','Sunglasses'],['🏐','Plaj Topu','Beach Ball'],['🍉','Karpuz','Watermelon'],['🍹','Kokteyl','Cocktail'],['🏖️','Plaj Keyfi','Beach Day']]},
+  camp:{c:'#DDF1D2',n:['Kamp','Camping'],it:[['🌰','Kestane','Chestnut'],['🍄','Mantar','Mushroom'],['🌲','Çam','Pine'],['⛺','Çadır','Tent'],['🔥','Kamp Ateşi','Campfire'],['🏕️','Kamp Alanı','Campsite']]},
+  bird:{c:'#FFF3C7',n:['Kuşlar','Birds'],it:[['🥚','Yumurta','Egg'],['🐣','Civciv','Chick'],['🐥','Yavru Kuş','Baby Bird'],['🐦','Kuş','Bird'],['🕊️','Güvercin','Dove'],['🦢','Kuğu','Swan']]},
+  winter:{c:'#E3F0FF',n:['Kış','Winter'],it:[['❄️','Kar Tanesi','Snowflake'],['🧤','Eldiven','Mittens'],['🧣','Atkı','Scarf'],['☃️','Kardan Adam','Snowman'],['🎿','Kayak','Ski'],['🏔️','Zirve','Summit']]},
+  travel:{c:'#E7E2FF',n:['Yolculuk','Journey'],it:[['🎒','Sırt Çantası','Backpack'],['🗺️','Harita','Map'],['🧭','Pusula','Compass'],['🚌','Otobüs','Bus'],['🚂','Tren','Train'],['✈️','Uçak','Plane']]},
+  fruit:{c:'#FFE3C2',n:['Meyveler','Fruits'],it:[['🍋','Limon','Lemon'],['🍊','Portakal','Orange'],['🍎','Elma','Apple'],['🍇','Üzüm','Grapes'],['🍑','Şeftali','Peach'],['🧃','Meyve Suyu','Juice']]},
+  kitchen:{c:'#FFD9CF',n:['Adana Sofrası','Adana Table'],it:[['🌶️','Biber','Pepper'],['🍅','Domates','Tomato'],['🥙','Dürüm','Wrap'],['🍢','Şiş','Skewer'],['🍖','Kebap','Kebab'],['🍲','Güveç','Stew']]},
+  catfood:{c:'#D9F0E4',n:['Kedi Mamaları','Cat Food'],it:[['🐟','Balık','Fish'],['🥫','Mama','Cat Food'],['🍤','Karides','Shrimp'],['🍗','Tavuk','Chicken'],['🥩','Biftek','Steak'],['🍱','Kedi Ziyafeti','Cat Feast']]},
+  cattoy:{c:'#EBDDFB',n:['Kedi Oyuncakları','Cat Toys'],it:[['🧶','Yumak','Yarn'],['🎾','Top','Ball'],['🐭','Fare Oyuncağı','Toy Mouse'],['🎀','Kurdele','Ribbon'],['🛏️','Kedi Yatağı','Cat Bed'],['🏠','Kedi Evi','Cat House']]},
+  cat:{c:'#FFE0EC',n:['Kediler','Cats']}
+};
+const setOf=c=>(c&&c.s&&SETS[c.s])?c.s:'post';
+function emoIcon(s,l){
+  const it=SETS[s].it[l-1],ring=l>=5?'#FFC94D':INK;
+  return wrapIco('<circle cx="32" cy="33" r="27" fill="'+SETS[s].c+'" stroke="'+ring+'" stroke-width="'+(l>=5?3.4:2.4)+'"/><path d="M13 26Q18 11 35 8" stroke="#fff" stroke-opacity=".85" stroke-width="3.4" fill="none" stroke-linecap="round"/><text x="32" y="46.5" text-anchor="middle" font-size="37" font-family=\''+EMO_FONT.replace(/"/g,'')+'\'>'+it[0]+'</text>'+(l>=5?'<path d="M51 8l1.8 4 4 1.8-4 1.8L51 20l-1.8-4.4-4-1.8 4-1.8z" fill="#FFC94D" stroke="'+INK+'" stroke-width="1.4"/>':''));
+}
+function itemIcon(t,l,s){
+  if(t==='m')return wrapIco(ICON_MOSS);
   if(t==='x')return wrapIco(ICON_BOX);
   if(t==='r')return wrapIco(ICON_ROCK(l));
   if(t==='w')return wrapIco(ICON_BALLOON);
   if(t==='c')return catSVG(CATS[l]).replace('<svg ','<svg class="ico cat" ');
+  if(s&&s!=='post'&&SETS[s]&&SETS[s].it)return emoIcon(s,l);
   return wrapIco(ICON_A[l]);
 }
 
@@ -144,7 +206,7 @@ const C_DESC=[null,
   ['Kulakları ve patileri çikolata gibi.','Ears and paws like chocolate.'],
   ['Postacı! Takım elbisesiyle kargo dağıtır.','The courier! Delivers parcels in a tux.'],
   ['Şans getirir; pati kaldırınca kalpler uçar.','Brings luck; hearts fly when its paw goes up.']];
-const itemName=(t,l)=>t==='x'?T('Sürpriz Kutusu','Surprise Box'):t==='w'?T('Balon Jokeri','Balloon Joker'):t==='r'?T('Taş','Rock'):(t==='c'?T(C_NAMES[l][0],C_NAMES[l][1]):T(A_NAMES[l][0],A_NAMES[l][1]));
+const itemName=(t,l,s)=>t==='x'?T('Sürpriz Kutusu','Surprise Box'):t==='m'?T('Yosun','Moss'):t==='w'?T('Balon Jokeri','Balloon Joker'):t==='r'?T('Taş','Rock'):(t==='c'?T(C_NAMES[l][0],C_NAMES[l][1]):(s&&s!=='post'&&SETS[s]&&SETS[s].it?T(SETS[s].it[l-1][1],SETS[s].it[l-1][2]):T(A_NAMES[l][0],A_NAMES[l][1])));
 const catName=l=>T(C_NAMES[l][0],C_NAMES[l][1]);
 const HAT_NAMES={none:['Şapkasız','No hat'],beanie:['Bere','Beanie'],flower:['Çiçek Tacı','Flower Crown'],bow:['Fiyonk','Bow'],catears:['Kedi Kulağı','Cat Ears'],crown:['Taç','Crown']};
 const THEME_NAMES={pink:['Şeker Pembe','Candy Pink'],autumn:['Sonbahar Kafesi','Autumn Café'],snow:['Karlı Pencere','Snowy Window']};
@@ -198,10 +260,11 @@ const STORY={
     {bg:'sunset',wide:true,chars:[{k:'me',x:10,y:8,w:24,mood:'happy'},{k:'c5',x:62,y:6,w:20,mood:'happy',acc:'mail'}],bub:[{txt:T('80 seviye, 8 şehir… Her seviye seni biraz daha yaklaştırsın! 💌','80 levels, 8 cities… every level brings me closer! 💌'),x:8,y:8},{txt:T('Kargo yola çıkıyor! 🐾','Parcel on its way! 🐾'),x:58,y:14,r:1}],cap:T('Yolculuk başlıyor','The journey begins')}
   ],
   beat:k=>{
-    const c=2*k-1,city=rc(c+1),pct=Math.round((c+1)*10/80*100),left=Math.round(KM_TOTAL*(1-(c+1)*10/80));
+    const city=rc(k),pct=Math.round(k*10/80*100),left=Math.round(KM_TOTAL*(1-k*10/80));
+    const bgs=['morning','road','sunset','sunset','snowroad','train','road','doorstep'][routeIdx(k)];
     return[
-      {bg:k===3?'snowroad':'train',chars:[{k:'c5',x:30,y:4,w:42,mood:'happy',acc:'mail'}],bub:[{txt:T(`${city}’a geldik! ${blurbAt(c+1)}`,`We reached ${city}! ${blurbAt(c+1)}`),x:4,y:4}],cap:city},
-      {bg:k===4?'doorstep':'snowroom',chars:[{k:'you',x:8,y:8,w:40,mood:'happy'},{k:'c1',x:58,y:4,w:30,mood:'happy'}],bub:[{txt:T(`Yolun %${pct}’i tamam! Aramızda ${left} km kaldı 💕`,`${pct}% of the road done! ${left} km left between us 💕`),x:4,y:6}],cap:rc(7)}
+      {bg:bgs,chars:[{k:'c5',x:30,y:4,w:42,mood:'happy',acc:'mail'}],bub:[{txt:T(`${city}’a geldik! ${blurbAt(k)}`,`We reached ${city}! ${blurbAt(k)}`),x:4,y:4}],cap:city},
+      {bg:k>=6?'doorstep':'snowroom',chars:[{k:'you',x:8,y:8,w:40,mood:'happy'},{k:'c1',x:58,y:4,w:30,mood:'happy'}],bub:[{txt:T(`Yolun %${pct}’i tamam! Aramızda ${left} km kaldı 💕`,`${pct}% of the road done! ${left} km left between us 💕`),x:4,y:6}],cap:rc(7)}
     ];
   },
   fin:()=>[
@@ -210,12 +273,15 @@ const STORY={
     {bg:'sunset',wide:true,chars:[{k:'c1',x:4,y:6,w:15,mood:'love'},{k:'me',x:28,y:6,w:22,mood:'love'},{k:'you',x:48,y:6,w:22,mood:'love'},{k:'c5',x:76,y:6,w:15,mood:'love',acc:'mail'}],bub:[{txt:T('Artık 0 km! Hoş geldin aşkım 💕','Zero km now! Welcome home, love 💕'),x:26,y:6}],cap:rc(7)+' · '+T('Kavuşma','Reunion')}
   ]
 };
-STORY[1]=()=>STORY.beat(1);STORY[2]=()=>STORY.beat(2);STORY[3]=()=>STORY.beat(3);STORY[4]=()=>STORY.beat(4);
+for(let k=1;k<=7;k++)STORY[k]=()=>STORY.beat(k);
 const LETTERS={
   intro:()=>T(`Sevgilim ${ME()},\naramızda koca bir yol var ama gönderdiğin her paket kalbime biraz daha yaklaşıyor.\n— ${YOU()}`,`Dear ${ME()},\nthere's a long road between us, but every parcel you send brings you a little closer to my heart.\n— ${YOU()}`),
-  1:()=>T(`${rc(2)} yakınlarındasın diye duydum! Sıcak kahve elimde, buharı yüzüme değiyor ve seni düşünüyorum ☕\n— ${YOU()}`,`I heard you're near ${rc(2)}! Hot coffee in my hands, steam on my face, and I'm thinking of you ☕\n— ${YOU()}`),
-  2:()=>T(`Yumak yünleri karıştırdı ama atkının yarısı bitti! ${rc(4)} yolunda üşüme diye örüyorum.\n— ${YOU()}`,`Fluff tangled the yarn, but half the scarf is done! I'm knitting it so you won't be cold on the way to ${rc(4)}.\n— ${YOU()}`),
-  3:()=>T(`Bu gece gökyüzü ne kadar güzel. Hâlâ aynı aya bakıyoruz, değil mi? ${rc(6)}’yı geçince bana yaz.\n— ${YOU()}`,`The sky is so beautiful tonight. We're still looking at the same moon, right? Write to me once you pass ${rc(6)}.\n— ${YOU()}`),
-  4:()=>T(`Camın önünden ayrılamıyorum. Her kapı sesinde sen geliyorsun sanıyorum. Çok az kaldı!\n— ${YOU()}`,`I can't leave the window. Every sound at the door feels like you. So close now!\n— ${YOU()}`),
+  1:()=>T(`${rc(1)} yolundasın! Boğaz’dan sıcak bir çay gönderiyorum, buharı yüzüne değsin ☕\n— ${YOU()}`,`You're on your way to ${rc(1)}! Sending a hot tea so the steam warms your face ☕\n— ${YOU()}`),
+  2:()=>T(`${rc(2)} nasıl? Yumak yünleri karıştırdı ama atkının yarısı bitti, ${rc(4)} yolunda üşüme diye örüyorum.\n— ${YOU()}`,`How is ${rc(2)}? Fluff tangled the yarn, but half the scarf is done. I'm knitting it so you won't be cold near ${rc(4)}.\n— ${YOU()}`),
+  3:()=>T(`${rc(3)} üstünde balonlar uçuyormuş. Birinde ben olsam, sana el sallarım 🎈\n— ${YOU()}`,`I hear balloons are flying over ${rc(3)}. If I were in one, I'd wave at you 🎈\n— ${YOU()}`),
+  4:()=>T(`Yolun yarısı! ${rc(4)} dağlarında kar varsa bile içim sıcacık. Hâlâ aynı aya bakıyoruz, değil mi?\n— ${YOU()}`,`Halfway there! Even if there's snow around ${rc(4)}, I feel so warm. We're still looking at the same moon, right?\n— ${YOU()}`),
+  5:()=>T(`${rc(5)} ovasından geçtiğini düşünüyorum. Pamuk gibi yumuşak bir sarılma bekliyor seni ☁️\n— ${YOU()}`,`I imagine you crossing the plains of ${rc(5)}. A hug soft as cotton is waiting for you ☁️\n— ${YOU()}`),
+  6:()=>T(`${rc(6)} yakınlarında deniz kokusu varmış. Bir avuç tuzlu rüzgâr gönder bana 🌊\n— ${YOU()}`,`They say you can smell the sea near ${rc(6)}. Send me a handful of salty wind 🌊\n— ${YOU()}`),
+  7:()=>T(`Camın önünden ayrılamıyorum. Her kapı sesinde sen geliyorsun sanıyorum. ${rc(7)} çok yakın, çok az kaldı!\n— ${YOU()}`,`I can't leave the window. Every sound at the door feels like you. ${rc(7)} is so close now!\n— ${YOU()}`),
   fin:()=>T(`Geldin! Artık mektuba da pakete de gerek yok… ama yine de birbirimize hediye göndermeye devam edelim, olur mu? 💕\n— ${YOU()}`,`You're here! We don't need letters or parcels anymore… but let's keep sending each other gifts anyway, okay? 💕\n— ${YOU()}`)
 };

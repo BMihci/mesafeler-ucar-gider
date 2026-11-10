@@ -125,10 +125,10 @@ function renderAch(b){
   ACH.forEach(a=>{const got=!!state.ach[a.id];h+='<div class="lrow'+(got?'':' lock2')+'"><div class="li">'+(got?'🏆':'🔒')+'</div><div class="lt">'+a.n()+'<small>'+a.d()+' · +'+a.h+'❤</small></div></div>'});
   b.innerHTML=h;
 }
-function letterTitle(id){return id==='intro'?T('İlk Mektup','First Letter'):id==='fin'?T('Kavuşma Mektubu','Reunion Letter'):(cities()[+id]||'')+' · '+T('Mektup','Letter')}
+function letterTitle(id){return id==='intro'?T('İlk Mektup','First Letter'):id==='fin'?T('Kavuşma Mektubu','Reunion Letter'):(rc(+id)||'')+' · '+T('Mektup','Letter')}
 function renderLetters(b){
   let h='<div class="sec">'+T('Mektuplar','Letters')+'</div>';
-  ['intro','1','2','3','4','fin'].forEach(id=>{
+  ['intro','1','2','3','4','5','6','7','fin'].forEach(id=>{
     const got=state.letters.includes(id);
     h+='<div class="lrow'+(got?'':' lock2')+'"'+(got?' data-act="letter:'+id+'" style="cursor:pointer"':'')+'><div class="li">'+(got?'💌':'🔒')+'</div><div class="lt">'+(got?letterTitle(id):'???')+'<small>'+(got?T('Okumak için dokun','Tap to read'):T('Yolda ilerledikçe açılır','Unlocks as you travel'))+'</small></div></div>';
   });
@@ -150,8 +150,9 @@ function renderCats(b){
     const got=l<=m;
     h+='<div class="lrow'+(got?'':' lock2')+'"><div class="li" style="background:#fff">'+(got?catSVG(CATS[l],'idle'):catSVG(CATS[l],'sleep'))+'</div><div class="lt">'+(got?catName(l):'???')+'<small>'+(got?T(C_DESC[l][0],C_DESC[l][1]):T('Kedileri birleştirerek bul','Find it by merging cats'))+'</small></div></div>';
   }
+  h+=regionCatGrid();
   b.innerHTML=h;
-  b.querySelectorAll('.lock2 .li svg').forEach(s=>s.style.filter='brightness(0) opacity(.35)');
+  b.querySelectorAll('.lock2 .li svg, .lock2 .rcs svg').forEach(s=>s.style.filter='brightness(0) opacity(.35)');
 }
 
 /* ---------- partner hediyesi (sunucusuz, kod ile) ---------- */
@@ -165,7 +166,7 @@ function decodeGift(code){
   try{const p=JSON.parse(b64d(m[1]));if(!p||p.v!==1||!p.id||(p.t!=='a'&&p.t!=='c')||!(p.l>=1&&p.l<=6))return null;return p}catch(e){return null}
 }
 function boardGiftOptions(){
-  const m={};state.board.forEach(c=>{if(c&&!c.k&&c.t!=='x'){const k=c.t+c.l;m[k]=(m[k]||0)+1}});
+  const m={};state.board.forEach(c=>{if(c&&!c.k&&(c.t==='c'||(c.t==='a'&&!c.s))){const k=c.t+c.l;m[k]=(m[k]||0)+1}});
   return Object.keys(m).map(k=>({t:k[0],l:+k[1],n:m[k]}));
 }
 function renderPartner(b){
@@ -234,67 +235,6 @@ $('#bookBody').addEventListener('click',e=>{
 $('#btnBook').addEventListener('click',()=>{sfx('tap');openBook()});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-close="mBook"]');if(b)updateBookDot()});
 
-/* ---------- dükkan ---------- */
-let shopTab='up';
-const UP_META={
-  blanket:{ico:'🧶',n:()=>T('Sıcak Battaniye','Cozy Blanket'),d:()=>T('Her seviyede +'+BAL.energyPerBlanket+' hamle','+'+BAL.energyPerBlanket+' moves every level')},
-  post:{ico:'📮',n:()=>T('Postane Güvercini','Post Office Pigeon'),d:()=>T('Her siparişte +1 ekstra hamle','+1 extra move per order')},
-  nest:{ico:'🪺',n:()=>T('Büyük Yuva','Bigger Nest'),d:()=>T('Yuvadan %'+(BAL.nestL2*100)+' ihtimalle Fotoğraf','+'+(BAL.nestL2*100)+'% chance of a Photo')}
-};
-function renderShop(){
-  $('#shopTabs').innerHTML=[['up','⬆️'],['cos','🎀']].map(([k,i])=>'<button data-tab="'+k+'" class="'+(k===shopTab?'on':'')+'">'+i+'</button>').join('');
-  let h='';
-  if(shopTab==='up'){
-    h+='<div class="sec">'+T('Yükseltmeler','Upgrades')+'</div>';
-    for(const k in UPS){
-      const u=UPS[k],lv=state.up[k],m=UP_META[k];
-      h+='<div class="lrow"><div class="li">'+m.ico+'</div><div class="lt">'+m.n()+'<small>'+m.d()+' · '+T('Seviye ','Lv ')+lv+'/'+u.max+'</small></div>'+(lv>=u.max?'<span class="chip on">MAX</span>':'<button class="btn sm" data-act="up:'+k+'">'+u.cost[lv]+' ❤</button>')+'</div>';
-    }
-    h+='<div class="sec">'+T('Hamle','Moves')+'</div><div class="lrow"><div class="li">🌻</div><div class="lt">+'+BAL.buyEnergyAmt+' '+T('hamle','moves')+'<small>'+T('Hemen kullan','Use right away')+'</small></div><button class="btn sm" data-act="energy">'+BAL.buyEnergyCost+' ❤</button></div>';
-  }else{
-    h+='<div class="sec">'+T('Bird’e Şapkalar','Hats for Bird')+'</div>';
-    for(const k in HATS){
-      const own=state.cos.hats.includes(k),on=state.cos.hat===k;
-      h+='<div class="lrow"><div class="li" style="background:#fff">'+birdSVG({body:'#FFE08A',wing:'#FFCD5E',belly:'#FFF4CB',acc:HAT[k]},'idle')+'</div><div class="lt">'+T(HAT_NAMES[k][0],HAT_NAMES[k][1])+'</div>'+(on?'<span class="chip on">✔</span>':'<button class="btn sm'+(own?' soft':'')+'" data-act="hat:'+k+'">'+(own?T('Tak','Wear'):HATS[k]+' ❤')+'</button>')+'</div>';
-    }
-  }
-  $('#shopBody').innerHTML=h;$('#shopHearts').textContent=state.hearts;
-}
-function buyUp(k){
-  const u=UPS[k],lv=state.up[k];if(lv>=u.max)return;
-  const c=u.cost[lv];if(state.hearts<c){sfx('err');toast(T('Yeterli ❤ yok','Not enough ❤'));return}
-  state.hearts-=c;state.up[k]++;sfx('levelup');toast(UP_META[k].n()+' ✔');
-  tickEnergy();renderHUD();renderShop();saveSoon();
-}
-function buyEnergy(){
-  if(state.settings.unlimited)return;
-  if(state.energy>=energyMax()+BAL.energyOverfill){toast(T('Hamlen zaten çok dolu 🌻','You already have plenty of moves 🌻'));return}
-  if(state.hearts<BAL.buyEnergyCost){sfx('err');toast(T('Hamle için '+BAL.buyEnergyCost+' ❤ gerek','Moves cost '+BAL.buyEnergyCost+' ❤'));return}
-  state.hearts-=BAL.buyEnergyCost;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+BAL.buyEnergyAmt);
-  sfx('energy');renderHUD();if($('#mShop').classList.contains('open'))renderShop();saveSoon();toast('+'+BAL.buyEnergyAmt+' 🌻');
-}
-function useHat(k){
-  if(!state.cos.hats.includes(k)){
-    if(state.hearts<HATS[k]){sfx('err');toast(T('Yeterli ❤ yok','Not enough ❤'));return}
-    state.hearts-=HATS[k];state.cos.hats.push(k);
-  }
-  state.cos.hat=k;sfx('levelup');renderArt();renderHUD();renderShop();saveSoon();
-}
-function useThemeOld(k){
-  if(!state.cos.themes.includes(k)){
-    if(state.hearts<THEMES[k]){sfx('err');toast(T('Yeterli ❤ yok','Not enough ❤'));return}
-    state.hearts-=THEMES[k];state.cos.themes.push(k);
-  }
-  state.cos.theme=k;sfx('levelup');applyTheme();renderHUD();renderShop();saveSoon();
-}
-$('#shopTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;shopTab=b.dataset.tab;sfx('tap');renderShop()});
-$('#shopBody').addEventListener('click',e=>{
-  const b=e.target.closest('[data-act]');if(!b)return;
-  const [a,x]=b.dataset.act.split(':');
-  if(a==='up')buyUp(x);else if(a==='energy')buyEnergy();else if(a==='hat')useHat(x);
-});
-$('#btnShop').addEventListener('click',()=>{sfx('tap');showModal('mShop',renderShop)});
-$('#buyEnergy').addEventListener('click',buyEnergy);
 $('#nest').addEventListener('click',spawn);
 $('#kitBtn').addEventListener('click',takeKitten);
 
@@ -425,9 +365,9 @@ function bootState(st){
   state.settings.names.you=cleanName(state.settings.names.you)||'Birdie';
   if(!state.order||state.order.done||(state.order.rush&&state.order.rush<Date.now()))state.order=makeOrder(false);
   sel=null;fxMap={};lastCode='';giftSel=null;lastHearts=-1;
-  tickEnergy();tickKit();ensureQuests();
+  tickEnergy();tickKit();ensureQuests();tickLives();
   shownKm=state.km;
-  applyTheme();renderArt();renderAll();updateKm(false);syncSettings();
+  applyTheme();applyBoardSkin();renderStats();renderJokers();renderArt();renderAll();updateKm(false);syncSettings();
   if(AC)applyTrack();
 }
 function slotInfo(n){
@@ -467,7 +407,7 @@ function startGame(){
       if(!state.tut.done)showTut();else maybeDaily();return;
     }
     if(state.saga.done){openMap();return}
-    startLevel(Math.min(80,state.saga.n));
+    tryStart(Math.min(80,state.saga.n));
   },500);
 }
 function goMenu(){
@@ -537,7 +477,8 @@ function init(){
   setInterval(()=>{if(document.hidden||mCur||!started)return;say(rnd(IDLE)())},13000);
   roamStart();
   showTitle();
-  window.__PK={startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
+  if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+  window.__PK={birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},set giftMsg(v){giftMsgVal=v},get lastCode(){return lastCode}};
 }
 init();
 })();

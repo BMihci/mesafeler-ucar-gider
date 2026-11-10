@@ -11,6 +11,7 @@
     <button class="ibtn" id="btnSettings" aria-label="Ayarlar">⚙️</button>
   </header>
 
+  <div class="colL">
   <section class="panel distance">
     <div class="d-top"><span id="cityA">📍 İstanbul</span><span class="km"><span id="kmText">1000 km</span> <small data-en="to go">kaldı</small></span><span id="cityB">Erzurum 📍</span></div>
     <div class="track" id="track">
@@ -22,7 +23,7 @@
   </section>
 
   <section class="panel lvcard" id="lvCard">
-    <div class="lv-top"><div class="lv-t" id="lvTitle"></div><button class="mapbtn" id="btnMap" aria-label="Harita">🗺️</button></div>
+    <div class="lv-top"><div class="lv-t" id="lvTitle"></div><button class="stat" id="stLives" aria-label="Can">🐥 3</button><button class="stat" id="stCoins" aria-label="Altın">🪙 0</button><button class="mapbtn" id="btnMap" aria-label="Harita">🗺️</button></div>
     <div class="goals" id="goals"></div>
   </section>
 
@@ -56,11 +57,15 @@
     </div>
   </section>
 
+  </div>
+  <div class="colR">
   <section class="boardWrap"><div class="boardBox" id="boardBox">
     <div class="bcat" id="bcat" aria-label="Kedi"></div>
     <div class="bcat2" id="bcat2" aria-label="Kedi"></div>
     <div class="board" id="board"></div>
   </div></section>
+
+  <section class="jbar" id="jbar"></section>
 
   <section class="nestRow">
     <button class="nest" id="nest" aria-label="Yuva">
@@ -101,6 +106,8 @@
     </button>
     <button class="pill" id="buyEnergy">+5 🌻<small>10 ❤</small></button>
   </section>
+
+  </div>
 
   <section class="panel coll" id="coll"></section>
 
@@ -145,6 +152,38 @@
   <div class="tfoot" id="tFoot"></div>
 </div>
 
+<!-- Reklam (demo) -->
+<div class="modal" id="mAd">
+  <div class="mcard">
+    <h2 class="li-h" id="adTitle">🎬</h2>
+    <p class="mcap" id="adText"></p>
+    <div class="adbar"><i id="adFill"></i></div>
+    <div class="ad-t" id="adTime">30</div>
+    <div class="mbtns"><button class="btn" id="adClaim" disabled></button><button class="btn soft" id="adCancel"></button></div>
+  </div>
+</div>
+
+<!-- Can bitti -->
+<div class="modal" id="mLives">
+  <div class="mcard">
+    <div class="ld-stars" style="font-size:46px">🥚</div>
+    <h2 class="li-h" id="lvsTitle"></h2>
+    <p class="mcap" id="lvsText"></p>
+    <div class="mbtns"><button class="btn" id="lvsAd"></button><button class="btn" id="lvsBuy"></button><button class="btn soft" id="lvsClose"></button></div>
+  </div>
+</div>
+
+<!-- Mini oyun -->
+<div class="modal" id="mMini">
+  <div class="mcard wide">
+    <div class="mhead"><h2 id="miniH">💌 Mektup Yakala</h2><button class="x" id="miniX">✕</button></div>
+    <div class="mini-top"><span id="miniScore">0</span><span id="miniTime">15</span></div>
+    <div class="mini-area" id="miniArea"></div>
+    <p class="mcap" id="miniText"></p>
+    <div class="mbtns"><button class="btn" id="miniGo"></button></div>
+  </div>
+</div>
+
 <!-- Karakter seç -->
 <div class="modal" id="mChar">
   <div class="mcard wide">
@@ -181,6 +220,7 @@
 <!-- Seviye tamam -->
 <div class="modal" id="mLvDone">
   <div class="mcard">
+    <div class="ld-scene" id="ldScene"></div>
     <div class="ld-stars" id="ldStars"></div>
     <h2 class="li-h" id="ldTitle"></h2>
     <p class="mcap" id="ldText"></p>
@@ -194,7 +234,7 @@
     <div class="ld-stars" style="font-size:46px">😿</div>
     <h2 class="li-h" id="lfTitle"></h2>
     <p class="mcap" id="lfText"></p>
-    <div class="mbtns"><button class="btn" id="lfMoves"></button><button class="btn soft" id="lfRetry"></button><button class="btn soft" id="lfMap">🗺️</button></div>
+    <div class="mbtns"><button class="btn" id="lfMoves"></button><button class="btn" id="lfAd"></button><button class="btn soft" id="lfRetry"></button><button class="btn soft" id="lfMap">🗺️</button></div>
   </div>
 </div>
 
@@ -243,7 +283,7 @@
 <div class="modal" id="mShop">
   <div class="mcard wide">
     <div class="mhead"><h2 data-en="🛍️ Shop">🛍️ Dükkan</h2><button class="x" data-close="mShop">✕</button></div>
-    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">❤ <b id="shopHearts">0</b></div>
+    <div style="text-align:right;font-weight:900;margin:-2px 2px 4px">🪙 <b id="shopCoins">0</b> &nbsp; ❤ <b id="shopHearts">0</b> &nbsp; 🐥 <b id="shopLives">3</b></div>
     <div class="tabs" id="shopTabs"></div>
     <div class="mbody" id="shopBody"></div>
   </div>
