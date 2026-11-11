@@ -29,3 +29,13 @@ v15 — MAĞAZA, TEMALAR, TEST REKLAMLARI
 - Ayarlar: aç/kapa anahtarları hizalandı
 - Tahta temaları önizlemesindeki ">"> yazı hatası düzeltildi; tahta temaları artık her görünüm temasında çalışıyor
 - Service worker dış (reklam) isteklerini önbelleğe almıyor
+
+
+v16 — ÖLÇÜM, ENERJİ MOLASI, 2x YUVA, REKLAM NOKTALARI, HAFTA SONU ETKİNLİĞİ
+- Ölçüm: oturum, seviye başlangıcı/bitişi/takılma, çıkış, reklam, mağaza, etkinlik olayları cihazda sayılır.
+  Ayarlar > Test verisi > Kopyala ile JSON olarak alınır. ANALYTICS_URL (src/p5d_economy.js) doldurulursa ayrıca gönderilir
+- Enerji molası: enerji bitince çıkan pencere artık "başarısız" gibi değil; sonraki enerjiye geri sayım gösterir. Can kaybı yok
+- 2x yuva: 8. seviyeden itibaren enerji panelindeki 2x düğmesi — 2 enerjiyle bir üst kademe eşya
+- Yeni ödüllü reklam noktaları: seviye sonunda altını ikiye katla, günlük ikinci hediye, boş kedi sepetini doldur, enerji 5 ve altındayken +8 enerji
+- Hafta sonu etkinliği: her Cuma 00:00'da başlar, 72 saat sürer. Sipariş tamamla (kolay 1, orta 2, zor 3 pul), 5 kademe ödül
+- Reklam ve satın alma pencereleri artık her pencerenin üstünde açılabiliyor

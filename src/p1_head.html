@@ -831,5 +831,29 @@ body.eco .mp-me{animation:none}
 :root.hasAd .coach:not(.show){transform:translate(-50%,calc(100% + var(--adH) + 40px))}
 :root.hasAd #scene{bottom:var(--adH)}
 .adtest{display:inline-block;background:#FBBC04;color:#202124;border-radius:4px;padding:1px 6px;font:700 10px Arial,sans-serif;vertical-align:middle;margin-left:4px}
+
+/* v16: 2x yuva, reklam teklifleri, etkinlik, ölçüm */
+#mAd,#mBuy,#mOffer{z-index:97!important}
+.ebtn{flex:none;border:2px solid var(--ink);border-radius:12px;background:var(--paper);font-family:inherit;font-weight:900;font-size:11px;line-height:1;padding:5px 7px;cursor:pointer;color:var(--ink);box-shadow:0 2px 0 rgba(107,74,69,.3);white-space:nowrap}
+.ebtn[hidden]{display:none}
+.ebtn.on{background:linear-gradient(180deg,var(--gold1),var(--gold2));border-color:var(--gold3);box-shadow:0 2px 0 var(--gold3),0 0 8px rgba(245,220,110,.8)}
+.ebtn.ad{background:linear-gradient(180deg,#E6F6DA,#BFE3A4);animation:ghPulse 1.8s ease-in-out infinite}
+.energy{position:relative}
+@media (min-width:900px){.energy .ebtn{position:absolute;top:6px;right:8px}.energy #adEn{right:54px}}
+.btn.gold{background:linear-gradient(180deg,#FBE9A6,#EBC65A 55%,#D2A636)!important;color:#5A4010!important;text-shadow:0 1px 0 rgba(255,255,255,.6)!important;box-shadow:0 4px 0 #8E6A22,inset 0 0 0 2px rgba(255,255,255,.4)!important}
+#ldDouble[hidden]{display:none}
+.lf-timer{text-align:center;font-weight:900;font-size:12px;color:var(--ink2);margin:-2px 0 6px}
+.lf-timer:empty{display:none}
+#stEvt{position:relative;white-space:nowrap}
+#stEvt.off{opacity:.75}
+#stEvt .dot{position:absolute;top:-5px;right:-4px}
+.evt-hero{text-align:center;font-weight:900;font-size:13px;margin:2px 0 8px;line-height:1.35}
+.evt-hero b{display:block;font-size:20px}
+.evt-time{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:2px 10px;background:var(--pink2);font-size:12px;margin-top:4px}
+.evt-bar{height:14px;border:2px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden;margin:8px 2px 4px}
+.evt-bar i{display:block;height:100%;background:linear-gradient(180deg,var(--gold1),var(--gold2));transition:width .4s}
+.evt-pts{text-align:center;font-weight:900;font-size:12px;color:var(--ink2);margin-bottom:6px}
+.lrow.got{opacity:.6}
+@media (max-width:899px){#stEvt{padding:0 6px;font-size:11px}}
 </style>
 </head>

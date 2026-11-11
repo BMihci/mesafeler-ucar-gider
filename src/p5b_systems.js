@@ -77,7 +77,7 @@ function dailyView(){
 }
 function claimDaily(){
   const v=dailyView();if(!v.due)return;
-  state.daily.streak=v.streak;state.daily.last=today();
+  state.daily.streak=v.streak;state.daily.last=today();state.daily.idx=v.idx;trk('daily',{i:v.idx});
   const r=DAILY[v.idx],parts=[];
   if(r.h){state.hearts+=r.h;parts.push('+'+r.h+' ❤')}
   if(r.e){state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+r.e);parts.push('+'+r.e+' 🌻')}
@@ -114,6 +114,7 @@ function renderDaily(b){
     h+='<div class="dday'+(i<=upTo?' claimed':(v.due&&i===v.idx?' today':''))+'">'+T('Gün ','Day ')+(i+1)+'<b>'+ico+'</b>'+sub+'</div>';
   });
   h+='</div><div class="mbtns">'+(v.due?'<button class="btn" data-act="claimD">'+T('🎁 Hediyeyi Al','🎁 Claim Gift')+'</button>':'<span style="font-size:12px;color:var(--ink2);font-weight:900">'+T('Bugünün hediyesi alındı. Yarın yenisi geliyor 🐾','Today’s gift is claimed. A new one tomorrow 🐾')+'</span>')+'</div>';
+  if(!v.due&&state.daily.dbl!==today())h+='<div class="mbtns"><button class="btn gold" data-act="dblD">🎬 '+T('Reklamla ikinci hediye','Second gift with an ad')+'</button></div>';
   h+='<div class="sec">'+T('Günlük Görevler','Daily Quests')+'</div>';
   state.quests.list.forEach(q=>{
     const d=QMAP[q.id];
@@ -288,6 +289,7 @@ $('#bookBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const [a,x,y]=b.dataset.act.split(':');
   if(a==='claimD')claimDaily();
+  else if(a==='dblD')openAd('daily');
   else if(a==='claimQ')claimQuest(x);
   else if(a==='letter')viewLetter(x);
 });
@@ -334,7 +336,7 @@ function renderChips(){
   $('#langChips').innerHTML=[['tr','🇹🇷 Türkçe'],['en','🇬🇧 English']].map(([k,n])=>'<button class="chip'+(state.settings.lang===k?' on':'')+'" data-lng="'+k+'">'+n+'</button>').join('');
 }
 function syncSettings(){
-  $('#swSfx').checked=!!state.settings.sfx;$('#swMusic').checked=!!state.settings.music;$('#swEco').checked=ecoOn();
+  $('#swSfx').checked=!!state.settings.sfx;$('#swMusic').checked=!!state.settings.music;$('#swEco').checked=ecoOn();try{$('#statLine').textContent=statsLine()}catch(_){};
   $('#rgSfx').value=Math.round(state.settings.sfxVol*100);$('#rgMus').value=Math.round(state.settings.musVol*100);
   $('#inMe').value=state.settings.names.me;$('#inYou').value=state.settings.names.you;
   renderChips();
@@ -353,6 +355,12 @@ function applyArt(){
   b.dataset.art=a;buildSprite();
   const m=document.querySelector('meta[name=theme-color]');if(m)m.content=ARTS[a].tc;
 }
+$('#statCopy').addEventListener('click',()=>{
+  const txt=JSON.stringify(statsReport());
+  const ok=()=>toast(T('Test verisi kopyalandı 📋','Test data copied 📋'));
+  const fb=()=>{try{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();ok()}catch(_){toast(T('Kopyalanamadı','Could not copy'))}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,fb);else fb();
+});
 function applyEco(){document.body.classList.toggle('eco',ecoOn());try{resizeCv()}catch(e){}}
 $('#swEco').addEventListener('change',e=>{state.settings.eco=e.target.checked;applyEco();saveSoon()});
 $('#rgSfx').addEventListener('input',e=>{state.settings.sfxVol=e.target.value/100;applyVolumes();saveSoon()});
@@ -447,7 +455,7 @@ function refreshTitle(){
   const t=$('#title');if(!t||!state)return;
   const n=curSlot(),info=slotInfo(n);
   $('#tStart').textContent=info?T('▶ Devam Et','▶ Continue'):T('▶ Başla','▶ Start');
-  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info&&info.lv?T('Seviye ','Level ')+info.lv+' · '+Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v15';
+  $('#tFoot').textContent=T('Kayıt ','Save ')+n+' · '+(info&&info.lv?T('Seviye ','Level ')+info.lv+' · '+Math.round(info.km)+' km '+T('kaldı','left'):T('yeni yolculuk','new journey'))+'  ·  v16';
   $('#tMusic').textContent=state.settings.music?'🎵':'🔇';
 }
 function renderTitleArt(){
@@ -466,7 +474,7 @@ function hideTitle(){
   setTimeout(()=>{if(!t.classList.contains('vis'))t.classList.remove('show')},520);
 }
 function startGame(){
-  started=true;ensureAudio();startMusic();hideTitle();
+  started=true;ensureAudio();startMusic();hideTitle();trk('session_start',{lv:state&&state.saga?state.saga.n:0});
   save(false);
   setTimeout(()=>{
     if(!state.saga){openChar();return}
@@ -546,7 +554,7 @@ function init(){
   roamStart();
   showTitle();
   if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
-  window.__PK={itemIcon,applyNest,albumReady,claimAlbum,birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},get lastCode(){return lastCode}};
+  window.__PK={evtInfo,evtOrder,statsReport,boostOn,renderHUD,itemIcon,applyNest,albumReady,claimAlbum,birdSVG,catSVG,BIRDIE,BIRDB,HAIR,SCARF,startLevel,genLevel,goalsMet,isStuck,pickDir,openMap,openChar,levelComplete,lvActive,goalHave,mechTick,windBlow,waveRoll,useBalloon,thawAround,isUp,canMerge,applyTheme,SCENES,REGION,MECH,get state(){return state},get started(){return started},startGame,pickSlot,renderSlots,spawn,takeKitten,merge,deliver,openBox,win,checkStory,claimDaily,makeGift,redeemGift,encodeGift,decodeGift,makeOrder,renderBook,renderShop,showTut,tapCell,walkCat,openBook,showComic,STORY,petCat,save,load,defState,fix,TRACKS,ensureAudio,showCatCard,buyUp,useHat,tryStart,openLives,openAd,loseLife,gainLife,addCoins,grantJokers,useJoker,jokerTarget,openMini,miniStart,weekId,weeklyN,renderJokers,BAL,unlockedRegionCats,tickLives,buyJoker,useBoard,useAcc,dailyView,set giftSel(v){giftSel=v},get lastCode(){return lastCode}};
 }
 init();
 emoScan();

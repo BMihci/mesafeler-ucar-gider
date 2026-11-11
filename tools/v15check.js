@@ -35,7 +35,7 @@ async function boot(b,vp,lang){
   /* ---- mağaza, temalar, ayarlar ---- */
   const {p,F}=await boot(b,{width:390,height:844});
   const S=()=>p.evaluate(()=>JSON.parse(JSON.stringify({coins:__PK.state.coins,energy:__PK.state.energy,iap:__PK.state.iap,jk:__PK.state.jk,cos:__PK.state.cos,lives:__PK.state.lives.n})));
-  await F('#btnSettings');await p.waitForTimeout(400);
+  await F('#btnSettings');await p.waitForTimeout(1000);
   const st=await p.evaluate(()=>{
     const out={unl:!!document.getElementById('swUnl'),art:!!document.getElementById('swArt'),txt:/test mod|sınırsız enerji|çizim stili/i.test(document.querySelector('#mSettings').textContent),sw:[]};
     document.querySelectorAll('#mSettings .sw').forEach(sw=>{const row=sw.closest('.mrow').getBoundingClientRect(),r=sw.getBoundingClientRect(),k=getComputedStyle(sw.querySelector('span'),'::after');

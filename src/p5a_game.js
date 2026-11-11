@@ -70,9 +70,10 @@ function elCenter(e){const r=e.getBoundingClientRect();return{x:r.left+r.width/2
 /* ---------- modal yöneticisi (kuyruklu) ---------- */
 const mq=[];let mCur=null,ovCur=null;
 const PANEL=['mBook','mShop','mSettings','mGift'];
+const OVER=['mAd','mBuy','mOffer']; /* her pencerenin üstüne açılabilenler */
 function showModal(id,prep){
   /* defter/dükkan açıkken not ve çizgi roman ÜSTTE açılır (kuyruğa girmez) */
-  if(mCur&&PANEL.includes(mCur)&&!PANEL.includes(id)){ovCur=id;if(prep)prep();$('#'+id).classList.add('open');return}
+  if(mCur&&mCur!==id&&(OVER.includes(id)||(PANEL.includes(mCur)&&!PANEL.includes(id)))){ovCur=id;if(prep)prep();$('#'+id).classList.add('open');return}
   if(mCur){if(mCur===id){if(prep)prep();return}if(!mq.some(m=>m.id===id))mq.push({id,prep});else{const m=mq.find(m=>m.id===id);m.prep=prep}return}
   mCur=id;if(prep)prep();$('#'+id).classList.add('open');
 }
@@ -165,8 +166,9 @@ function renderEnergy(){
   if(unl)note=T('Sınırsız (test modu) ♾️','Unlimited (test mode) ♾️');
   else if(!state.lv||state.lv.done)note=T('Bir seviye başlat 🗺️','Start a level 🗺️');
   else if(state.energy<=0)note=T('Enerji bitti! Siparişler enerji kazandırır 📦','Out of energy! Orders give energy 📦');
+  else if(boostOn())note=T('2x açık: her dokunuş 2 enerji · bir üst kademe eşya','2x on: 2 energy per tap · one tier higher');
   else note=T('Yuvaya her dokunuş 1 enerji · zamanla yenilenir','1 energy per nest tap · refills over time');
-  $('#eNote').textContent=note;
+  $('#eNote').textContent=note;renderBoost();
 }
 function renderKit(){
   $('#kitN').textContent=state.kit.n;$('#kitBtn').classList.toggle('empty',state.kit.n<=0);
@@ -186,16 +188,34 @@ function renderHUD(){
 }
 
 /* ---------- üretim ---------- */
+/* v16: güçlendirilmiş yuva — 2 enerjiyle bir üst kademe eşya */
+const BOOST_LV=8;
+function boostUnlocked(){return !!(state&&state.saga&&state.saga.n>=BOOST_LV)}
+function boostOn(){return !!(state&&state.boost&&boostUnlocked())}
+function renderBoost(){
+  const b=$('#boostBtn');if(!b)return;
+  b.hidden=!boostUnlocked();const on=boostOn();
+  b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
+  const a=$('#adEn');if(a){a.hidden=!(lvActive()&&state.energy<=5);a.innerHTML='🎬 +'+BAL.buyEnergyAmt}
+}
+$('#boostBtn').addEventListener('click',()=>{
+  state.boost=!state.boost;sfx('tap');trk('boost',{on:state.boost});
+  toast(state.boost?T('2x açık: her dokunuş 2 enerji, bir üst kademe eşya ⚡','2x on: 2 energy per tap, one tier higher ⚡'):T('2x kapalı','2x off'));
+  renderEnergy();saveSoon();
+});
+$('#adEn').addEventListener('click',()=>{sfx('tap');openAd('moves')});
 function spawn(k){
   ensureAudio();k=k||'post';
   const unl=false,nest=document.querySelector('.nest[data-k="'+k+'"]')||$('#nest');
   if(!lvActive()){sfx('err');toast(T('Önce haritadan bir seviye seç 🗺️','Pick a level on the map first 🗺️'));bounceEl(nest);return}
-  if(!unl&&state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da altınla enerji al','Out of energy! Deliver orders, wait, or buy energy with coins'));bounceEl(nest);afterAction();return}
+  const bst=boostOn(),cost=bst?2:1;
+  if(state.energy<=0){sfx('err');toast(T('Enerji bitti! Sipariş teslim et, bekle ya da reklamla enerji al','Out of energy! Deliver orders, wait, or watch an ad for energy'));bounceEl(nest);afterAction();return}
+  if(state.energy<cost){sfx('err');toast(T('2x için 2 enerji gerek — 2x\'i kapatabilirsin','2x needs 2 energy — you can switch 2x off'));bounceEl($('#boostBtn'));return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! Biraz birleştir 🧺','Board is full! Merge a few items 🧺'));bounceEl(nest);afterAction();return}
-  if(!unl)state.energy--;
-  const l=Math.random()<BAL.nestL2*state.up.nest?2:1;
+  state.energy-=cost;
+  const l=(Math.random()<BAL.nestL2*state.up.nest?2:1)+(bst?1:0);
   place(newItem(l,k),'spawn');
-  state.stats.spawns++;ev('spawn');state.lv.spawned++;state.lv.usedMoves++;
+  state.stats.spawns++;ev('spawn');state.lv.spawned+=cost;state.lv.usedMoves++;
   sfx('pop');buzz(8);mechTick();renderBoard();renderHUD();tutAdv('spawn');afterAction();saveSoon();
 }
 const NEST_LBL={post:['Mektup','Letters']};
@@ -218,7 +238,7 @@ function renderNests(){
 function takeKitten(){
   ensureAudio();tickKit();const kb=$('#kitBtn');
   if(!lvActive()){sfx('err');return}
-  if(state.kit.n<=0){sfx('err');toast(T('Sepet boş! Yeni yavru biraz sonra gelir 🐱','The basket is empty! A new kitten is coming soon 🐱'));bounceEl(kb);return}
+  if(state.kit.n<=0){sfx('tap');bounceEl(kb);openOffer('kit');return}
   if(!emptyCells().length){sfx('err');toast(T('Tahta dolu! 🧺','Board is full! 🧺'));bounceEl(kb);return}
   if(state.kit.n>=BAL.kitMax)state.kit.t=Date.now();
   state.kit.n--;place({t:'c',l:1,k:false},'spawn');
@@ -450,7 +470,7 @@ function deliver(idx,oi,ri){
   renderBoard();renderHUD();renderOrder();tutAdv('deliver');
   if(o.reqs.every(r=>r.got>=r.need)){
     const rw=orderReward(Object.assign({},o,{reqs:o.reqs.map(r=>Object.assign({},r,{got:0}))}));
-    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');if(o.d===2){state.stats.rush++;ev('rush')}
+    o.done=true;state.stats.orders++;state.orderN++;ev('order');lvEv('order');evtOrder(o.d);trk('order',{n:state.lv?state.lv.n:0,d:o.d});if(o.d===2){state.stats.rush++;ev('rush')}
     const bh=BAL.orderHearts*(o.d+1);state.hearts+=bh;
     const en=BAL.orderEnergy+o.d+state.up.post;state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+en);
     addCoins([1,2,4][o.d]);

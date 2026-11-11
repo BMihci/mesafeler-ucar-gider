@@ -35,6 +35,8 @@ Bird Adana'da, Birdie İstanbul'da. Aynı eşyaları birleştirerek siparişleri
 - **Hediye kodu** — partnerine kısa bir kodla (`PK-XXXXX-XXXXX`) hediye gönder
 - **Mağaza** — jokerler, şapkalar, tahta ve yuva görünümleri, kalıcı yükseltmeler, altın/enerji paketleri (şimdilik test satın alma)
 - **5 görünüm teması** — Suluboya Masal, Şeker, Kiraz Çiçeği, Eskiz Defteri, Gece Feneri; tema tüm arayüzü, ikonları ve arka planı değiştirir
+- **Hafta sonu etkinliği** — her Cuma başlayan 72 saatlik pul toplama etkinliği, kademeli ödüller
+- **2x yuva** — 2 enerjiyle bir üst kademe eşya üreten güçlendirilmiş üretim
 - **Reklam altyapısı** — ödüllü reklam ve alt banner, Google'ın test reklam birimleriyle
 - **Tamamı çizim** — ikonlar, kuşlar, kediler ve harita kod içinde SVG olarak çizildi; harici görsel dosyası yok
 - **Çevrimdışı çalışır (PWA)** — ana ekrana eklenebilir; ilerleme cihazda saklanır, 3 kayıt yuvası
@@ -49,7 +51,7 @@ Framework ya da bağımlılık yok: tek bir `index.html` (HTML + CSS + JavaScrip
 | `index.html`, `sw.js`, `manifest.webmanifest`, ikonlar | Yayınlanan oyun — depo kökü doğrudan statik site olarak sunulabilir |
 | `src/` | Kaynak parçalar (stil, gövde, çekirdek, çizimler, oyun, saga, ekonomi, sistemler) |
 | `build.sh` | `src/` parçalarını birleştirip `index.html` üretir ve sözdizimini denetler |
-| `tools/` | Playwright ile yazılmış oyun botu ve denetim betikleri (`audit.js`, `v15check.js`, `shots.js`) |
+| `tools/` | Playwright ile yazılmış oyun botu ve denetim betikleri (`audit.js`, `v15check.js`, `v16check.js`, `adcheck.js`, `shots.js`) |
 | `README.txt` | Sürüm notları |
 
 ```bash
@@ -60,7 +62,7 @@ Yerelde denemek için `index.html` dosyasını tarayıcıda açmak yeterli; PWA 
 
 ## Sürümler
 
-Güncel sürüm **v15**, `main` dalında. Eski sürümler ayrı dallarda duruyor: `surum/v2`, `surum/v3`, `surum/v8`, `surum/v9`, `surum/v10`, `surum/v14`.
+Güncel sürüm **v16**, `main` dalında. Eski sürümler ayrı dallarda duruyor: `surum/v2`, `surum/v3`, `surum/v8`, `surum/v9`, `surum/v10`, `surum/v14`.
 
 ## Durum
 

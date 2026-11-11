@@ -101,7 +101,7 @@ function defState(settings){
     story:{intro:false,beat:0},trip:1,letters:[],notes:[],
     up:{blanket:0,post:0,nest:0},
     cos:{hat:'beanie',hats:['beanie','none'],theme:'pink',themes:['pink'],acc:'none',accs:['none'],board:'wood',boards:['wood'],art:'gh',arts:['gh','candy']},
-    iap:{noads:false,starter:false,n:0},
+    iap:{noads:false,starter:false,n:0},boost:false,evt:{id:0,pts:0,claimed:[]},
     daily:{last:'',streak:0},quests:{date:'',list:[]},ach:{},
     stats:{orders:0,items:0,merges:0,spawns:0,boxes:0,rush:0,catMerges:0,pets:0,gifts:0,kittens:0},
     gifts:{used:[],sent:[]},
@@ -175,6 +175,9 @@ function fix(s){
   if(!(s.cos.art in ARTS))s.cos.art='gh';
   ['gh','candy'].forEach(k=>{if(!s.cos.arts.includes(k))s.cos.arts.push(k)});
   s.iap=Object.assign({noads:false,starter:false,n:0},(s.iap&&typeof s.iap==='object')?s.iap:{});
+  s.boost=!!s.boost;
+  s.evt=Object.assign({id:0,pts:0,claimed:[]},(s.evt&&typeof s.evt==='object')?s.evt:{});s.evt.pts=clamp(s.evt.pts|0,0,9999);if(!Array.isArray(s.evt.claimed))s.evt.claimed=[];
+  if(s.daily&&typeof s.daily==='object'){s.daily.dbl=String(s.daily.dbl||'');s.daily.idx=clamp(s.daily.idx|0,0,6)}
   s.saga=sanSaga(s.saga);s.lv=sanLv(s.lv);
   return s;
 }

@@ -24,7 +24,7 @@
   </section>
 
   <section class="panel lvcard" id="lvCard">
-    <div class="lv-top"><div class="lv-t" id="lvTitle"></div><button class="stat" id="stLives" aria-label="Can">🐥 3</button><button class="stat" id="stCoins" aria-label="Altın">🪙 0</button><button class="mapbtn" id="btnMap" aria-label="Harita">🗺️</button></div>
+    <div class="lv-top"><div class="lv-t" id="lvTitle"></div><button class="stat" id="stLives" aria-label="Can">🐥 3</button><button class="stat" id="stEvt" aria-label="Etkinlik">📮</button><button class="stat" id="stCoins" aria-label="Altın">🪙 0</button><button class="mapbtn" id="btnMap" aria-label="Harita">🗺️</button></div>
     <div class="goals" id="goals"></div>
   </section>
 
@@ -72,6 +72,8 @@
       <div class="e-top"><span data-en="🌻 Energy">🌻 Enerji</span> <b id="eNum">20</b><small id="eMax">/20</small></div>
       <div class="ebar"><i id="eFill"></i></div>
       <div class="e-note" id="eNote"></div>
+      <button class="ebtn ad" id="adEn" hidden>🎬 +8</button>
+      <button class="ebtn" id="boostBtn" hidden aria-pressed="false">2x</button>
     </div>
     <button class="kit" id="kitBtn" aria-label="Kedi Sepeti">
       <div class="kitArt">
@@ -136,6 +138,20 @@
 </div>
 
 <!-- Reklam (demo) -->
+<div class="modal" id="mOffer">
+  <div class="mcard">
+    <div class="buyart" id="offArt"></div>
+    <h2 class="li-h" id="offTitle"></h2>
+    <p class="mcap" id="offText"></p>
+    <div class="mbtns"><button class="btn" id="offOk"></button><button class="btn soft" id="offNo" data-en="No thanks">Vazgeç</button></div>
+  </div>
+</div>
+<div class="modal" id="mEvt">
+  <div class="mcard wide">
+    <div class="mhead"><h2 id="evtTitle">📮</h2><button class="x" data-close="mEvt">✕</button></div>
+    <div class="mbody" id="evtBody"></div>
+  </div>
+</div>
 <div class="modal" id="mBuy">
   <div class="mcard">
     <h2 class="li-h" id="buyTitle"></h2>
@@ -216,6 +232,7 @@
     <div class="ld-stars" id="ldStars"></div>
     <h2 class="li-h" id="ldTitle"></h2>
     <p class="mcap" id="ldText"></p>
+    <div class="mbtns"><button class="btn gold" id="ldDouble"></button></div>
     <div class="mbtns"><button class="btn" id="ldNext"></button><button class="btn soft" id="ldMap">🗺️</button><button class="btn soft" id="ldAgain">↻</button></div>
   </div>
 </div>
@@ -223,9 +240,10 @@
 <!-- Seviye kaybı -->
 <div class="modal" id="mLvFail">
   <div class="mcard">
-    <div class="ld-stars" style="font-size:46px">😿</div>
+    <div class="ld-stars" style="font-size:46px" id="lfArt">🌻</div>
     <h2 class="li-h" id="lfTitle"></h2>
     <p class="mcap" id="lfText"></p>
+    <div class="lf-timer" id="lfTimer"></div>
     <div class="mbtns"><button class="btn" id="lfMoves"></button><button class="btn" id="lfAd"></button><button class="btn soft" id="lfRetry"></button><button class="btn soft" id="lfMap">🗺️</button></div>
   </div>
 </div>
@@ -241,6 +259,7 @@
       <div class="mrow"><div style="width:100%"><span data-en="Music volume">Müzik sesi</span><input type="range" id="rgMus" min="0" max="100"><div class="chips" id="trackChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🌍 Language">🌍 Dil</span><div class="chips" id="langChips"></div></div></div>
       <div class="mrow"><div style="width:100%"><span data-en="🐦 Names">🐦 İsimler</span><small data-en="You / your partner">Sen / sevgilin</small><input type="text" id="inMe" maxlength="12" style="margin-top:5px"><input type="text" id="inYou" maxlength="12" style="margin-top:5px"></div></div>
+      <div class="mrow"><div><span data-en="📋 Test data">📋 Test verisi</span><small id="statLine"></small></div><button class="btn sm soft" id="statCopy" data-en="Copy">Kopyala</button></div>
       <div class="mrow"><div><span data-en="🔋 Battery saver">🔋 Pil tasarrufu</span><small data-en="Fewer animations, lighter music — keeps the phone cool">Daha az animasyon, hafif müzik — telefon ısınmasın</small></div><label class="sw"><input type="checkbox" id="swEco"><span></span></label></div>
     </div>
     <div class="mbtns">

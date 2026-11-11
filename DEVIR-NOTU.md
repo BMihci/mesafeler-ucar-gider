@@ -1,6 +1,6 @@
 # Mesafeler Uçar Gider — Devir Notu
 
-*Son güncelleme: 10 Kasım 2026 · Güncel sürüm: v15*
+*Son güncelleme: 10 Kasım 2026 · Güncel sürüm: v16*
 
 Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığı yerden devam edebilmek için yazıldı. Yeni konuşmaya bu dosyayı ver ve depoyu açmasını iste.
 
@@ -51,6 +51,10 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 - **Hediye kodu:** `PK-XXXXX-XXXXX` (base36 + sağlama). Ayrı 🎁 butonu ve `mGift` modalı.
 - **Görünüm temaları:** `ARTS` (p3_core.js) — `gh`, `candy`, `sakura`, `kraft`, `night`. Seçim `state.cos.art`, sahip olunanlar `state.cos.arts`. `applyArt()` `body.gh` + `body.art-*` sınıflarını, `data-art` özniteliğini ve ikon sprite'ını yeniler. `GS()` renkleri `ART_FX` ayarlarına göre dönüştürür. Tema CSS'i `gh.css` sonunda.
 - **Mağaza paketleri:** `PACKS` (p5d_economy.js), `openBuy()` → `mBuy` penceresi. Şimdilik test satın alma; gerçek ödeme bağlanınca `#buyOk` işleyicisi ödeme sonucuna bağlanmalı. Durum: `state.iap`.
+- **Ölçüm:** `trk(olay,veri)` (p5d_economy.js) olayları `localStorage` içinde `mug_events_v1` anahtarında sayar; `statsReport()` özet üretir. `ANALYTICS_URL` doluysa ayrıca POST eder.
+- **2x yuva:** `state.boost`, `boostOn()`, `BOOST_LV=8` (p5a_game.js `spawn`).
+- **Etkinlik:** `EVT`, `evtInfo()` (Cuma 00:00 TR başlar, 72 saat), `state.evt`, `evtOrder()`; arayüz `#stEvt` ve `mEvt`.
+- **Üste açılan pencereler:** `OVER=['mAd','mBuy','mOffer']` her pencerenin üstüne açılır.
 - **Reklamlar:** `ADS` (p5d_economy.js). Google Publisher Tag ile Google'ın test birimleri. `openAd(kind)` ödüllü reklamı ister, gelmezse `openTestAd()` yerleşik test reklamını açar; ödül `grantAd()`. Banner: `syncBanner()`, `:root.hasAd` ve `--adH`. Yayında `ADS.banner` / `ADS.rewarded` kendi birimlerinle değiştirilmeli.
 - **Pil tasarrufu:** `ecoOn()`; dokunmatik cihazda varsayılan açık. `body.eco` CSS'i efektleri kapatır.
 - **Harita:** 9 duraklı yol; ilerleme `#mpDone` çizgisi ve `.mp-city.on` ile gösterilir.
@@ -61,6 +65,7 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 - **v11:** tester geri bildirimleri — sipariş sayısına dayalı seviyeler, zorluk eğrisi, gerçek Türkiye haritası, pil tasarrufu, mobil tek ekran düzeni.
 - **v12:** modal üst üste açılma hatası, ayrı hediye butonu, kısa hediye kodu.
 - **v13:** harita ilerleme düzeltmesi, tüm emojiler yerine SVG çizimler, denetim botu.
+- **v16:** Ölçüm (cihazda olay sayımı + Ayarlar'dan kopyalama), enerji molası penceresi, 2x yuva, yeni ödüllü reklam noktaları, 72 saatlik hafta sonu etkinliği.
 - **v15:** Mağaza (paketler — test satın alma), 5 görünüm teması, Google test reklamları (GPT: ödüllü + alt banner), test modu kaldırıldı, ayarlar hizası, tahta teması yazı hatası.
 - **v14:** Ghibli'den esinli el boyaması tema (CSS katmanı + renk süzgeci), yaprak/taç yaprağı arka plan, yumuşak animasyonlar, "Çizim stili" ayarı.
 
@@ -72,7 +77,9 @@ Bu not, projeye yeni bir konuşmada (ya da başka bir geliştiriciyle) kaldığ�
 4. **Satın almalar test modunda.** Gerçek ödeme yok; paket fiyatları yer tutucu.
 5. **Kullanıcı onayı (çerez/izin) penceresi yok.** Gerçek reklamla yayına çıkmadan önce gerekli.
 6. **Gerçek telefonda ısınma ve akıcılık ölçülmedi.**
-7. Geliştirme tavsiyeleri: `docs/PAZAR-ARASTIRMASI.md`.
+7. **Merkezi ölçüm yok.** `ANALYTICS_URL` boş; veriler yalnızca oyuncunun cihazında.
+8. **Can sistemi kodu duruyor ama kullanılmıyor** (`loseLife` hiç çağrılmıyor, `#stLives` gizli).
+9. Geliştirme tavsiyeleri: `docs/PAZAR-ARASTIRMASI.md`.
 
 ## 6. Yeni sürüm çıkarma adımları
 

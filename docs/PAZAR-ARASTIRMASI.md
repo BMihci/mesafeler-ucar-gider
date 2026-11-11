@@ -17,12 +17,12 @@
 | --- | --- | --- |
 | Kalıcı tahta + sipariş | Yarım kalan işler oturumlar arasında durur; oyuncu "bitirmez, ara verir" | Var |
 | Enerji = hem para hem fren | Enerji bitince oyun durur; bu bir "kayıp" değil "kesinti" gibi hissettirir, o yüzden ödeme isteği yüksek | Var |
-| Güçlendirilmiş üretici (2x/4x) | Oyuncu enerjiyi daha hızlı harcayıp daha yüksek kademe eşya alır; harcama tavanını kaldırır. 2023'ten beri türün standardı | **Yok** |
+| Güçlendirilmiş üretici (2x/4x) | Oyuncu enerjiyi daha hızlı harcayıp daha yüksek kademe eşya alır; harcama tavanını kaldırır. 2023'ten beri türün standardı | v16'da eklendi (2x) |
 | Üretici bekleme süresi | Enerjiye ek ikinci bir fren; oyuncu hangi üreticiyi çalıştıracağını seçer, geri dönme sebebi olur | Kısmen (kedi sepeti) |
-| Süreli etkinlikler | 72 saatlik sipariş etkinlikleri, günlük sıfırlanan sezon bileti; "etkinlik öncesi enerji biriktirme" gibi planlama yaratır | **Yok** (yalnızca haftalık meydan okuma) |
+| Süreli etkinlikler | 72 saatlik sipariş etkinlikleri, günlük sıfırlanan sezon bileti; "etkinlik öncesi enerji biriktirme" gibi planlama yaratır | v16'da eklendi (72 saatlik hafta sonu etkinliği) |
 | Hikâye + dekorasyon | Diyalog sahneleri dekorasyon görevine bağlanır; hikâye ödülün kendisi olur | Kısmen (mektuplar, çizgi roman; dekorasyon yalnızca yuva) |
 | Tahta sıkışıklığı | "Hamle yetmiyor" değil "yer yetmiyor"; tahta verimi düşünce oyuncu yer açmak için öder | Var (tasarım hedefimiz zaten bu) |
-| Birleştirme sonrası teklif | Oyuncu devam etmek isterken çıkan küçük teklif balonları | **Yok** |
+| Birleştirme sonrası teklif | Oyuncu devam etmek isterken çıkan küçük teklif balonları | v16'da kısmen (enerji azken reklam düğmesi, boş sepet teklifi) |
 
 **Sayılar:** Hikâye odaklı merge örneği Love & Pies için bildirilen değerler yaklaşık %50 birinci gün ve %20 otuzuncu gün elde tutma (2022 verisi). Genel casual bulmaca için "iyi" sayılan aralık: 1. gün %27–32, 7. gün %8–14, 30. gün %3–6. Ortalama oturum 3–3,5 dakika; en iyi %10'da 8 dakikanın üstü.
 
@@ -35,7 +35,7 @@
 - Tek dosya, kurulum yok: web portallarında yayınlamaya hazır.
 
 **Zayıf**
-- **Seviye yapısı türün ana akımıyla ters.** Rakipler seviyesiz, sürekli akan tek bir tahta kullanıyor; bizde 80 seviye, can ve "başarısız oldun" ekranı var. Bu, match-3 mantığı. Merge'in güçlü yanı tam da kaybetme durumunun olmaması.
+- **Seviye yapısı türün ana akımından farklı.** Rakipler seviyesiz, sürekli akan tek bir tahta kullanıyor; bizde 80 seviye var. (Düzeltme: ilk sürümde burada "can ve başarısız ekranı var" yazmıştım; kodu inceleyince can kaybının zaten hiç tetiklenmediğini, enerji bitince seviyenin kaybedilmediğini gördüm. v16'da pencere "enerji molası" olarak yeniden yazıldı.)
 - Uzun vadeli içerik sınırlı: 80 seviye bitince oynanacak bir şey kalmıyor.
 - Etkinlik yok: oyuncunun yarın geri gelmesi için takvime bağlı bir sebep zayıf.
 - Enerjiyi hızlı harcama yolu yok; harcama tavanı düşük.
@@ -43,15 +43,15 @@
 
 ## 4. Tavsiyeler (öncelik sırasıyla)
 
-### Önce — az iş, büyük etki
-1. **Ölçüm ekle.** Kodda `ANALYTICS_URL` hazır ama boş. Seviye başlangıcı/bitişi, bırakma noktası, reklam izleme ve mağaza açılışı olaylarını topla. Bundan sonraki her karar buna dayanacak.
-2. **"Başarısız" ekranını ve canları yumuşat ya da kaldır.** Enerji bitince seviye kaybedilmesin; oyuncu beklesin, reklam izlesin ya da enerji alsın. Türün ödeme mantığı bu: kesinti, kayıp değil.
-3. **Güçlendirilmiş yuva (2x).** Yuvaya uzun basınca 2 enerji harcayıp bir üst kademe eşya çıksın. Hem oyunu hızlandırır hem enerji tüketimini artırır.
-4. **Birleştirme sonrası küçük teklifler.** Enerji 5'in altına düşünce "reklam izle, +8 enerji" balonu; tahta dolunca "çekiç ister misin" balonu.
-5. **Ödüllü reklam noktalarını artır.** Şu an üç yer var (altın, can, enerji). Eklenebilecekler: sipariş ödülünü ikiye katla, günlük hediyeyi ikiye katla, kedi sepetini hemen doldur.
+### Önce — az iş, büyük etki (v16'da uygulandı)
+1. **Ölçüm.** Olaylar cihazda sayılıyor ve Ayarlar > Test verisi ile kopyalanabiliyor. Merkezi toplama için `ANALYTICS_URL` hâlâ boş; bir uç nokta gerekli.
+2. **Enerji molası.** Enerji bitince çıkan pencere başarısızlık gibi değil mola gibi; geri sayım gösteriyor.
+3. **Güçlendirilmiş yuva (2x).** 8. seviyeden itibaren 2 enerjiyle bir üst kademe eşya.
+4. **Yeni ödüllü reklam noktaları.** Seviye sonunda altını ikiye katla, ikinci günlük hediye, boş kedi sepetini doldur, enerji azken +8 enerji.
+5. **Hafta sonu etkinliği.** Her Cuma başlayan 72 saatlik pul toplama etkinliği, 5 ödül kademesi.
 
 ### Sonra — orta iş
-6. **Haftalık süreli etkinlik.** Örneğin "Sevgililer Postası": 72 saat, ayrı küçük bir eşya zinciri, kademeli ödüller. Altyapıda haftalık meydan okuma zaten var, genişletilebilir.
+6. **Etkinliği derinleştir.** Şu an yalnızca pul toplama var; etkinliğe özel küçük bir eşya zinciri ve temalı ödüller (yuva süsü, şapka) eklenebilir.
 7. **Sezon bileti.** Günlük görevlerden puan, 30 kademeli ödül yolu, ücretsiz ve ücretli hat.
 8. **Hikâyeyi dekorasyona bağla.** Her şehirde Bird ya da Birdie'nin odasına bir eşya ekle; mektup açılınca odada yeni bir köşe görünsün. Rakiplerde hikâyenin oyuncuyu tutan kısmı bu bağ.
 9. **Partner özelliğini büyüt.** Hediye kodu iyi bir başlangıç. Devamı: günlük "seni düşünüyorum" kalbi, birlikte tamamlanan haftalık hedef. İncelediğim kaynaklarda öne çıkan oyunların hiçbiri iki kişilik bağ üzerine kurulu değil; en özgün kozumuz bu olabilir.

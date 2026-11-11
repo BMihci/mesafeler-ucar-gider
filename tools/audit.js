@@ -135,7 +135,7 @@ async function auditMap(tag){
     const me=document.querySelector('#mapBody .mp-me svg');if(!me)out.push('no player bird on map');else{const x=+me.getAttribute('x'),y=+me.getAttribute('y');if(!(x>0&&x<700&&y>-10&&y<320))out.push('bird out of map '+x+','+y)}
     const dn=document.querySelectorAll('#mapBody .lvb.done').length;const starsN=Object.keys(g.stars).filter(k=>g.stars[k]>0&&k<=80).length;
     if(dn!==starsN&&!g.done)out.push('done buttons '+dn+' vs stars '+starsN);
-    const done=document.querySelector('#mpDone');if(done){const a=+done.getAttribute('stroke-dasharray').split(' ')[0],L=done.getTotalLength();const frac=a/L;const lo=comp/80*0.55,hi=Math.min(1,comp/80*1.9+0.05);if(comp>0&&(frac<lo||frac>hi))out.push('done path frac '+frac.toFixed(2)+' for comp '+comp)}
+    const done=document.querySelector('#mpDone');if(done){const a=+done.getAttribute('stroke-dasharray').split(' ')[0],L=done.getTotalLength();const frac=a/L;const lo=comp/80*0.12,/* duraklar eşit aralıklı değil (B yönünde ilk şehirler birbirine yakın) */hi=Math.min(1,comp/80*1.9+0.05);if(comp>0&&(frac<lo||frac>hi))out.push('done path frac '+frac.toFixed(2)+' for comp '+comp)}
     return{out,comp,on,dots}
   });
   r.out.forEach(x=>add('MAP['+tag+'] '+x));

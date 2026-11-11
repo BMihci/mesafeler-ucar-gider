@@ -283,19 +283,29 @@ function isStuck(){
 function showFail(){
   if(!lvActive()||mCur)return;
   const noMoves=state.energy<=0&&!false;
-  trk('level_stuck',{n:state.lv.n,noMoves});
+  trk('level_stuck',{n:state.lv.n,noMoves,e:state.energy});
   showModal('mLvFail',()=>{
-    $('#lfTitle').textContent=noMoves?T('Enerjin bitti! 🌻','Out of energy! 🌻'):T('Tahta tıkandı! 🧺','The board is jammed! 🧺');
+    $('#lfArt').textContent=noMoves?'🌻':'🧺';
+    $('#lfTitle').textContent=noMoves?T('Enerji molası 🌻','Energy break 🌻'):T('Tahta doldu 🧺','The board is full 🧺');
+    lfTick();
     $('#lfText').textContent=noMoves
-      ?T('Bekleyebilirsin: enerji zamanla yenilenir. Ya da altınla / reklamla '+BAL.buyEnergyAmt+' enerji al.','You can wait: energy refills over time. Or get '+BAL.buyEnergyAmt+' energy with coins / an ad.')
+      ?T('Seviyen ve tahtan olduğu gibi duruyor. Enerji kendiliğinden doluyor; beklemek istemezsen reklamla ya da altınla hemen '+BAL.buyEnergyAmt+' enerji al.','Your level and board stay exactly as they are. Energy refills on its own; if you would rather not wait, get '+BAL.buyEnergyAmt+' energy now with an ad or coins.')
       :T('Birleşecek eşya ve boş yer kalmadı. 💰 Sat ile birkaç eşyayı altına çevirip yer aç.','No merges and no space left. Use 💰 Sell to turn a few items into coins and free space.');
     const b=$('#lfMoves');b.style.display=noMoves?'':'none';b.classList.toggle('dis',state.coins<BAL.buyEnergyCost);b.innerHTML=T('+'+BAL.buyEnergyAmt+' enerji · '+BAL.buyEnergyCost+' 🪙','+'+BAL.buyEnergyAmt+' energy · '+BAL.buyEnergyCost+' 🪙');
     const a=$('#lfAd');a.style.display=noMoves?'':'none';a.innerHTML=T('🎬 Reklam izle · +'+BAL.buyEnergyAmt+' enerji','🎬 Watch ad · +'+BAL.buyEnergyAmt+' energy');
     const r=$('#lfRetry');r.style.display=noMoves?'none':'';r.textContent=T('💰 Sat modunu aç','💰 Open sell mode');
     $('#lfMap').textContent=noMoves?T('⏳ Bekleyeceğim','⏳ I will wait'):T('Kapat','Close');
   });
-  sfx('err');
+  sfx(noMoves?'tap':'err');
 }
+function lfTick(){
+  const el=$('#lfTimer');if(!el||!state)return;
+  if(!$('#mLvFail').classList.contains('open')&&mCur!=='mLvFail'){return}
+  if(state.energy>0){el.textContent=T('Enerji geldi ✔ — devam edebilirsin','Energy is back ✔ — you can keep going');return}
+  const left=Math.max(0,regenMs()-(Date.now()-state.energyT));
+  el.textContent=T('Sonraki enerji: ','Next energy in: ')+fmtLeft(left);
+}
+setInterval(()=>{try{if($('#mLvFail').classList.contains('open'))lfTick()}catch(_){}},1000);
 $('#lfMoves').addEventListener('click',()=>{
   if(state.coins<BAL.buyEnergyCost){sfx('err');toast(T('Yeterli 🪙 yok. Mağazadan ya da reklamla kazanabilirsin','Not enough 🪙. Earn some or watch an ad'));return}
   spendCoins(BAL.buyEnergyCost);state.energy+=BAL.buyEnergyAmt;sfx('energy');
@@ -319,7 +329,7 @@ function levelComplete(){
   let hearts=first?3+stars+(boss?10:0):1;
   let wb=0;
   if(weekly&&state.weekly.w===weekId()&&!state.weekly.done){state.weekly.done=true;wb=120;hearts+=5}
-  coins+=wb;addCoins(coins);state.hearts+=hearts;
+  coins+=wb;addCoins(coins);state.hearts+=hearts;lastLvCoins=coins;
   const advanced=!weekly&&state.saga.n===L.n&&L.n<80;
   if(advanced)state.saga.n=L.n+1;
   const newCat=(boss&&first)?routeIdx(chOf(L.n)):-1;
@@ -343,8 +353,11 @@ function levelComplete(){
     $('#ldNext').innerHTML=weekly?T('Harita ▶','Map ▶'):T('Sonraki ▶','Next ▶');
     $('#ldNext').dataset.beat=beatK||'';$('#ldNext').dataset.weekly=weekly?'1':'';
     $('#ldAgain').textContent=T('↻ Tekrar','↻ Replay');
+    const dd=$('#ldDouble');dd.hidden=!(coins>0);dd.classList.remove('dis');dd.innerHTML='🎬 '+T('Altını ikiye katla · +'+coins+' 🪙','Double the coins · +'+coins+' 🪙');
   });
 }
+let lastLvCoins=0;
+$('#ldDouble').addEventListener('click',e=>{if(e.currentTarget.hidden||!lastLvCoins)return;sfx('tap');openAd('double')});
 $('#ldNext').addEventListener('click',e=>{
   const k=+e.currentTarget.dataset.beat,n=state.saga.n,wk=e.currentTarget.dataset.weekly;
   closeModal('mLvDone');

@@ -2,15 +2,51 @@
    EKONOMİ: canlar, altın, reklam, jokerler, dükkan,
    mini oyun, haftalık meydan okuma, analitik
    ========================================================= */
-const ANALYTICS_URL=''; // İstersen buraya bir uç nokta yaz (POST JSON). Boşsa sadece yerel sayaçlar tutulur.
+const ANALYTICS_URL=''; // İstersen buraya bir uç nokta yaz (POST JSON). Boşsa olaylar yalnızca cihazda tutulur.
+/* v16: ölçüm — olaylar cihazda sayılır (Ayarlar > Test verisi ile kopyalanır); ANALYTICS_URL doluysa ayrıca gönderilir */
+const EVKEY='mug_events_v1',EV_MAX=400,SESS=Math.random().toString(36).slice(2,10),SESS_T=Date.now();
+let evBuf=null,evDirty=false;
+function evLoad(){
+  if(evBuf)return evBuf;
+  try{evBuf=JSON.parse(localStorage.getItem(EVKEY)||'null')}catch(_){}
+  if(!evBuf||typeof evBuf!=='object'||!Array.isArray(evBuf.log))evBuf={first:Date.now(),sessions:0,n:{},lv:{},log:[]};
+  if(!evBuf.n)evBuf.n={};if(!evBuf.lv)evBuf.lv={};
+  return evBuf;
+}
+function evFlush(){if(!evDirty||!evBuf)return;evDirty=false;try{localStorage.setItem(EVKEY,JSON.stringify(evBuf))}catch(_){}}
+const LV_KEY={level_start:'s',level_complete:'c',level_stuck:'k',quit:'q'};
 function trk(ev,data){
   try{
+    const B=evLoad(),d=data||{},now=Date.now();
+    B.n[ev]=(B.n[ev]||0)+1;
+    if(ev==='session_start')B.sessions=(B.sessions||0)+1;
+    if(LV_KEY[ev]&&d.n){const L=B.lv[d.n]||(B.lv[d.n]={s:0,c:0,k:0,q:0});L[LV_KEY[ev]]++}
+    B.log.push([now,ev,d]);if(B.log.length>EV_MAX)B.log.splice(0,B.log.length-EV_MAX);
+    evDirty=true;
     if(!ANALYTICS_URL)return;
-    const body=JSON.stringify({ev,data:data||{},t:Date.now(),v:4,slot:curSlot()});
+    const body=JSON.stringify({ev,data:d,t:now,v:16,s:SESS,slot:curSlot()});
     if(navigator.sendBeacon)navigator.sendBeacon(ANALYTICS_URL,body);
     else fetch(ANALYTICS_URL,{method:'POST',body,keepalive:true}).catch(()=>{});
   }catch(e){}
 }
+setInterval(evFlush,5000);
+function statsReport(){
+  const B=evLoad(),lv=B.lv,ns=Object.keys(lv).map(Number).sort((a,b)=>a-b);
+  let worst=0,wr=0;ns.forEach(n=>{const L=lv[n];if(L.s>=1){const r=(L.k+L.q)/Math.max(1,L.s);if(r>wr){wr=r;worst=n}}});
+  return{v:16,first:B.first,now:Date.now(),sessions:B.sessions||0,
+    maxLevel:state&&state.saga?state.saga.n:0,coins:state?state.coins:0,hearts:state?state.hearts:0,
+    theme:state&&state.cos?state.cos.art:'',lang:lang(),screen:innerWidth+'x'+innerHeight,
+    counts:B.n,levels:lv,hardestLevel:worst,log:B.log.slice(-150)};
+}
+function statsLine(){
+  const B=evLoad(),r=statsReport();
+  return T((r.sessions||0)+' oturum · '+(B.n.level_complete||0)+' seviye bitti · '+(B.n.ad_done||0)+' reklam'+(r.hardestLevel?' · en çok takılınan: seviye '+r.hardestLevel:''),
+           (r.sessions||0)+' sessions · '+(B.n.level_complete||0)+' levels done · '+(B.n.ad_done||0)+' ads'+(r.hardestLevel?' · most stuck: level '+r.hardestLevel:''));
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden||!state||!started)return;
+  trk('quit',{n:state.lv&&!state.lv.done?state.lv.n:0,e:state.energy,secs:Math.round((Date.now()-SESS_T)/1000)});evFlush();
+});
 
 /* ---------- altın ---------- */
 function addCoins(n){state.coins=Math.max(0,state.coins+n);renderStats();saveSoon()}
@@ -53,7 +89,7 @@ function renderStats(){
   const h=$('#shopHearts');if(h)h.textContent=state.hearts;
 }
 setInterval(()=>{
-  try{syncBanner()}catch(_){}
+  try{syncBanner();if(state&&started)renderEvt()}catch(_){}
   if(!state||!started)return;
   const was=state.lives.n;tickLives();if(state.lives.n!==was){renderStats();saveSoon()}
   if($('#mLives').classList.contains('open'))paintLives();
@@ -128,11 +164,21 @@ function grantAd(k){
   trk('ad_done',{k});
   if(k==='life'){gainLife(1);toast(T('+1 🐥 can!','+1 🐥 life!'))}
   else if(k==='moves'){state.energy+=BAL.buyEnergyAmt;sfx('energy');renderHUD();toast('+'+BAL.buyEnergyAmt+' 🌻');afterAction()}
+  else if(k==='double'){const c=lastLvCoins;lastLvCoins=0;if(c>0){addCoins(c);sfx('coin');toast('+'+c+' 🪙');const d=$('#ldDouble');if(d)d.hidden=true}}
+  else if(k==='kit'){state.kit.n=BAL.kitMax;state.kit.t=Date.now();sfx('meow',1.2);renderKit();toast(T('Sepet doldu 🐱','Basket refilled 🐱'))}
+  else if(k==='daily'){
+    const r=DAILY[state.daily.idx|0]||{},parts=[];state.daily.dbl=today();
+    const h=r.h||(r.e?0:10),en=r.e||0;
+    if(h){state.hearts+=h;parts.push('+'+h+' ❤')}
+    if(en){state.energy=Math.min(energyMax()+BAL.energyOverfill,state.energy+en);parts.push('+'+en+' 🌻')}
+    sfx('levelup');toast(T('İkinci hediye: ','Second gift: ')+parts.join(' '));renderHUD();if($('#mBook').classList.contains('open'))renderBook();
+  }
   else if(k==='coins'){state.adT=Date.now();addCoins(BAL.adCoins);sfx('coin');toast('+'+BAL.adCoins+' 🪙');if($('#mShop').classList.contains('open'))renderShop()}
   saveSoon();
 }
 function openAd(kind){
   if(rw)return;
+  trk('ad_offer',{k:kind});
   let settled=false;
   const fallback=()=>{if(settled)return;settled=true;cleanupRw();openTestAd(kind)};
   if(gptState===-1||!/^https?:/.test(location.protocol)||navigator.onLine===false){fallback();return}
@@ -151,13 +197,92 @@ function openAd(kind){
     });
   });
 }
+/* reklam teklifi penceresi: oyuncu isterse izler */
+let offKind=null;
+function openOffer(kind){
+  offKind=kind;trk('offer_show',{k:kind});
+  showModal('mOffer',()=>{
+    if(kind==='kit'){
+      $('#offArt').textContent='🧺';$('#offTitle').textContent=T('Sepet boş','The basket is empty');
+      $('#offText').textContent=T('Yeni yavru birazdan kendiliğinden gelir. Beklemek istemezsen kısa bir reklamla sepeti hemen doldur ('+BAL.kitMax+' yavru).','A new kitten arrives on its own soon. If you would rather not wait, refill the basket now with a short ad ('+BAL.kitMax+' kittens).');
+    }
+    $('#offOk').innerHTML='🎬 '+T('İzle ve doldur','Watch and refill');
+  });
+}
+$('#offOk').addEventListener('click',()=>{const k=offKind;offKind=null;closeModal('mOffer');if(k)setTimeout(()=>openAd(k),200)});
+$('#offNo').addEventListener('click',()=>{offKind=null;closeModal('mOffer')});
+
+/* ---------- hafta sonu etkinliği: Cuma 00:00 – Pazartesi 00:00 (TR), 72 saat ---------- */
+const EVT={
+  names:[['Sevgi Postası','Love Post'],['Kedi Şenliği','Cat Festival'],['Çiçek Haftası','Flower Week'],['Kahve Molası','Coffee Break']],
+  tiers:[{p:4,r:{coins:40}},{p:10,r:{energy:15}},{p:18,r:{jk:'hammer'}},{p:28,r:{coins:120,energy:10}},{p:40,r:{coins:250,jk:'star'}}]
+};
+function evtInfo(now){
+  now=now||Date.now();
+  const W=604800000,D=86400000,t=now+3*3600000-D; /* 1970-01-01 Perşembe; bir gün kaydır -> hafta Cuma başlar */
+  const id=Math.floor(t/W),into=t-id*W,active=into<3*D;
+  return{id,active,ends:active?3*D-into:0,starts:active?0:W-into,name:EVT.names[((id%EVT.names.length)+EVT.names.length)%EVT.names.length]};
+}
+function evtSync(){
+  const I=evtInfo();
+  if(state&&I.active&&state.evt.id!==I.id){state.evt={id:I.id,pts:0,claimed:[]};saveSoon()}
+  return I;
+}
+function evtPts(){const I=evtInfo();return (state&&state.evt.id===I.id)?state.evt.pts:0}
+function evtClaimable(){const I=evtInfo();if(!state||state.evt.id!==I.id)return 0;return EVT.tiers.filter((t,i)=>state.evt.pts>=t.p&&!state.evt.claimed.includes(i)).length}
+function fmtSpan(ms){const s=Math.max(0,Math.floor(ms/1000)),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return d?d+T('g ','d ')+h+T('s','h'):h?h+T('s ','h ')+m+T('dk','m'):m+T('dk','m')}
+function evtOrder(d){
+  const I=evtSync();if(!I.active)return;
+  const g=1+(d|0);state.evt.pts+=g;renderEvt();
+  setTimeout(()=>{const r=$('#stEvt').getBoundingClientRect();floatText('+'+g+' 📮',r.left+r.width/2,r.bottom+14)},700);
+}
+function rewardTxt(r){const a=[];if(r.coins)a.push(r.coins+' 🪙');if(r.energy)a.push(r.energy+' 🌻');if(r.jk)a.push(JOKERS[r.jk].ico+' '+T(JNAME[r.jk][0],JNAME[r.jk][1]));return a.join(' + ')}
+let evtSig='';
+function renderEvt(){
+  const el=$('#stEvt');if(!el||!state)return;
+  const I=evtSync(),n=evtClaimable();
+  const txt=I.active?'📮 '+evtPts():'📮 '+fmtSpan(I.starts);
+  const sig=txt+'|'+n+'|'+I.active;
+  if(sig!==evtSig){evtSig=sig;el.innerHTML=txt+(n?'<i class="dot on"></i>':'');el.classList.toggle('off',!I.active)}
+  if($('#mEvt').classList.contains('open'))paintEvt();
+}
+function paintEvt(){
+  const I=evtSync(),pts=evtPts(),top=EVT.tiers[EVT.tiers.length-1].p;
+  $('#evtTitle').textContent='📮 '+T(I.name[0],I.name[1]);
+  let h='<div class="evt-hero">'+(I.active
+    ?T('Sipariş tamamla, pul topla, ödülleri al!','Complete orders, collect stamps, claim rewards!')+'<br><span class="evt-time">⏳ '+T('Bitmesine ','Ends in ')+fmtSpan(I.ends)+'</span>'
+    :T('Hafta sonu etkinliği her Cuma başlar ve 3 gün sürer.','The weekend event starts every Friday and lasts 3 days.')+'<br><span class="evt-time">⏳ '+T('Başlamasına ','Starts in ')+fmtSpan(I.starts)+'</span>')+'</div>';
+  h+='<div class="evt-bar"><i style="width:'+Math.min(100,pts/top*100)+'%"></i></div><div class="evt-pts">'+pts+' / '+top+' 📮 · '+T('kolay sipariş 1, orta 2, zor 3 pul','easy order 1, medium 2, hard 3 stamps')+'</div>';
+  EVT.tiers.forEach((t,i)=>{
+    const got=I.active&&state.evt.id===I.id&&state.evt.claimed.includes(i),can=I.active&&pts>=t.p&&!got;
+    h+='<div class="lrow'+(got?' got':'')+'"><div class="li">📮</div><div class="lt">'+rewardTxt(t.r)+'<small>'+t.p+' '+T('pul','stamps')+'</small></div>'+(got?'<span class="chip on">✔</span>':can?'<button class="btn sm" data-evt="'+i+'">'+T('Al','Claim')+'</button>':'<span class="chip">'+Math.min(pts,t.p)+'/'+t.p+'</span>')+'</div>';
+  });
+  $('#evtBody').innerHTML=h;
+}
+$('#stEvt').addEventListener('click',()=>{sfx('tap');trk('evt_open',{});showModal('mEvt',paintEvt)});
+$('#mEvt').addEventListener('click',e=>{
+  if(e.target.id==='mEvt'){closeModal('mEvt');return}
+  const b=e.target.closest('[data-evt]');if(!b)return;
+  const i=+b.dataset.evt,I=evtSync(),t=EVT.tiers[i];
+  if(!I.active||!t||state.evt.pts<t.p||state.evt.claimed.includes(i))return;
+  state.evt.claimed.push(i);const r=t.r;
+  if(r.coins)addCoins(r.coins);
+  if(r.energy){state.energy=Math.min(energyMax()+BAL.energyOverfill+r.energy,state.energy+r.energy);renderHUD()}
+  if(r.jk){state.jk[r.jk]++;renderJokers()}
+  sfx('win');toast(T('Etkinlik ödülü: ','Event reward: ')+rewardTxt(r));trk('evt_claim',{i});
+  evtSig='';renderEvt();saveSoon();
+});
+
 /* yerleşik test reklamı (GPT yoksa) */
 function openTestAd(kind){
   adKind=kind;adDone=false;adStart=Date.now();adLen=Math.min(BAL.adMs,10000);
   showModal('mAd',()=>{
     $('#adTitle').innerHTML='🎬 '+T('Reklam','Ad')+' <span class="adtest">TEST</span>';
     const s=adLen/1000;
-    $('#adText').textContent=kind==='life'?T('Bir can için '+s+' sn izle.','Watch '+s+'s for a life.')
+    $('#adText').textContent=kind==='double'?T('Altını ikiye katlamak için '+s+' sn izle.','Watch '+s+'s to double your coins.')
+      :kind==='kit'?T('Kedi sepetini doldurmak için '+s+' sn izle.','Watch '+s+'s to refill the cat basket.')
+      :kind==='daily'?T('İkinci günlük hediye için '+s+' sn izle.','Watch '+s+'s for a second daily gift.')
+      :kind==='life'?T('Bir can için '+s+' sn izle.','Watch '+s+'s for a life.')
       :kind==='moves'?T('+'+BAL.buyEnergyAmt+' enerji için '+s+' sn izle.','Watch '+s+'s for +'+BAL.buyEnergyAmt+' energy.')
       :T('+'+BAL.adCoins+' 🪙 için '+s+' sn izle.','Watch '+s+'s for +'+BAL.adCoins+' 🪙.');
     $('#adCancel').textContent=T('Vazgeç','Cancel');
@@ -347,7 +472,7 @@ const PACKS={
 };
 let buyKey=null;
 function openBuy(k){
-  const P=PACKS[k];if(!P)return;buyKey=k;
+  const P=PACKS[k];if(!P)return;buyKey=k;trk('iap_open',{k});
   showModal('mBuy',()=>{
     $('#buyTitle').textContent=T(P.n[0],P.n[1]);$('#buyArt').textContent=P.ico;
     $('#buyText').textContent=T(P.d[0],P.d[1]);$('#buyOk').textContent=T('Satın al · '+P.p[0],'Buy · '+P.p[1]);
@@ -374,7 +499,7 @@ function artPreview(k){
 function useArt(k){
   if(!ARTS[k])return;
   if(!state.cos.arts.includes(k)){if(!needCoins(ARTS[k].cost))return;spendCoins(ARTS[k].cost);state.cos.arts.push(k)}
-  state.cos.art=k;sfx('levelup');applyArt();
+  state.cos.art=k;sfx('levelup');applyArt();trk('theme',{k});
   try{applyTheme();renderAll();renderArt();renderJokers();applyNest()}catch(_){}
   renderShop();saveSoon();
 }
@@ -506,7 +631,7 @@ function useBoard(k){
   if(!state.cos.boards.includes(k)){if(!needCoins(BOARDS[k]))return;spendCoins(BOARDS[k]);state.cos.boards.push(k)}
   state.cos.board=k;sfx('levelup');applyBoardSkin();renderShop();saveSoon();
 }
-$('#shopTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;shopTab=b.dataset.tab;sfx('tap');renderShop()});
+$('#shopTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;shopTab=b.dataset.tab;trk('shop_tab',{t:shopTab});sfx('tap');renderShop()});
 $('#shopBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b||b.classList.contains('dis'))return;
   const [a,x]=b.dataset.act.split(':');
@@ -515,7 +640,7 @@ $('#shopBody').addEventListener('click',e=>{
   else if(a==='adcoins'){closeModal('mShop');setTimeout(()=>openAd('coins'),280)}
   else if(a==='adlife'){closeModal('mShop');setTimeout(()=>openAd('life'),280)}
 });
-$('#btnShop').addEventListener('click',()=>{sfx('tap');showModal('mShop',renderShop)});
+$('#btnShop').addEventListener('click',()=>{sfx('tap');trk('shop_open',{});showModal('mShop',renderShop)});
 $('#buyEnergy').addEventListener('click',buyEnergy);
 
 /* ---------- mini oyun: Mektup Yakala ---------- */

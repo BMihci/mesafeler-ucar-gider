@@ -152,7 +152,7 @@ const emoScan=(()=>{
       if(m.type==='characterData'){if(m.target.parentNode)q.add(m.target)}
       else m.addedNodes.forEach(n=>q.add(n));
     }
-    if(!raf)raf=requestAnimationFrame(flush);
+    flush(); /* v16: aynı karede çevir — emoji bir an bile görünmesin */
   });
   function start(){walk(document.body);obs.observe(document.body,{childList:true,subtree:true,characterData:true})}
   return start;
